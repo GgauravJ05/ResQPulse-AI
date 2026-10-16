@@ -17,6 +17,14 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-16 · Data slide with real numbers (PR #10)
+**Who:** Gaurav (ML1) · **Area:** Docs
+- Presentation guide, slide 5 (Data), rewritten with the real figures: about 37,000 real tweets (13 HumAID disasters,
+  26 CrisisLex crises, Kaggle negatives), 710 synthetic reports, 9,551 training rows (7,563 real + 497 unique synthetic x4),
+  107 / 7,755 / 144 held-out rows, the 16% event-label error finding, and a per-type table of real, synthetic and gold counts.
+- `[x]%` is the human-audit agreement, filled in once `data/gold/gold_audit.csv` is scored.
+- Created the `predictions/` folder (git-ignored) where teammates' prediction CSVs go.
+
 ## 2026-10-16 · Evaluation script (PR #9)
 **Who:** Gaurav (ML1) · **Area:** Data, Evaluation
 - `src/eval/metrics.py` (pure metric functions) and `scripts/evaluate.py` score the teammates' prediction CSVs and write
