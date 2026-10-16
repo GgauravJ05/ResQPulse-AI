@@ -36,8 +36,10 @@ except ImportError:  # identical to SCHEMA §9
 LABELS = sorted(LABEL_MAP, key=LABEL_MAP.get)          # index order 0..7
 IDX = list(range(len(LABELS)))
 
-def load(data_dir, name):
+def load(data_dir, name, labelled=True):
     df = pd.read_csv(Path(data_dir) / name, dtype={"id": str}, keep_default_na=False)
+    if not labelled:                      # e.g. gold_inputs.csv: id, text only
+        return df
     unknown = set(df["incident_type"]) - set(LABELS)
     if unknown:
         raise ValueError(f"{name}: labels not in LABEL_MAP: {sorted(unknown)}")
@@ -85,6 +87,9 @@ def main():
     ap.add_argument("--val_file", default="val.csv", help="used only to pick C")
     ap.add_argument("--eval_files", nargs="*", default=["val.csv", "test_public.csv", "test_synth.csv"],
                     help="labelled files to score and write predictions for")
+    ap.add_argument("--predict_only", nargs="*", default=[],
+                    help="unlabelled files (id, text) to write predictions for, e.g. gold_inputs.csv:baseline_gold.csv "
+                         "(optional ':<output name>')")
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -127,6 +132,13 @@ def main():
         pred = probs.argmax(1)
         results[k] = evaluate(k, dfs[k]["y"].to_numpy(), pred)
         write_predictions(dfs[k], probs, out / f"baseline_{k}_predictions.csv")
+    for item in args.predict_only:              # no scoring, no tuning: just apply the model chosen on val
+        name, _, out_name = item.partition(":")
+        df = load(args.data, name, labelled=False)
+        Xp = hstack([word.transform(df["text"]), char.transform(df["text"])]).tocsr()
+        probs = np.zeros((len(df), len(LABELS)))
+        probs[:, clf.classes_] = clf.predict_proba(Xp)
+        write_predictions(df, probs, out / (out_name or f"baseline_{Path(name).stem}_predictions.csv"))
     (out / "baseline_metrics.json").write_text(json.dumps(results, indent=2))
     print(f"wrote {out / 'baseline_metrics.json'}")
 
