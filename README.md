@@ -252,7 +252,22 @@ cp .env.example .env          # then fill in the values
 brew install ffmpeg           # macOS; use apt on Linux
 ```
 
-Run commands for the API and the app are added here once those parts exist.
+### Run the backend
+
+```bash
+# Fake models (no weights needed, good for developing the app):
+USE_FAKE_MODELS=true .venv/bin/python -m uvicorn src.api.main:app --port 8000
+
+# Real models: put the trained folders in models/ (git-ignored, ~1.2 GB in total), set USE_FAKE_MODELS=false in .env
+#   models/classifier/   config.json, model.safetensors, heads.pt, label_map.json, tokenizer files   (ML2, DistilBERT)
+#   models/generator/    config.json, model.safetensors, tokenizer files                              (ML3, Flan-T5)
+.venv/bin/python -m uvicorn src.api.main:app --port 8000
+curl localhost:8000/health       # classifier / generator are true only if the weights actually loaded
+```
+
+The first request after startup takes a few seconds (warm-up); later ones take about 1 to 2 seconds on a laptop CPU.
+If the Flan-T5 model cannot load, extraction falls back to rules (`extractor: "fallback_rules"`) and the API keeps working.
+Tests: `.venv/bin/python -m pytest tests -q`.
 
 ## 12. Team and roles
 

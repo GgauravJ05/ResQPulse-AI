@@ -31,7 +31,8 @@ IncidentType = Literal["FIRE", "FLOOD", "STORM_CYCLONE", "EARTHQUAKE_COLLAPSE",
 
 MAX_LEN = 128                      # SCHEMA §9
 REPO_ROOT = Path(__file__).resolve().parents[2]
-MODEL_DIR = Path(os.environ.get("RESQPULSE_CLASSIFIER_DIR", REPO_ROOT / "models" / "classifier"))
+_raw_dir = os.environ.get("RESQPULSE_CLASSIFIER_DIR") or os.environ.get("CLASSIFIER_DIR") or "models/classifier"
+MODEL_DIR = Path(_raw_dir) if Path(_raw_dir).is_absolute() else REPO_ROOT / _raw_dir
 MODEL_VERSION = "distilbert-v1"
 
 

@@ -47,6 +47,7 @@ alert_store: Dict[str, Alert] = {}
 alert_counter = 1
 counter_lock = threading.Lock()
 models_loaded = {"classifier": False, "generator": False, "asr": False}
+model_versions = {"classifier": "unavailable", "generator": "unavailable", "asr": "unavailable"}
 
 # Model references
 classify_fn = None
@@ -63,19 +64,22 @@ def load_models_once():
         extract_fn = extract
         transcribe_fn = transcribe
         models_loaded = {"classifier": True, "generator": True, "asr": True}
+        model_versions.update({"classifier": "fake-distilbert", "generator": "fake-flan-t5", "asr": "fake-whisper"})
     else:
         # Load real models when ML2/ML3 deliver them
         try:
-            from src.models.classifier import classify as real_classify
-            classify_fn = real_classify
-            models_loaded["classifier"] = True
+            from src.models import classifier as clf_module
+            classify_fn = clf_module.classify
+            models_loaded["classifier"] = clf_module.is_ready()      # weights actually loaded, not just imported
+            model_versions["classifier"] = clf_module.MODEL_VERSION
         except Exception:
             models_loaded["classifier"] = False
 
         try:
-            from src.models.generator import extract as real_extract
-            extract_fn = real_extract
-            models_loaded["generator"] = True
+            from src.models import generator as gen_module
+            extract_fn = gen_module.extract                          # works with the rule-based fallback even if the model failed
+            models_loaded["generator"] = gen_module.is_ready()
+            model_versions["generator"] = gen_module.MODEL_VERSION if gen_module.is_ready() else "fallback_rules"
         except Exception:
             models_loaded["generator"] = False
 
@@ -186,7 +190,7 @@ def analyze_endpoint(payload: AnalyzeRequest):
         return format_error("EMPTY_INPUT", "Report text is empty.", status.HTTP_400_BAD_REQUEST)
     if len(payload.text) > 2000:
         return format_error("TEXT_TOO_LONG", "Text exceeds maximum 2000 characters.", status.HTTP_400_BAD_REQUEST)
-    if not models_loaded["classifier"] or not models_loaded["generator"]:
+    if classify_fn is None or extract_fn is None:
         return format_error("MODEL_NOT_READY", "Inference models are not loaded.", status.HTTP_503_SERVICE_UNAVAILABLE)
 
     # 1. Model inference
@@ -251,11 +255,7 @@ def analyze_endpoint(payload: AnalyzeRequest):
         explanation=AlertExplanation(attention=cls_res.attention),
         duplicate_of=None,
         extractor=ext_res.extractor,
-        model_versions={
-            "classifier": "fake-distilbert" if USE_FAKE_MODELS else "distilbert-v1",
-            "generator": "fake-flan-t5" if USE_FAKE_MODELS else "flan-t5-v1",
-            "asr": "fake-whisper" if USE_FAKE_MODELS else "small.en"
-        },
+        model_versions=dict(model_versions),
         latency_ms=latency_ms
     )
 
