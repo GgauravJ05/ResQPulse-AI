@@ -269,6 +269,16 @@ The first request after startup takes a few seconds (warm-up); later ones take a
 If the Flan-T5 model cannot load, extraction falls back to rules (`extractor: "fallback_rules"`) and the API keeps working.
 Tests: `.venv/bin/python -m pytest tests -q`.
 
+### Run the dashboard
+
+```bash
+.venv/bin/python -m streamlit run app/streamlit_app.py     # opens on http://localhost:8501
+```
+
+It starts in **Live mode** when the backend answers on `API_URL` (default `http://localhost:8000`) and falls back to Mock Mode
+otherwise; the sidebar shows the mode and can switch it. Screens: report input (text, 9 demo samples, microphone or audio file
+with an editable transcript), alert card, attention heatmap, dispatcher dashboard (priority queue and map) and model metrics.
+
 ## 12. Team and roles
 
 | Role | Owns |

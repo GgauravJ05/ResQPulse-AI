@@ -563,7 +563,7 @@ Updated with every merged change. The full history is in [UPDATE.md](UPDATE.md).
 | Flan-T5 generator + fallback | ML3 | ✅ Trained, scored; `src/models/generator.py` (`extract()` + rule fallback + people rule) written and tested; ML3 to review | Weights in `models/generator/`; 1 to 2 s per report on CPU |
 | Whisper ASR | BE2 | ✅ Integrated and verified: 9 s spoken report to text in about 4 s on CPU | Needs ffmpeg and, on Python 3.13+, `audioop-lts`; accuracy not evaluated on a test set |
 | FastAPI backend | BE1 | ✅ API merged; real classifier + generator wired (`USE_FAKE_MODELS=false`), 9 of 9 demo reports correct end to end | Geocoding: offline city table + cache + Nominatim, 7 of 9 demo alerts get a pin; duplicate detection is optional (needs `sentence-transformers`) |
-| Streamlit dashboard | FE | ⏳ Not started | |
+| Streamlit dashboard | FE | ✅ Built and verified against the real backend (5 screens, live and mock modes, heatmap, map, queue, metrics) | Starts in Live mode if the API answers; try the microphone once by hand |
 | Evaluation + metrics.json | ML1 | ✅ Scored on real ML2 + baseline + ML3 predictions; rerun if any file is resent | `reports/results.md`; slide 6 filled in |
 | Slides + backup video | FE + all | ⏳ Not started | |
 
