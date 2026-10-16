@@ -17,6 +17,20 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-16 · Gold set pre-labels and review pipeline (PR #7)
+**Who:** Gaurav (ML1) · **Area:** Data
+- `scripts/sample_gold.py` samples 154 real tweets (22 per mapped type) from `test_public.csv`, the data the models never
+  train on. `data/gold/gold_prelabels.jsonl` holds Claude's pre-labels (type, severity, location, people, injuries,
+  hazards, summary); `scripts/build_gold.py prelabel` merges them into `data/gold/gold_review.csv` for human review
+  (146 rows; 8 Spanish-language tweets dropped). All pre-labelled fields pass the word-for-word check.
+- `docs/GOLD_REVIEW.md` is the reviewer guide; `scripts/build_gold.py finalize` turns the reviewed sheet into
+  `data/gold/gold.csv` in the SCHEMA §2 format.
+- **Finding:** 24 of 146 real tweets (16%) have a different type than the event-based mapping gave them, mostly
+  donations, jokes, commentary and follow-up news (which are `NON_EMERGENCY`), plus a few wind or river posts filed
+  under the wrong disaster. So `test_public` scores are measured against noisy labels; the gold set is the clean benchmark.
+- **Limits to state honestly:** the gold set comes from a handful of events (LAX shooting, West Texas explosion, Spain
+  train crash, typhoon Pablo and others), and there are no real MEDICAL tweets at all.
+
 ## 2026-10-16 · Synthetic round 2, data v2 (PR #6)
 **Who:** Gaurav (ML1) · **Area:** Data
 - **710 validated synthetic reports** (up from 485): MEDICAL 134, VIOLENCE_CRIME 103, TRANSPORT_ACCIDENT 91,
