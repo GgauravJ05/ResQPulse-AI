@@ -12,6 +12,9 @@ from fastapi import FastAPI, UploadFile, File, Query, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.services.geocoding import geocode_location
+from src.services.deduplication import find_duplicate, register_embedding
+
 from src.api.schemas import (
     AnalyzeRequest, PatchAlertRequest, Alert, AlertInput, AlertLocation,
     AlertExplanation, AlertQueueResponse, HealthResponse, ErrorResponse, ErrorDetail
@@ -64,14 +67,14 @@ def load_models_once():
     else:
         # Load real models when ML2/ML3 deliver them
         try:
-            from src.models.classifier import classify as real_classify
+            from src.models.classifier import classify as real_classify #type: ignore
             classify_fn = real_classify
             models_loaded["classifier"] = True
         except Exception:
             models_loaded["classifier"] = False
 
         try:
-            from src.models.generator import extract as real_extract
+            from src.models.generator import extract as real_extract #type: ignore
             extract_fn = real_extract
             models_loaded["generator"] = True
         except Exception:
@@ -149,30 +152,16 @@ async def transcribe_endpoint(file: UploadFile = File(...)):
     if not models_loaded["asr"] or transcribe_fn is None:
         return format_error("MODEL_NOT_READY", "ASR model is not ready.", status.HTTP_503_SERVICE_UNAVAILABLE)
 
-    filename = file.filename or ""
-    allowed_exts = (".wav", ".mp3", ".m4a", ".webm")
-    if not filename.lower().endswith(allowed_exts):
-        return format_error("AUDIO_UNREADABLE", "Unsupported file extension.", status.HTTP_400_BAD_REQUEST)
-
-    with tempfile.NamedTemporaryFile(delete=False, suffix=Path(filename).suffix) as tmp:
-        content = await file.read()
-        if len(content) == 0:
-            return format_error("AUDIO_UNREADABLE", "Empty audio file.", status.HTTP_400_BAD_REQUEST)
-        tmp.write(content)
-        tmp_path = tmp.name
-
+    content = await file.read()
+    if len(content) == 0:
+        return format_error("AUDIO_UNREADABLE", "Empty audio file.", status.HTTP_400_BAD_REQUEST)
+        
     try:
-        res = transcribe_fn(tmp_path)
-        if res.duration_s > 60.0:
-            return format_error("AUDIO_UNREADABLE", "Audio exceeds 60 seconds limit.", status.HTTP_400_BAD_REQUEST)
-        if not res.transcript.strip():
-            return format_error("AUDIO_UNREADABLE", "Audio contains no recognizable speech.", status.HTTP_400_BAD_REQUEST)
+        # Changed this line to use the dynamically loaded transcribe_fn
+        res = transcribe_fn(content)
         return res
     except Exception as e:
         return format_error("AUDIO_UNREADABLE", f"Could not decode audio: {str(e)}", status.HTTP_400_BAD_REQUEST)
-    finally:
-        if os.path.exists(tmp_path):
-            os.remove(tmp_path)
 
 @app.post("/analyze", response_model=Alert)
 def analyze_endpoint(payload: AnalyzeRequest):
@@ -207,6 +196,9 @@ def analyze_endpoint(payload: AnalyzeRequest):
 
     # 3. Geocode
     lat, lon, geocoded = geocode_location(ext_res.location)
+
+   # ---> NEW: Run the deduplication check
+    duplicate_id, new_embedding = find_duplicate(payload.text, alert_store)
 
     # 4. Construct Alert
     global alert_counter
@@ -243,7 +235,10 @@ def analyze_endpoint(payload: AnalyzeRequest):
         responders=responders,
         sdg_targets=sdg_targets,
         explanation=AlertExplanation(attention=cls_res.attention),
-        duplicate_of=None,
+        
+        # ---> NEW: Pass the found duplicate ID here
+        duplicate_of=duplicate_id, 
+        
         extractor=ext_res.extractor,
         model_versions={
             "classifier": "fake-distilbert" if USE_FAKE_MODELS else "distilbert-v1",
@@ -255,6 +250,9 @@ def analyze_endpoint(payload: AnalyzeRequest):
 
     # In-memory store
     alert_store[alert_id] = alert
+    
+    # ---> NEW: Save the embedding for future comparisons
+    register_embedding(alert_id, new_embedding)
 
     # Append to reports/alerts.jsonl
     with open(ALERTS_LOG, "a", encoding="utf-8") as f:

@@ -16,6 +16,7 @@ pydub>=0.25
 # Validation, geocoding
 pydantic>=2.6
 geopy>=2.4
+rapidfuzz
 
 # Evaluation
 jiwer>=3.0
