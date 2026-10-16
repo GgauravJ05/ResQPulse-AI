@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Secrets
+.env
+kaggle.json
+
+# Data: raw and generated files stay local / on Kaggle (only small gold + samples are committed)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Voice recordings of teammates are personal data: never commit them
+data/audio/*
+!data/audio/.gitkeep
+
+# Model weights (download from Kaggle outputs instead)
+models/*
+!models/.gitkeep
+*.pt
+*.bin
+*.safetensors
+*.ckpt
+
+# Caches
+.cache/
+geocode_cache.json
+wandb/
+
+# OS / editors
+.DS_Store
+.vscode/
+.idea/
