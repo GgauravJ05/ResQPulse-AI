@@ -2,20 +2,20 @@
 
 Public training rows are capped at 1200 per incident type; synthetic training rows are repeated 4x in `train.csv` (the unrepeated rows are in `train_flan.csv`).
 
-## train (8,919 rows)
+## train (9,551 rows)
 
 By incident type:
 
 | incident_type       |   count |
 |:--------------------|--------:|
-| FIRE                |    1412 |
-| TRANSPORT_ACCIDENT  |    1408 |
-| NON_EMERGENCY       |    1392 |
-| FLOOD               |    1320 |
-| EARTHQUAKE_COLLAPSE |    1304 |
-| STORM_CYCLONE       |    1304 |
-| VIOLENCE_CRIME      |     571 |
-| MEDICAL             |     208 |
+| TRANSPORT_ACCIDENT  |    1456 |
+| NON_EMERGENCY       |    1444 |
+| FIRE                |    1444 |
+| FLOOD               |    1404 |
+| STORM_CYCLONE       |    1388 |
+| EARTHQUAKE_COLLAPSE |    1388 |
+| VIOLENCE_CRIME      |     651 |
+| MEDICAL             |     376 |
 
 By data source:
 
@@ -23,23 +23,23 @@ By data source:
 |:----------------|--------:|
 | crisislex       |    4731 |
 | humaid          |    2125 |
-| synthetic       |    1356 |
+| synthetic       |    1988 |
 | kaggle_disaster |     707 |
 
-## val (3,543 rows)
+## val (3,576 rows)
 
 By incident type:
 
 | incident_type       |   count |
 |:--------------------|--------:|
-| STORM_CYCLONE       |    1295 |
-| NON_EMERGENCY       |     834 |
-| EARTHQUAKE_COLLAPSE |     508 |
-| FIRE                |     343 |
-| FLOOD               |     341 |
-| TRANSPORT_ACCIDENT  |     161 |
-| VIOLENCE_CRIME      |      50 |
-| MEDICAL             |      11 |
+| STORM_CYCLONE       |    1300 |
+| NON_EMERGENCY       |     837 |
+| EARTHQUAKE_COLLAPSE |     512 |
+| FLOOD               |     346 |
+| FIRE                |     345 |
+| TRANSPORT_ACCIDENT  |     162 |
+| VIOLENCE_CRIME      |      54 |
+| MEDICAL             |      20 |
 
 By data source:
 
@@ -48,28 +48,28 @@ By data source:
 | humaid          |    1682 |
 | crisislex       |    1170 |
 | kaggle_disaster |     618 |
-| synthetic       |      73 |
+| synthetic       |     106 |
 
-## test_synth (73 rows)
+## test_synth (107 rows)
 
 By incident type:
 
 | incident_type       |   count |
 |:--------------------|--------:|
-| NON_EMERGENCY       |      11 |
-| TRANSPORT_ACCIDENT  |      11 |
-| FIRE                |      11 |
-| VIOLENCE_CRIME      |      11 |
-| MEDICAL             |      11 |
-| FLOOD               |       7 |
-| STORM_CYCLONE       |       6 |
-| EARTHQUAKE_COLLAPSE |       5 |
+| MEDICAL             |      20 |
+| VIOLENCE_CRIME      |      16 |
+| TRANSPORT_ACCIDENT  |      14 |
+| NON_EMERGENCY       |      13 |
+| FIRE                |      13 |
+| FLOOD               |      11 |
+| EARTHQUAKE_COLLAPSE |      10 |
+| STORM_CYCLONE       |      10 |
 
 By data source:
 
 | data_source   |   count |
 |:--------------|--------:|
-| synthetic     |      73 |
+| synthetic     |     107 |
 
 ## test_public (7,755 rows)
 

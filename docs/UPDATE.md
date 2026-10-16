@@ -17,6 +17,20 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-16 · Synthetic round 2, data v2 (PR #6)
+**Who:** Gaurav (ML1) · **Area:** Data
+- **710 validated synthetic reports** (up from 485): MEDICAL 134, VIOLENCE_CRIME 103, TRANSPORT_ACCIDENT 91,
+  FIRE 88, NON_EMERGENCY 87, FLOOD 73, STORM_CYCLONE 67, EARTHQUAKE_COLLAPSE 67. Round 2 targeted the gaps:
+  MEDICAL (+60), the three disaster types (+30 each) and VIOLENCE/TRANSPORT/FIRE/NON_EMERGENCY (+16 to +25),
+  written longer (mean 26.9 words, up from 21) with more detail, plus more hard negatives (mock drills,
+  film shoots with toy guns, lonely callers, lost phones).
+- Validator minimum length lowered from 8 to 5 words so short vague reports are kept. 711 in, 710 kept, 2 hazard
+  items auto-removed.
+- v2 splits: `train.csv` 9,551 rows, `val.csv` 3,576, `test_synth.csv` 107 (8 to 20 per class, up from 73),
+  `test_public.csv` 7,755, `train_flan.csv` 497, `val_flan.csv` 106, `test_flan.csv` 107.
+- Still small: per-class counts in `test_synth` are 10 to 20, so per-class synthetic scores stay rough;
+  the real-text test (`test_public`) and the gold set carry the credible numbers.
+
 ## 2026-10-16 · Synthetic reports and final splits, v1 (PR #5)
 **Who:** Gaurav (ML1) · **Area:** Data
 - **485 synthetic call-style reports** written directly by Claude in a Claude Code session (no API key), covering
