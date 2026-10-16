@@ -557,7 +557,7 @@ Updated with every merged change. The full history is in [UPDATE.md](UPDATE.md).
 | Repo, docs, schema v1 | – | ✅ Done | README, this brief, [SCHEMA.md](SCHEMA.md), [DATASETS.md](DATASETS.md) |
 | Datasets downloaded + mapped | ML1 | ✅ Done (v0) | 37k rows in `data/processed/public_*.csv`; no MEDICAL, few VIOLENCE_CRIME rows yet |
 | Synthetic reports (Claude) | ML1 | ✅ v2 done (710) | All 8 types, 67 to 134 each; test_synth is 107 rows |
-| Gold test set | ML1 + BE2 | ⏳ Not started | |
+| Gold test set | ML1 + BE2 | 🔶 Pre-labelled (146 rows), human review pending | See GOLD_REVIEW.md; 16% of event-mapped types were wrong |
 | Baseline (TF-IDF + LR) | ML2 | ⏳ Not started | |
 | DistilBERT classifier + attention | ML2 | ⏳ Not started | |
 | Flan-T5 generator + fallback | ML3 | ⏳ Not started | |
