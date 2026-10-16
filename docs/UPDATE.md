@@ -17,6 +17,20 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-16 · ML3 Flan-T5 training notebook added (ML3, reviewed by Gaurav)
+**Who:** rugvedas (ML3), committed and reviewed by Gaurav · **Area:** Generator
+- `notebooks/flan-t5-train.ipynb`: Kaggle notebook that fine-tunes `google/flan-t5-base` and produces `ml3_test_flan.csv` and
+  `ml3_gold.csv`. Scanned for secrets (none) before committing.
+- Review: trains only on `train_flan.csv`, validates on `val_flan.csv` (best checkpoint by validation loss), uses `test_flan.csv`
+  and `gold_inputs.csv` only for predictions; fp32, seed 42, lr 1e-4, 5 epochs, batch 4 x accumulation 4, beam search 4. The model
+  is saved (`model.safetensors` 944 MB; `generator_model.zip` 877 MB on the notebook's Output tab).
+- To state honestly: (1) one gold prediction (`kaggle_disaster-996`) had a truncated output and was repaired by hand with a
+  hard-coded id (the tweet text copied into the summary), so the raw model parsed 143 of 144 gold rows (99.3%), not 100%;
+  `extract()` should use the fallback extractor for this case instead. (2) The people-count rule was written and checked on
+  `val_flan.csv` (no change there) but not applied to the CSVs. On gold it would raise people exact match from 0.285 to 0.500
+  and lower the synthetic test from 0.607 to 0.598; it needs a resend of both CSVs if adopted.
+- Still missing: `src/models/generator.py` (`extract()` plus the fallback extractor) in the repo.
+
 ## 2026-10-16 · Backend API with fake models (BE1, reviewed and merged by Gaurav)
 **Who:** Aaryan0802 (BE1), review and fixes by Gaurav · **Area:** API
 - BE1's FastAPI app (`src/api/main.py`, `schemas.py`), fake models (`src/models/fake.py`), geocoding with a Nominatim lookup and a
