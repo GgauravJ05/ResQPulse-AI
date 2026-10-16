@@ -556,7 +556,7 @@ Updated with every merged change. The full history is in [UPDATE.md](UPDATE.md).
 |---|---|---|---|
 | Repo, docs, schema v1 | – | ✅ Done | README, this brief, [SCHEMA.md](SCHEMA.md), [DATASETS.md](DATASETS.md) |
 | Datasets downloaded + mapped | ML1 | ✅ Done (v0) | 37k rows in `data/processed/public_*.csv`; no MEDICAL, few VIOLENCE_CRIME rows yet |
-| Synthetic reports (Claude) | ML1 | ⏳ Not started | |
+| Synthetic reports (Claude) | ML1 | 🔶 v1 done (485 of ~1,200) | All 8 types; second round needed for bigger val/test sets |
 | Gold test set | ML1 + BE2 | ⏳ Not started | |
 | Baseline (TF-IDF + LR) | ML2 | ⏳ Not started | |
 | DistilBERT classifier + attention | ML2 | ⏳ Not started | |
@@ -576,6 +576,8 @@ Updated with every merged change. The full history is in [UPDATE.md](UPDATE.md).
 | 2026-10-16 | Claude chosen for synthetic data | Structured outputs guarantee valid labelled JSON for every report |
 | 2026-10-16 | CrisisLexT26 split by crisis, not held out entirely | It holds the only real transport-accident and violence examples; 6 crises stay unseen as a generalisation test |
 | 2026-10-16 | Speech-transcript augmentation cut; typo/lowercase noise instead | Only about 8 hours between starting and presenting |
+| 2026-10-16 | Synthetic reports written directly by Claude in a Claude Code session, not through the API | No API key available; chat-session writing with a validator gives the same labelled data |
+| 2026-10-16 | Public training rows capped at 1,200 per type; synthetic train rows repeated 4x | Keeps the call-style reports from being drowned out by 7,500 real tweets |
 
 ---
 
