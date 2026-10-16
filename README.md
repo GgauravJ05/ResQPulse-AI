@@ -189,6 +189,15 @@ Results are filled in after training.
 We emphasise **recall on critical incidents**, because missing a real emergency is worse than a false alarm.
 Confusion matrices and error analysis go in `reports/`.
 
+**All numbers come from one script**, so every model is scored the same way and the models never see the test labels:
+
+```bash
+# teammates' prediction CSVs go in predictions/ (formats: docs/SCHEMA.md §8.1)
+.venv/bin/python scripts/evaluate.py          # writes reports/metrics.json, results.md, error_analysis.md, confusion matrices
+.venv/bin/python tests/test_metrics.py        # metric unit tests (hand-computed values)
+.venv/bin/python scripts/make_fake_predictions.py --out /tmp/fake   # fake files to try the pipeline; numbers are meaningless
+```
+
 ## 9. SDG alignment
 
 | SDG target | How ResQPulse supports it |
