@@ -1,0 +1,194 @@
+{
+  "n_clips": 20,
+  "wer_clean": 0.099,
+  "wer_noisy": 0.1548,
+  "voices": [
+    "Daniel",
+    "Aman (English (India))",
+    "Samantha",
+    "Eddy (English (UK))"
+  ],
+  "note": "text-to-speech audio, not human speech",
+  "clips": [
+    {
+      "id": "synthetic-000597",
+      "voice": "Daniel",
+      "reference": "waves broke the wall of the fish market at Mangalore Bengre beach, many stalls are floating, the sea is rough and some fishermen's families are living in tents on the shore, I think they must be moved now before the high tide at 9",
+      "clean_hyp": "Waves broke the wall of the fish market at Mangalore-Benga Beach. Menastols are floating. The sea is rough and some fishermen's families are living in tents on the shore. I think they must be moved now before the high tide at 9.",
+      "clean_wer": 0.068,
+      "noisy_hyp": "Waves broke the wall of the fish market at Mango or Benga Beach. Menastols are floating. The sea is rough and some fishermen's families are living in tents on the shore. I think they must be moved now before the high tide at 9.",
+      "noisy_wer": 0.114
+    },
+    {
+      "id": "synthetic-000346",
+      "voice": "Aman (English (India))",
+      "reference": "boat capsized in flood water near Hajipur, 6 people in water holding on to a tree",
+      "clean_hyp": "boat capsized in flood water near Hajipur, six people in water holding onto a tree.",
+      "clean_wer": 0.188,
+      "noisy_hyp": "boat capsized in flood water near Hajipur, six people in water holding onto a tree.",
+      "noisy_wer": 0.188
+    },
+    {
+      "id": "synthetic-000352",
+      "voice": "Samantha",
+      "reference": "Tree branches fell on the compound wall during the storm in Aundh and the street light pole is bent, no one hurt",
+      "clean_hyp": "Tree branches fell on the compound wall during the storm in Andh and the street light pole is bent, no one heard.",
+      "clean_wer": 0.091,
+      "noisy_hyp": "Three branches fell on the compound wall during the storm and on the street like coal is bent, no one heard.",
+      "noisy_wer": 0.318
+    },
+    {
+      "id": "synthetic-000040",
+      "voice": "Eddy (English (UK))",
+      "reference": "Labourer collapsed in the sun at the Sitabuldi market, skin is very hot and he is not responding properly",
+      "clean_hyp": "The laborer collapsed in the sun at the Cittabaldi Market. Skin is very hot and he is not responding properly.",
+      "clean_wer": 0.158,
+      "noisy_hyp": "The laborer collapsed in the sun at the seat of Aldi Market, skin is very hot and he is not responding properly.",
+      "noisy_wer": 0.263
+    },
+    {
+      "id": "synthetic-000348",
+      "voice": "Daniel",
+      "reference": "My ground floor flat in Salt Lake sector 5 is under 2 feet water and my medicine is floating, I have sugar and need insulin urgently",
+      "clean_hyp": "My ground floor flat in Salt Lake sector 5 is under 2 feet water and my medicine is floating. I have sugar and need insulin urgently.",
+      "clean_wer": 0.0,
+      "noisy_hyp": "My ground floor flat in Salt Lake sector 5 is under 2 feet water and my medicine is floating. I have sugar and needon seal in urgently.",
+      "noisy_wer": 0.115
+    },
+    {
+      "id": "synthetic-000431",
+      "voice": "Aman (English (India))",
+      "reference": "Is there any helpline for lost pets, my cat has been missing since yesterday from our society in Baner",
+      "clean_hyp": "Is there any helpline for lost pets, my cat has been missing since yesterday from our society in Banae.",
+      "clean_wer": 0.053,
+      "noisy_hyp": "Is there any helpline for lost pets? My cat has been missing since yesterday from our society in Bane.",
+      "noisy_wer": 0.053
+    },
+    {
+      "id": "synthetic-000466",
+      "voice": "Samantha",
+      "reference": "I am so angry at my landlord in Gurgaon Sector 14 for not returning the deposit, can the police force him to pay",
+      "clean_hyp": "I am so angry at my landlord in Gurgaon Sector 14 for not returning the deposit, can the police force him to pay?",
+      "clean_wer": 0.0,
+      "noisy_hyp": "I am so angry at my landlord in Gurgaon sector 14 for not returning the deposit, can the police force him to pay?",
+      "noisy_wer": 0.0
+    },
+    {
+      "id": "synthetic-000227",
+      "voice": "Eddy (English (UK))",
+      "reference": "Looks like a robbery, three men ran out of the jeweller's shop at Zaveri Bazaar carrying bags, the shutter is half down and the owner is shouting",
+      "clean_hyp": "Looks like a robbery. Three men ran out of the two in the shop at the very bazaar carrying bags. The shutter is off down and the owner is shouting.",
+      "clean_wer": 0.222,
+      "noisy_hyp": "Looks like a robbery, three men ran out of the two in the shoppers of every bazaar carrying bags, the shelter is half down and the owner is shouting.",
+      "noisy_wer": 0.259
+    },
+    {
+      "id": "synthetic-000078",
+      "voice": "Daniel",
+      "reference": "My throat is paining a bit and I have mild fever, should I go to hospital or wait till morning",
+      "clean_hyp": "My throat is paining a bit and I have mild fever, should I go to hospital or wait till morning?",
+      "clean_wer": 0.0,
+      "noisy_hyp": "My throat is paining a bit and I have mild fever, should I go to hospital or wait till morning?",
+      "noisy_wer": 0.0
+    },
+    {
+      "id": "synthetic-000056",
+      "voice": "Aman (English (India))",
+      "reference": "someone is not feeling well in the bus, please send somebody",
+      "clean_hyp": "Someone is not feeling well in the bus please send somebody",
+      "clean_wer": 0.0,
+      "noisy_hyp": "Someone is not feeling well in the bus, please send somebody",
+      "noisy_wer": 0.0
+    },
+    {
+      "id": "synthetic-000235",
+      "voice": "Samantha",
+      "reference": "i heard gunshot sounds from somewhere",
+      "clean_hyp": "I heard gunshot sounds from somewhere.",
+      "clean_wer": 0.0,
+      "noisy_hyp": "I heard gunshot sounds from somewhere.",
+      "noisy_wer": 0.0
+    },
+    {
+      "id": "synthetic-000157",
+      "voice": "Eddy (English (UK))",
+      "reference": "Two-wheeler collision, pillion female thrown onto road at Boring Road Patna, suspected head injury, helmet absent",
+      "clean_hyp": "2-wheeler collision, billion female thrown on the road at Boring Road Panda, suspected head injury, helmet absent.",
+      "clean_wer": 0.294,
+      "noisy_hyp": "through wheeler collision, billion female thrown off the road at boring road padna, suspected head injury, helmet absent.",
+      "noisy_wer": 0.294
+    },
+    {
+      "id": "synthetic-000514",
+      "voice": "Daniel",
+      "reference": "my friend is lying on the floor and not talking",
+      "clean_hyp": "My friend is lying on the floor and not talking.",
+      "clean_wer": 0.0,
+      "noisy_hyp": "My friend is lying on the floor and not talking.",
+      "noisy_wer": 0.0
+    },
+    {
+      "id": "synthetic-000692",
+      "voice": "Aman (English (India))",
+      "reference": "What is the number of the fire station near Kothrud Paud road, I want to save it in my phone because my building has an old wiring and I keep getting worried when the lights flicker, there is no fire now, just in case",
+      "clean_hyp": "What is the number of the fire station near Kothrut pod road, I want to save it in my phone because my building has an old wiring and I keep getting worried when the lights flicker, there is no fire now, just in case.",
+      "clean_wer": 0.045,
+      "noisy_hyp": "What is the number of the fire station near Kothrud Pod Road? I want to save it in my phone because my building has an old wiring and I keep getting worried when the lights flicker. There is no fire now, just in case.",
+      "noisy_wer": 0.023
+    },
+    {
+      "id": "synthetic-000011",
+      "voice": "Samantha",
+      "reference": "Strong tremors felt in Bhuj, wall of a old house near Hamirsar lake cracked and fell, one man has a leg injury",
+      "clean_hyp": "Strong tremors felt in vodge, while of an old house near Hammerser Lake cracked and fell, one man has a leg injury.",
+      "clean_wer": 0.182,
+      "noisy_hyp": "strong tremors felt in vodge wall of an old house near hammers are late cracked and fell one man has a leg injury",
+      "noisy_wer": 0.227
+    },
+    {
+      "id": "synthetic-000103",
+      "voice": "Eddy (English (UK))",
+      "reference": "auto overturned near bandra reclamation, 3 passengers inside, 1 bleeding. pls send help",
+      "clean_hyp": "Auto-overturn near Banter reclamation, three passengers inside, one bleeding. PLS send help.",
+      "clean_wer": 0.308,
+      "noisy_hyp": "Auto overturn their planned reclamation, three passengers inside, one cleaning, PLS send help.",
+      "noisy_wer": 0.462
+    },
+    {
+      "id": "synthetic-000377",
+      "voice": "Daniel",
+      "reference": "very strong wind and rain, I am scared",
+      "clean_hyp": "Very strong wind and rain. I am scared.",
+      "clean_wer": 0.0,
+      "noisy_hyp": "very strong wind and rain. I am scared.",
+      "noisy_wer": 0.0
+    },
+    {
+      "id": "synthetic-000384",
+      "voice": "Aman (English (India))",
+      "reference": "cyclone damage, please send relief",
+      "clean_hyp": "cyclone damage, fleece send relief",
+      "clean_wer": 0.2,
+      "noisy_hyp": "cyclone damage, please send relief.",
+      "noisy_wer": 0.0
+    },
+    {
+      "id": "synthetic-000337",
+      "voice": "Samantha",
+      "reference": "Pls help my parents are at home in Muzaffarpur near Juran Chhapra and water is at the windows now, phone battery is 5 percent, they are alone",
+      "clean_hyp": "PLS help my parents are at home in Musa Farper near Duran Chapa and water is at the windows now phone battery is five percent They are alone",
+      "clean_wer": 0.185,
+      "noisy_hyp": "TLS health my parents are at home in Musafarper near Duran Chapra and water is at the windows now phone battery is five percent They are alone",
+      "noisy_wer": 0.222
+    },
+    {
+      "id": "synthetic-000168",
+      "voice": "Eddy (English (UK))",
+      "reference": "Heard a loud crash on the highway at night, no idea what happened, near Kasara",
+      "clean_hyp": "Heard a loud crash on the highway at night, no idea what happened near Kasara.",
+      "clean_wer": 0.0,
+      "noisy_hyp": "I heard a loud crash of the highway at night, but I didn't know what happened near Casara.",
+      "noisy_wer": 0.467
+    }
+  ]
+}

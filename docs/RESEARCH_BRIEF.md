@@ -700,8 +700,13 @@ real pipeline that runs in the demo (`extract()`: generation, retry, rule fallba
 - *Severity shrinks toward the middle on tweets:* reports we labelled 5.0 average 3.7, labelled 1.0 average 1.8. The severity
   head was trained only on call-style reports, so it generalises only partly to news-style tweets.
 
-**Say plainly what we did not measure:** speech recognition (Whisper) accuracy and typed-versus-spoken results were not
-evaluated; we have no voice test set. Do not show a voice row.
+**Voice (Whisper) check, small and synthetic:** we have no recordings of real people, so we measured 20 held-out call-style
+reports spoken by 4 text-to-speech voices (US, UK and Indian English), clean and then degraded to phone quality with noise
+(`scripts/eval_whisper.py`, `reports/whisper_wer.json`). Word error rate: **9.9% clean, 15.5% noisy.** Most errors are place
+names and digits ("Casara" for Kasara, "cleaning" for bleeding). The incident type from the spoken report matched the type from
+the typed text in **18 of 20 (clean) and 16 of 20 (noisy)**, and was correct against the label 17 of 20 for both (19 of 20 from
+typed text). Say plainly: this is synthetic speech and 20 clips, not human callers, so it is a rough guide, and it is why the
+dispatcher can correct the transcript before the alert is made. Real caller audio was not evaluated.
 
 Show `reports/confusion_matrix_gold_ml2.png` next to the table.
 

@@ -17,6 +17,11 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · Whisper word error rate and ensemble test (PR #25)
+**Who:** Data lead · **Area:** ASR, Docs
+- Added `scripts/eval_whisper.py` and `reports/whisper_wer.json`: 20 held-out reports spoken by 4 TTS voices, clean and phone-noisy. WER 9.9% clean, 15.5% noisy; type matches the typed result 18/20 and 16/20. Synthetic speech, disclosed in the brief.
+- Tested averaging DistilBERT with the TF-IDF baseline on all three test sets: no gain (gold macro F1 stays 0.765 or drops), so it was not added.
+
 ## 2026-10-17 · Frontend visual redesign (PR #24)
 **Who:** Data lead (with the Impeccable design skill) · **Area:** UI
 - New look: warm paper background, navy masthead with a drawn pulse mark, Newsreader serif for titles and numbers, Hanken Grotesk for text, red kept for critical only. Added `.streamlit/config.toml` (theme).
