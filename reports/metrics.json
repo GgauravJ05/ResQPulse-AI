@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-16T23:23:47+05:30",
+  "generated_at": "2026-10-17T00:24:50+05:30",
   "eval_sets": {
     "test_synth": {
       "n": 107
@@ -983,7 +983,7 @@
         "n": 107,
         "location_exact": 0.6355140186915887,
         "location_token_f1": 0.7789171887302729,
-        "people_exact_match": 0.6074766355140186,
+        "people_exact_match": 0.5981308411214953,
         "injuries": {
           "precision": 0.5466666666666666,
           "recall": 0.5256410256410257,
@@ -1021,9 +1021,9 @@
       },
       "gold": {
         "n": 144,
-        "location_exact": 0.4097222222222222,
-        "location_token_f1": 0.4901104931742187,
-        "people_exact_match": 0.2847222222222222,
+        "location_exact": 0.4166666666666667,
+        "location_token_f1": 0.49705493761866315,
+        "people_exact_match": 0.5,
         "injuries": {
           "precision": 0.16666666666666666,
           "recall": 0.17073170731707318,
@@ -1056,7 +1056,7 @@
           "fp": 34,
           "fn": 48
         },
-        "summary_rougeL": 0.42912320658770053,
+        "summary_rougeL": 0.42756984401460113,
         "parse_rate": 1.0
       }
     }

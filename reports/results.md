@@ -25,8 +25,8 @@ Test sets: `test_synth` = call-style synthetic reports; `test_public` = real twe
 
 | Test set | n | Parse rate | Location F1 | Location exact | People exact | Injuries F1 (strict / lenient) | Hazards F1 (strict / lenient) | ROUGE-L |
 |---|---|---|---|---|---|---|---|---|
-| test_synth | 107 | 1.000 | 0.779 | 0.636 | 0.607 | 0.536 / 0.641 | 0.384 / 0.588 | 0.502 |
-| gold | 144 | 1.000 | 0.490 | 0.410 | 0.285 | 0.169 / 0.386 | 0.276 / 0.461 | 0.429 |
+| test_synth | 107 | 1.000 | 0.779 | 0.636 | 0.598 | 0.536 / 0.641 | 0.384 / 0.588 | 0.502 |
+| gold | 144 | 1.000 | 0.497 | 0.417 | 0.500 | 0.169 / 0.386 | 0.276 / 0.461 | 0.428 |
 
 ## test_public accuracy by data source
 

@@ -17,6 +17,69 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · Real models wired into the API, BE2 services integrated (Gaurav, with ML2, ML3, BE2)
+**Who:** Gaurav (integration and fixes); code by ML2 (classifier), ML3 (model), BE2 (Whisper, geocoding, dedupe) · **Area:** API, ML
+- **Real models in the backend.** ML2's `classify()` (merged from `feat/classifier`; attention rollout) and a new
+  `src/models/generator.py` (`extract()`: Flan-T5 loaded once, retry with a wider beam, rule-based fallback that works offline,
+  ML3's people-count rule). `USE_FAKE_MODELS=false` runs them; `/health` now reports a model as loaded only if its weights
+  loaded. Weights live in `models/classifier/` and `models/generator/` (git-ignored). Verified: the classifier reproduces ML2's
+  CSV on 50 of 50 sampled rows (CPU 10 to 25 ms); the generator reproduces ML3's CSV exactly and takes 1 to 2.5 s per report.
+  The 9 demo reports are classified correctly end to end (first request after startup takes about 6 s, warm it up before the demo).
+- **BE2's `BE2_Tasks` branch was not mergeable as submitted**: `main.py` imported `geocode_location` but the module defined
+  `get_coordinates` (ImportError on startup), `whisper.py` imported a `TranscribeResult` that did not exist and exposed no
+  `transcribe()`, and the dedupe module loaded a model at import and needed an uninstalled package. Fixed while integrating:
+  name alias, `TranscribeResult` added to `schemas.py`, `transcribe` alias, dedupe made lazy and optional (the API degrades to
+  `duplicate_of: null` if `sentence-transformers` is missing), the extension/empty-speech checks BE2 removed from `/transcribe`
+  restored, `rapidfuzz` added.
+- **Two bugs found only by running it.** (1) `pydub` fails on Python 3.13 and newer (`audioop` was removed from the standard
+  library): `audioop-lts` added to requirements. (2) The geocoder's fuzzy match put "Barrackpore Kalyani expressway" (West Bengal)
+  at Lonavala; it now matches only whole known place names (longest wins) and uses fuzzy matching only for typos. Offline city
+  table grown to about 55 names; 7 of 9 demo alerts now get a correct pin.
+- **Whisper verified**: a spoken demo report (9 s) transcribed in about 4 s on CPU, 79% confidence, one misheard word
+  ("Lenavala"), which shows why the transcript box is editable. Whisper accuracy was not evaluated on a test set.
+- **Evaluation now uses the real pipeline.** `scripts/predict_generator.py` regenerates the ML3 prediction files through
+  `extract()`. Gold people-count exact match 0.285 to 0.500; 143 of 144 gold outputs come from the model and 1 from the fallback
+  (replacing ML3's hand repair); synthetic scores unchanged. ML3's original CSVs were kept as a backup. Slide 6 updated.
+- 34 tests pass (`pytest tests`).
+
+## 2026-10-16 · Incident classifier: baseline, DistilBERT two-head, classify() (PR #7)
+**Who:** Vansh · **Area:** Classifier
+- `scripts/baseline_tfidf_lr.py`: TF-IDF (word 1–2-grams + char 2–5-grams) + Logistic Regression. C picked on
+  `val.csv` macro-F1 only (C = 8). `--predict_only` writes predictions for unlabelled files
+  (`gold_inputs.csv` → `baseline_gold.csv`).
+- `src/models/two_head.py` + `scripts/train_classifier.py`: `distilbert-base-uncased` with a type head
+  (8-way, cross-entropy) and a severity head (sigmoid, MSE on severity scaled to 0–1, back to 1–5 for output).
+  Severity loss is masked for rows without severity and divided by max(count, 1), so real tweets only train
+  the type head. Settings as agreed: lr 2e-5, batch 32, max_len 128, 3 epochs, fp16, seed 42, Kaggle T4.
+  The **last** epoch is kept (not chosen on val, because val shares events with train).
+  `NON_EMERGENCY` severity is forced to 1.0 (SCHEMA §1.2). Model folder = HF encoder + tokenizer + `heads.pt`
+  + `label_map.json` (SCHEMA §9 order), saved as Kaggle notebook output (`classifier_run/model/`), not in git.
+- `src/models/classifier.py`: `classify(text) -> ClassifyResult` (SCHEMA §5). Model loaded once at import from
+  `models/classifier/` (override with env `RESQPULSE_CLASSIFIER_DIR`). `is_ready()` for `/health`;
+  `classify()` raises `ModelNotReady` if loading failed (→ `MODEL_NOT_READY`, 503) and `ValueError("EMPTY_INPUT")`
+  for blank text. Attention heatmap = attention rollout over all 6 layers (heads averaged, residual added),
+  [CLS]/[SEP] dropped, word pieces merged into words (max), punctuation-only tokens skipped, max score = 1.
+- Trained on data v2 (Kaggle dataset version 4): `train.csv` 9,551 rows, 1,988 with severity.
+- **Results (own sanity check; official numbers come from ML1's scoring of the prediction CSVs).**
+  Macro-F1 over the classes present in each set:
+
+  | Set | TF-IDF + LR | DistilBERT |
+  |---|---|---|
+  | `val.csv` | 0.921 | 0.910 |
+  | `test_public.csv` (7 classes, held-out events) | 0.625 | **0.746** |
+  | `test_synth.csv` (8 classes) | 0.869 | **0.957** |
+
+  Severity MAE on `test_synth`: 0.51. On `test_public`, VIOLENCE_CRIME F1 rose from 0.29 to 0.79 and
+  NON_EMERGENCY precision from 0.44 to 0.61. Both models score about the same on `val`, which shares events
+  with train, so the gain shows up on unseen events.
+- **Known weaknesses:** TRANSPORT_ACCIDENT recall on `test_public` is about 0.45 for both models. A few real
+  tweets are predicted MEDICAL (a class with no real rows), so a macro over all 8 classes on `test_public`
+  shows 0.653. Severity is learned only from synthetic text, so severity on real tweets is a rough estimate.
+- **Nothing was tuned on test or gold.** Prediction CSVs sent to ML1 for `val`, `test_public`, `test_synth`
+  and `gold_inputs` (DistilBERT), plus the baseline for the same sets and `baseline_gold.csv`.
+- Follow-ups: BE1 copies the model folder to `models/classifier/` (or sets `RESQPULSE_CLASSIFIER_DIR`).
+  `ClassifyResult` is defined in `classifier.py`; move it to a shared schemas module if the API has one.
+
 ## 2026-10-16 · ML3 Flan-T5 training notebook added (ML3, reviewed by Gaurav)
 **Who:** rugvedas (ML3), committed and reviewed by Gaurav · **Area:** Generator
 - `notebooks/flan-t5-train.ipynb`: Kaggle notebook that fine-tunes `google/flan-t5-base` and produces `ml3_test_flan.csv` and

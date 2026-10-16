@@ -555,14 +555,14 @@ Updated with every merged change. The full history is in [UPDATE.md](UPDATE.md).
 | Part | Owner | Status | Notes |
 |---|---|---|---|
 | Repo, docs, schema v1 | – | ✅ Done | README, this brief, [SCHEMA.md](SCHEMA.md), [DATASETS.md](DATASETS.md) |
-| Datasets downloaded + mapped | ML1 | ✅ Done (v0) | 37k rows in `data/processed/public_*.csv`; no MEDICAL, few VIOLENCE_CRIME rows yet |
+| Datasets downloaded + mapped | ML1 | ✅ Done | ~37k real rows; no real MEDICAL, 363 real VIOLENCE_CRIME |
 | Synthetic reports (Claude) | ML1 | ✅ v2 done (710) | All 8 types, 67 to 134 each; test_synth is 107 rows |
-| Gold test set | ML1 | ✅ 144 rows (Claude labels + second pass); 30-row human audit pending | See GOLD_REVIEW.md; 16% of event-mapped types were wrong |
-| Baseline (TF-IDF + LR) | ML2 | ⏳ Not started | |
-| DistilBERT classifier + attention | ML2 | ⏳ Not started | |
-| Flan-T5 generator + fallback | ML3 | 🔶 Trained and scored; model zip (877 MB) on the Kaggle notebook output; `extract()` and fallback not in the repo yet | `notebooks/flan-t5-train.ipynb` |
-| Whisper ASR | BE2 | ⏳ Not started | |
-| FastAPI backend | BE1 | ✅ API + fake models merged, 10 tests pass; real models not wired yet | Waiting on `classify()`, `extract()`, Whisper |
+| Gold test set | ML1 | ✅ 144 rows (Claude labels + second pass); 30-row human audit: 30 of 30 agreed | See GOLD_REVIEW.md; 16% of event-mapped types were wrong |
+| Baseline (TF-IDF + LR) | ML2 | ✅ Done and scored | `scripts/baseline_tfidf_lr.py` |
+| DistilBERT classifier + attention | ML2 | ✅ Trained, scored; `classify()` with attention rollout verified against ML2's CSV (50 of 50 rows) | Weights in `models/classifier/` (git-ignored); heatmap contrast is flat, stretch scores in the UI |
+| Flan-T5 generator + fallback | ML3 | ✅ Trained, scored; `src/models/generator.py` (`extract()` + rule fallback + people rule) written and tested; ML3 to review | Weights in `models/generator/`; 1 to 2 s per report on CPU |
+| Whisper ASR | BE2 | ✅ Integrated and verified: 9 s spoken report to text in about 4 s on CPU | Needs ffmpeg and, on Python 3.13+, `audioop-lts`; accuracy not evaluated on a test set |
+| FastAPI backend | BE1 | ✅ API merged; real classifier + generator wired (`USE_FAKE_MODELS=false`), 9 of 9 demo reports correct end to end | Geocoding: offline city table + cache + Nominatim, 7 of 9 demo alerts get a pin; duplicate detection is optional (needs `sentence-transformers`) |
 | Streamlit dashboard | FE | ⏳ Not started | |
 | Evaluation + metrics.json | ML1 | ✅ Scored on real ML2 + baseline + ML3 predictions; rerun if any file is resent | `reports/results.md`; slide 6 filled in |
 | Slides + backup video | FE + all | ⏳ Not started | |
@@ -688,8 +688,10 @@ This is the strongest evidence for using a transformer.
 | Real tweets, gold | 1.33 | 1.77 | 50% |
 
 **Field extraction (Flan-T5), call-style reports:** output parses 100% of the time; location F1 0.78, people count exact
-61%, injuries F1 0.54 (0.64 lenient), hazards F1 0.38 (0.59 lenient), summary ROUGE-L 0.50. On real tweets these are lower
-(location F1 0.49). Update these if ML3 resends after the people-count rule.
+60%, injuries F1 0.54 (0.64 lenient), hazards F1 0.38 (0.59 lenient), summary ROUGE-L 0.50. On real tweets these are lower:
+location F1 0.50, people count 50% (it was 28% before the people-count rule), injuries F1 0.17. These scores come from the
+real pipeline that runs in the demo (`extract()`: generation, retry, rule fallback, people rule). The model alone parsed
+143 of 144 real reports; the rule-based fallback handled the last one.
 
 **Show one failure and say why (pick one):**
 - *False alarm:* "Photo of dummy presented as wounded LAX shooter by media" is predicted `VIOLENCE_CRIME`. The text is
