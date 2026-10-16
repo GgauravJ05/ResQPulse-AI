@@ -556,7 +556,7 @@ Updated with every merged change. The full history is in [UPDATE.md](UPDATE.md).
 |---|---|---|---|
 | Repo, docs, schema v1 | – | ✅ Done | README, this brief, [SCHEMA.md](SCHEMA.md), [DATASETS.md](DATASETS.md) |
 | Datasets downloaded + mapped | ML1 | ✅ Done (v0) | 37k rows in `data/processed/public_*.csv`; no MEDICAL, few VIOLENCE_CRIME rows yet |
-| Synthetic reports (Claude) | ML1 | 🔶 v1 done (485 of ~1,200) | All 8 types; second round needed for bigger val/test sets |
+| Synthetic reports (Claude) | ML1 | ✅ v2 done (710) | All 8 types, 67 to 134 each; test_synth is 107 rows |
 | Gold test set | ML1 + BE2 | ⏳ Not started | |
 | Baseline (TF-IDF + LR) | ML2 | ⏳ Not started | |
 | DistilBERT classifier + attention | ML2 | ⏳ Not started | |
