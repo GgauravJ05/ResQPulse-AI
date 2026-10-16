@@ -17,6 +17,15 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-16 · ML3 gold file resent, predictions folder cleaned (PR #15)
+**Who:** Gaurav (ML1) · **Area:** Evaluation
+- ML3 resent `ml3_gold.csv`: one previously truncated output is now complete (gold parse rate 99.3% to 100%, ROUGE-L 0.428 to
+  0.429, all other extraction scores unchanged). `ml3_test_flan.csv` was resent byte-identical. The people-count rule was
+  not applied (the model still predicts a people number for 119 of 144 real tweets), so people exact match on gold stays 0.285.
+- `predictions/` now holds exactly the 8 required files (`ml2_*`, `baseline_*` for test_synth, test_public and gold, plus
+  `ml3_test_flan.csv` and `ml3_gold.csv`); the validation-set predictions and duplicate copies were moved out, not deleted.
+- `reports/` regenerated.
+
 ## 2026-10-16 · Baseline on gold and the results slide (PR #14)
 **Who:** Gaurav (ML1) · **Area:** Evaluation, Docs
 - ML2's `baseline_gold.csv` arrived; `reports/` regenerated with the full baseline vs DistilBERT comparison on all three test sets.

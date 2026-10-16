@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-16T23:13:59+05:30",
+  "generated_at": "2026-10-16T23:23:47+05:30",
   "eval_sets": {
     "test_synth": {
       "n": 107
@@ -1056,8 +1056,8 @@
           "fp": 34,
           "fn": 48
         },
-        "summary_rougeL": 0.4284918934563874,
-        "parse_rate": 0.9930555555555556
+        "summary_rougeL": 0.42912320658770053,
+        "parse_rate": 1.0
       }
     }
   },
