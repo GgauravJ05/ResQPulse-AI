@@ -17,6 +17,44 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-16 · Incident classifier: baseline, DistilBERT two-head, classify() (PR #7)
+**Who:** Vansh · **Area:** Classifier
+- `scripts/baseline_tfidf_lr.py`: TF-IDF (word 1–2-grams + char 2–5-grams) + Logistic Regression. C picked on
+  `val.csv` macro-F1 only (C = 8). `--predict_only` writes predictions for unlabelled files
+  (`gold_inputs.csv` → `baseline_gold.csv`).
+- `src/models/two_head.py` + `scripts/train_classifier.py`: `distilbert-base-uncased` with a type head
+  (8-way, cross-entropy) and a severity head (sigmoid, MSE on severity scaled to 0–1, back to 1–5 for output).
+  Severity loss is masked for rows without severity and divided by max(count, 1), so real tweets only train
+  the type head. Settings as agreed: lr 2e-5, batch 32, max_len 128, 3 epochs, fp16, seed 42, Kaggle T4.
+  The **last** epoch is kept (not chosen on val, because val shares events with train).
+  `NON_EMERGENCY` severity is forced to 1.0 (SCHEMA §1.2). Model folder = HF encoder + tokenizer + `heads.pt`
+  + `label_map.json` (SCHEMA §9 order), saved as Kaggle notebook output (`classifier_run/model/`), not in git.
+- `src/models/classifier.py`: `classify(text) -> ClassifyResult` (SCHEMA §5). Model loaded once at import from
+  `models/classifier/` (override with env `RESQPULSE_CLASSIFIER_DIR`). `is_ready()` for `/health`;
+  `classify()` raises `ModelNotReady` if loading failed (→ `MODEL_NOT_READY`, 503) and `ValueError("EMPTY_INPUT")`
+  for blank text. Attention heatmap = attention rollout over all 6 layers (heads averaged, residual added),
+  [CLS]/[SEP] dropped, word pieces merged into words (max), punctuation-only tokens skipped, max score = 1.
+- Trained on data v2 (Kaggle dataset version 4): `train.csv` 9,551 rows, 1,988 with severity.
+- **Results (own sanity check; official numbers come from ML1's scoring of the prediction CSVs).**
+  Macro-F1 over the classes present in each set:
+
+  | Set | TF-IDF + LR | DistilBERT |
+  |---|---|---|
+  | `val.csv` | 0.921 | 0.910 |
+  | `test_public.csv` (7 classes, held-out events) | 0.625 | **0.746** |
+  | `test_synth.csv` (8 classes) | 0.869 | **0.957** |
+
+  Severity MAE on `test_synth`: 0.51. On `test_public`, VIOLENCE_CRIME F1 rose from 0.29 to 0.79 and
+  NON_EMERGENCY precision from 0.44 to 0.61. Both models score about the same on `val`, which shares events
+  with train, so the gain shows up on unseen events.
+- **Known weaknesses:** TRANSPORT_ACCIDENT recall on `test_public` is about 0.45 for both models. A few real
+  tweets are predicted MEDICAL (a class with no real rows), so a macro over all 8 classes on `test_public`
+  shows 0.653. Severity is learned only from synthetic text, so severity on real tweets is a rough estimate.
+- **Nothing was tuned on test or gold.** Prediction CSVs sent to ML1 for `val`, `test_public`, `test_synth`
+  and `gold_inputs` (DistilBERT), plus the baseline for the same sets and `baseline_gold.csv`.
+- Follow-ups: BE1 copies the model folder to `models/classifier/` (or sets `RESQPULSE_CLASSIFIER_DIR`).
+  `ClassifyResult` is defined in `classifier.py`; move it to a shared schemas module if the API has one.
+
 ## 2026-10-16 · ML3 Flan-T5 training notebook added (ML3, reviewed by Gaurav)
 **Who:** rugvedas (ML3), committed and reviewed by Gaurav · **Area:** Generator
 - `notebooks/flan-t5-train.ipynb`: Kaggle notebook that fine-tunes `google/flan-t5-base` and produces `ml3_test_flan.csv` and
