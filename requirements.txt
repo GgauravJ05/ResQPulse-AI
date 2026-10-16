@@ -32,6 +32,7 @@ streamlit>=1.39
 streamlit-folium>=0.20
 folium>=0.16
 plotly>=5.20
+matplotlib>=3.8
 
 # Synthetic data generation (Claude) / config
 anthropic>=1.0

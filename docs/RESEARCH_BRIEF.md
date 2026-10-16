@@ -564,7 +564,7 @@ Updated with every merged change. The full history is in [UPDATE.md](UPDATE.md).
 | Whisper ASR | BE2 | ⏳ Not started | |
 | FastAPI backend | BE1 | ⏳ Not started | |
 | Streamlit dashboard | FE | ⏳ Not started | |
-| Evaluation + metrics.json | ML1–3 | ⏳ Not started | |
+| Evaluation + metrics.json | ML1 | 🔶 Script built and tested on fake predictions; waiting for real CSVs | `scripts/evaluate.py`, formats in SCHEMA §8.1 |
 | Slides + backup video | FE + all | ⏳ Not started | |
 
 **Changes from the original plan** (record every change here, because judges like to hear *why* a plan changed):

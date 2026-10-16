@@ -461,6 +461,28 @@ Keys can be added; **existing keys must not be renamed** without updating the ap
 
 ---
 
+### 8.1 Prediction files (what ML2 and ML3 send)
+
+Teammates never see the labels. They predict on the label-free inputs and send CSVs; `scripts/evaluate.py` scores them.
+All files: same ids as the test file, any row order, UTF-8, header row.
+
+| File | Predict on | Columns |
+|---|---|---|
+| `ml2_test_synth.csv`, `ml2_test_public.csv`, `ml2_gold.csv` | `test_synth.csv`, `test_public.csv`, `gold_inputs.csv` | `id, pred_type, pred_severity, p_<TYPE> x8` |
+| `baseline_test_synth.csv`, `baseline_test_public.csv`, `baseline_gold.csv` | same | `id, pred_type, p_<TYPE> x8` (no severity) |
+| `ml3_test_flan.csv` | `test_flan.csv` | `id, raw_output, pred_location, pred_people, pred_injuries, pred_hazards, pred_summary` |
+| `ml3_gold.csv` | `gold_inputs.csv` | same as above |
+
+`pred_type` is one of the 8 type names; `pred_severity` is 1.0 to 5.0 (values outside are clipped); the `p_<TYPE>` columns
+are optional and are used to rank the most confident mistakes. Lists are joined with ` ; `. If the `pred_*` columns are
+missing, they are parsed from `raw_output` with `parse_target()`. `ml3_test_flan.csv` is scored against the synthetic test
+labels (same ids as `test_synth.csv`). Put the files in `predictions/` (git-ignored).
+
+Metric definitions: macro P/R/F1 cover only classes present in the test set; `emergency_recall` = share of real emergencies
+not predicted as NON_EMERGENCY; `false_alarm_rate` = share of NON_EMERGENCY predicted as an emergency; `critical_recall` =
+same as emergency recall for rows with true severity >= 4; severity is clipped to 1 to 5 before MSE/RMSE/MAE;
+extraction scores items by normalised exact match (strict) and by token-F1 >= 0.5 (lenient).
+
 ## 9. Conventions
 
 | Item | Convention |

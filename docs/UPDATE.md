@@ -17,6 +17,22 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-16 · Evaluation script (PR #9)
+**Who:** Gaurav (ML1) · **Area:** Data, Evaluation
+- `src/eval/metrics.py` (pure metric functions) and `scripts/evaluate.py` score the teammates' prediction CSVs and write
+  `reports/metrics.json` (SCHEMA §8), `results.md` (slide tables), `error_analysis.md` (most confident mistakes, worst severity
+  and extraction errors) and one confusion-matrix PNG per model and test set.
+- Metrics: type precision/recall/F1 (macro over the classes present, weighted F1, per class), emergency recall, false alarm
+  rate, critical recall (severity >= 4), severity MSE/RMSE/MAE/bucket accuracy, extraction parse rate, location token F1,
+  people exact match, injuries/hazards P/R/F1 (strict and lenient), ROUGE-L, and test_public accuracy per data source.
+- Why a central script: one definition of every metric, the gold labels never reach the model builders, and the evaluation
+  sheet's Precision/Recall/MSE/RMSE come out in one table with baseline vs model side by side.
+- Tested: 10 unit tests against hand-computed values; an end-to-end run on fake predictions (the fake numbers track the noise
+  injected, confirming the code measures what it should); and failure cases (empty folder, missing ids, invalid type names,
+  duplicate ids, blank severity, missing column) which warn and keep scoring the usable rows.
+- `scripts/make_fake_predictions.py` writes fake files for testing only. `data/gold/gold_inputs.csv` (id, text) is the
+  label-free input for gold predictions. Prediction formats are in SCHEMA §8.1.
+
 ## 2026-10-16 · Gold set second pass and audit sample (PR #8)
 **Who:** Gaurav (ML1) · **Area:** Data
 - Instead of a full human review, Claude re-reviewed all 146 pre-labelled rows against the written rules. It found

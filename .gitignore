@@ -39,3 +39,6 @@ wandb/
 .DS_Store
 .vscode/
 .idea/
+
+# Teammates prediction CSVs (scored by scripts/evaluate.py)
+predictions/
