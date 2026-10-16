@@ -17,6 +17,25 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-16 · Synthetic reports and final splits, v1 (PR #5)
+**Who:** Gaurav (ML1) · **Area:** Data
+- **485 synthetic call-style reports** written directly by Claude in a Claude Code session (no API key), covering
+  all 8 types: FIRE 76, TRANSPORT_ACCIDENT 75, MEDICAL 74, VIOLENCE_CRIME 74, NON_EMERGENCY 69, FLOOD 43,
+  STORM_CYCLONE 37, EARTHQUAKE_COLLAPSE 37. Mixed severities (1–5), 8 writing styles, 100+ Indian cities,
+  about 20 words on average, plus hard negatives (figurative speech, pranks, mock drills, film shoots).
+- `scripts/validate_synthetic.py` checks enums, ranges and the word-for-word rule and removes near-duplicates:
+  of 486 reports, 1 dropped (too short) and 1 hazard item removed; everything else passed.
+- `scripts/make_splits.py` builds `train.csv`, `val.csv`, `test_synth.csv`, `test_public.csv` and the Flan-T5 files
+  `train_flan.csv`, `val_flan.csv`, `test_flan.csv`, plus `reports/data_card.md`. `src/data/flan.py` is the shared
+  serializer/parser for the Flan-T5 line format (round-trip tested).
+- **Decisions:** public training rows capped at 1,200 per type and synthetic train rows repeated 4x, so the
+  call-style reports are not drowned out by 7,500 real tweets; the real test set (`test_public.csv`) and the
+  synthetic test set (`test_synth.csv`) are reported separately.
+- **Known gaps:** `test_synth` and `val` synthetic parts are only 73 rows each, too small for per-class metrics;
+  MEDICAL has no real rows. A second generation round (about 700 more reports) will fix both. A first bug was
+  caught while building the splits: pandas 3 drops the grouping column inside `groupby.apply`, which had removed
+  `incident_type` from the public rows; fixed with an explicit loop and a null check.
+
 ## 2026-10-16 · Public-data pipeline, v0 splits (PR #4)
 **Who:** Gaurav (ML1) · **Area:** Data
 - Added `src/data/labels.py` (types, label map, event → type maps, HumAID keep list, CrisisLex held-out crises),

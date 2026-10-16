@@ -121,6 +121,8 @@ it is set to `null`.
 
 ## 3. Synthetic generation with Claude
 
+> **How it was actually done:** with no API key available, the reports were written directly by Claude in a Claude Code session, following this schema and the rubric in §1.2, one batch per incident type, and checked by `scripts/validate_synthetic.py`. The API sketch in §3.4 remains valid for reproducing or extending the data.
+
 ### 3.1 Generation grid
 
 Don't ask for "3,000 reports". Loop over a grid and fill these values into each request:
