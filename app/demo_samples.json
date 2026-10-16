@@ -1,0 +1,56 @@
+[
+  {
+    "label": "Fire",
+    "text": "Aag lag gayi hai!! A fire in our flat in Mira Road, the sofa is burning and the curtains too, I am holding my baby and the door is full of smoke",
+    "expected_type": "FIRE",
+    "expected_severity": 4.5
+  },
+  {
+    "label": "Flood",
+    "text": "pls share, a bus with college students going for picnic is stuck in flood water on Mulshi road near Paud, around 40 students, bus is leaning, water has reached the windows, teachers are calling for help, no network at times",
+    "expected_type": "FLOOD",
+    "expected_severity": 5.0
+  },
+  {
+    "label": "Storm Cyclone",
+    "text": "A tin roof fell on a bus stop with 10 people waiting near Barrackpore Kalyani expressway in the storm, most ran away but an old woman and a child are under the sheet, please help they are shouting!!",
+    "expected_type": "STORM_CYCLONE",
+    "expected_severity": 5.0
+  },
+  {
+    "label": "Earthquake Collapse",
+    "text": "Request for rescue dogs and heavy cranes at Sector 62 Noida collapsed construction site, 8 workers trapped, one voice heard from below slab",
+    "expected_type": "EARTHQUAKE_COLLAPSE",
+    "expected_severity": 5.0
+  },
+  {
+    "label": "Transport Accident",
+    "text": "Ambulance requested for victim of road accident at km 112 of Kolhapur-Pune highway, male approx 35 years, bleeding from nose and ears, unresponsive",
+    "expected_type": "TRANSPORT_ACCIDENT",
+    "expected_severity": 5.0
+  },
+  {
+    "label": "Medical",
+    "text": "Wife is 7 months pregnant and has heavy bleeding, we are at Saheed Nagar, taxi is not available",
+    "expected_type": "MEDICAL",
+    "expected_severity": 4.5
+  },
+  {
+    "label": "Violence Crime",
+    "text": "Police please! Gang war outside the club on Park Street, bottles, swords, many injured, people are running over each other",
+    "expected_type": "VIOLENCE_CRIME",
+    "expected_severity": 5.0
+  },
+  {
+    "label": "Non Emergency",
+    "text": "My car AC is not working and it is very hot, is there any government service centre near Gachibowli",
+    "expected_type": "NON_EMERGENCY",
+    "expected_severity": 1.0
+  },
+  {
+    "label": "Violence Crime (vague)",
+    "text": "someone is shouting and throwing things in the house next door, I am worried",
+    "expected_type": "VIOLENCE_CRIME",
+    "expected_severity": 2.0
+  }
+]
