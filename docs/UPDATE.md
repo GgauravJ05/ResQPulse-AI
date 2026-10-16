@@ -17,6 +17,15 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-16 · Baseline on gold and the results slide (PR #14)
+**Who:** Gaurav (ML1) · **Area:** Evaluation, Docs
+- ML2's `baseline_gold.csv` arrived; `reports/` regenerated with the full baseline vs DistilBERT comparison on all three test sets.
+- Gold set (144 real reports), macro F1: baseline 0.560, DistilBERT 0.765; emergency recall 0.707 vs 0.909; critical recall
+  (severity >= 4) 0.750 vs 0.982. Largest per-class gains: VIOLENCE_CRIME F1 0.19 to 0.91, FIRE 0.36 to 0.80.
+- False alarm on gold is similar for both (0.356 baseline, 0.378 DistilBERT), so it is reported as a weakness, not a win.
+- Slide 6 (Results) of the presentation guide filled in with real numbers, one failure case with the reason, the
+  generalisation result (64% vs 48% on unseen crises) and an explicit note that voice was not evaluated.
+
 ## 2026-10-16 · Interim evaluation on real predictions (PR #13)
 **Who:** Gaurav (ML1) · **Area:** Evaluation
 - First real scores from ML2 (DistilBERT + TF-IDF baseline) and ML3 (Flan-T5), committed as `reports/metrics.json`,
