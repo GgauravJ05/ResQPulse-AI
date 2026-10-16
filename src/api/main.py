@@ -3,6 +3,7 @@ import time
 import json
 import uuid
 import tempfile
+import threading
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List, Dict, Tuple
 from pathlib import Path
@@ -44,6 +45,7 @@ app.add_middleware(
 # Global store & model holders
 alert_store: Dict[str, Alert] = {}
 alert_counter = 1
+counter_lock = threading.Lock()
 models_loaded = {"classifier": False, "generator": False, "asr": False}
 
 # Model references
@@ -188,8 +190,11 @@ def analyze_endpoint(payload: AnalyzeRequest):
         return format_error("MODEL_NOT_READY", "Inference models are not loaded.", status.HTTP_503_SERVICE_UNAVAILABLE)
 
     # 1. Model inference
-    cls_res = classify_fn(cleaned_text)
-    ext_res = extract_fn(cleaned_text)
+    try:
+        cls_res = classify_fn(cleaned_text)
+        ext_res = extract_fn(cleaned_text)
+    except Exception as e:
+        return format_error("MODEL_NOT_READY", f"Model inference failed: {e}", status.HTTP_503_SERVICE_UNAVAILABLE)
 
     # 2. Rule derivations
     is_emergency = cls_res.incident_type != "NON_EMERGENCY"
@@ -210,8 +215,9 @@ def analyze_endpoint(payload: AnalyzeRequest):
 
     # 4. Construct Alert
     global alert_counter
-    alert_id = f"RQP-{alert_counter:06d}"
-    alert_counter += 1
+    with counter_lock:
+        alert_id = f"RQP-{alert_counter:06d}"
+        alert_counter += 1
 
     latency_ms = int((time.time() - t0) * 1000)
 

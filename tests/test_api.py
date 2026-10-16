@@ -4,6 +4,14 @@ from src.api.main import app, alert_store, CORRECTIONS_LOG
 
 client = TestClient(app)
 
+
+@pytest.fixture(scope="module", autouse=True)
+def _run_startup():
+    # `with client:` runs the startup hook that loads the models; without it every /analyze returns 503
+    with client:
+        yield
+
+
 def setup_function():
     alert_store.clear()
 
@@ -72,3 +80,31 @@ def test_patch_and_correction_logging():
 
     # Confirm logged to corrections.jsonl
     assert CORRECTIONS_LOG.exists()
+
+def test_unknown_alert_returns_schema_error():
+    res = client.get("/alerts/RQP-999999")
+    assert res.status_code == 404
+    assert res.json()["error"]["code"] == "ALERT_NOT_FOUND"
+
+
+def test_alert_ids_are_unique():
+    ids = {client.post("/analyze", json={"text": "Small smoke near FC road"}).json()["alert_id"] for _ in range(5)}
+    assert len(ids) == 5
+
+
+def test_transcribe_rejects_unsupported_file():
+    res = client.post("/transcribe", files={"file": ("notes.txt", b"hello", "text/plain")})
+    assert res.status_code == 400
+    assert res.json()["error"]["code"] == "AUDIO_UNREADABLE"
+
+
+def test_model_failure_is_a_schema_error_not_a_500(monkeypatch):
+    import src.api.main as api
+
+    def boom(_text):
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr(api, "classify_fn", boom)
+    res = client.post("/analyze", json={"text": "Fire near FC road"})
+    assert res.status_code == 503
+    assert res.json()["error"]["code"] == "MODEL_NOT_READY"
