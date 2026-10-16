@@ -1,0 +1,916 @@
+{
+  "generated_at": "2026-10-16T22:57:45+05:30",
+  "eval_sets": {
+    "test_synth": {
+      "n": 107
+    },
+    "test_public": {
+      "n": 7755
+    },
+    "gold": {
+      "n": 144
+    }
+  },
+  "classification": {
+    "baseline_tfidf_lr": {
+      "test_synth": {
+        "n": 107,
+        "accuracy": 0.8598130841121495,
+        "macro_precision": 0.8852591036414565,
+        "macro_recall": 0.8620598151848151,
+        "macro_f1": 0.8685927216415021,
+        "weighted_f1": 0.8625003165919511,
+        "classes_evaluated": [
+          "FIRE",
+          "FLOOD",
+          "STORM_CYCLONE",
+          "EARTHQUAKE_COLLAPSE",
+          "TRANSPORT_ACCIDENT",
+          "MEDICAL",
+          "VIOLENCE_CRIME",
+          "NON_EMERGENCY"
+        ],
+        "per_class": {
+          "FIRE": {
+            "precision": 0.8571428571428571,
+            "recall": 0.9230769230769231,
+            "f1": 0.8888888888888888,
+            "support": 13
+          },
+          "FLOOD": {
+            "precision": 1.0,
+            "recall": 0.8181818181818182,
+            "f1": 0.9,
+            "support": 11
+          },
+          "STORM_CYCLONE": {
+            "precision": 0.9,
+            "recall": 0.9,
+            "f1": 0.9,
+            "support": 10
+          },
+          "EARTHQUAKE_COLLAPSE": {
+            "precision": 1.0,
+            "recall": 0.8,
+            "f1": 0.8888888888888888,
+            "support": 10
+          },
+          "TRANSPORT_ACCIDENT": {
+            "precision": 0.8571428571428571,
+            "recall": 0.8571428571428571,
+            "f1": 0.8571428571428571,
+            "support": 14
+          },
+          "MEDICAL": {
+            "precision": 0.7619047619047619,
+            "recall": 0.8,
+            "f1": 0.7804878048780488,
+            "support": 20
+          },
+          "VIOLENCE_CRIME": {
+            "precision": 1.0,
+            "recall": 0.875,
+            "f1": 0.9333333333333333,
+            "support": 16
+          },
+          "NON_EMERGENCY": {
+            "precision": 0.7058823529411765,
+            "recall": 0.9230769230769231,
+            "f1": 0.8,
+            "support": 13
+          }
+        },
+        "emergency_recall": 0.9468085106382979,
+        "false_alarm_rate": 0.07692307692307693,
+        "confusion_matrix": [
+          [
+            12,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            9,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            9,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            8,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0,
+            12,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            16,
+            0,
+            3
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            14,
+            2
+          ],
+          [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            12
+          ]
+        ],
+        "critical_recall": 0.9666666666666667
+      },
+      "test_public": {
+        "n": 7755,
+        "accuracy": 0.7174725983236622,
+        "macro_precision": 0.7316087428410251,
+        "macro_recall": 0.6175058502527075,
+        "macro_f1": 0.6251158148592252,
+        "weighted_f1": 0.7113771133916341,
+        "classes_evaluated": [
+          "FIRE",
+          "FLOOD",
+          "STORM_CYCLONE",
+          "EARTHQUAKE_COLLAPSE",
+          "TRANSPORT_ACCIDENT",
+          "VIOLENCE_CRIME",
+          "NON_EMERGENCY"
+        ],
+        "per_class": {
+          "FIRE": {
+            "precision": 0.7458333333333333,
+            "recall": 0.504225352112676,
+            "f1": 0.6016806722689075,
+            "support": 710
+          },
+          "FLOOD": {
+            "precision": 0.6400541271989174,
+            "recall": 0.6158854166666666,
+            "f1": 0.6277372262773723,
+            "support": 768
+          },
+          "STORM_CYCLONE": {
+            "precision": 0.9177413733008016,
+            "recall": 0.865833607365998,
+            "f1": 0.8910321489001692,
+            "support": 3041
+          },
+          "EARTHQUAKE_COLLAPSE": {
+            "precision": 0.7931844888366627,
+            "recall": 0.7705479452054794,
+            "f1": 0.781702374059062,
+            "support": 876
+          },
+          "TRANSPORT_ACCIDENT": {
+            "precision": 0.8439306358381503,
+            "recall": 0.4485407066052227,
+            "f1": 0.5857572718154463,
+            "support": 651
+          },
+          "MEDICAL": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "VIOLENCE_CRIME": {
+            "precision": 0.74,
+            "recall": 0.17903225806451614,
+            "f1": 0.2883116883116883,
+            "support": 620
+          },
+          "NON_EMERGENCY": {
+            "precision": 0.44051724137931036,
+            "recall": 0.938475665748393,
+            "f1": 0.5995893223819302,
+            "support": 1089
+          }
+        },
+        "emergency_recall": 0.8052805280528053,
+        "false_alarm_rate": 0.06152433425160698,
+        "confusion_matrix": [
+          [
+            358,
+            8,
+            95,
+            13,
+            36,
+            0,
+            30,
+            170
+          ],
+          [
+            22,
+            473,
+            65,
+            3,
+            9,
+            0,
+            1,
+            195
+          ],
+          [
+            10,
+            192,
+            2633,
+            37,
+            1,
+            0,
+            2,
+            166
+          ],
+          [
+            1,
+            24,
+            52,
+            675,
+            0,
+            0,
+            0,
+            124
+          ],
+          [
+            49,
+            0,
+            1,
+            116,
+            292,
+            0,
+            0,
+            193
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            31,
+            10,
+            12,
+            3,
+            3,
+            0,
+            111,
+            450
+          ],
+          [
+            9,
+            32,
+            11,
+            4,
+            5,
+            0,
+            6,
+            1022
+          ]
+        ],
+        "per_source": {
+          "crisislex": {
+            "n": 3884,
+            "accuracy": 0.48300720906282185
+          },
+          "humaid": {
+            "n": 3274,
+            "accuracy": 0.9492974954184484
+          },
+          "kaggle_disaster": {
+            "n": 597,
+            "accuracy": 0.9715242881072027
+          }
+        }
+      }
+    },
+    "distilbert": {
+      "test_synth": {
+        "n": 107,
+        "accuracy": 0.9532710280373832,
+        "macro_precision": 0.9613095238095238,
+        "macro_recall": 0.9558238636363636,
+        "macro_f1": 0.9573668095278364,
+        "weighted_f1": 0.9531591034654777,
+        "classes_evaluated": [
+          "FIRE",
+          "FLOOD",
+          "STORM_CYCLONE",
+          "EARTHQUAKE_COLLAPSE",
+          "TRANSPORT_ACCIDENT",
+          "MEDICAL",
+          "VIOLENCE_CRIME",
+          "NON_EMERGENCY"
+        ],
+        "per_class": {
+          "FIRE": {
+            "precision": 0.9285714285714286,
+            "recall": 1.0,
+            "f1": 0.9629629629629629,
+            "support": 13
+          },
+          "FLOOD": {
+            "precision": 1.0,
+            "recall": 0.9090909090909091,
+            "f1": 0.9523809523809523,
+            "support": 11
+          },
+          "STORM_CYCLONE": {
+            "precision": 1.0,
+            "recall": 0.9,
+            "f1": 0.9473684210526315,
+            "support": 10
+          },
+          "EARTHQUAKE_COLLAPSE": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 10
+          },
+          "TRANSPORT_ACCIDENT": {
+            "precision": 0.9333333333333333,
+            "recall": 1.0,
+            "f1": 0.9655172413793104,
+            "support": 14
+          },
+          "MEDICAL": {
+            "precision": 0.9,
+            "recall": 0.9,
+            "f1": 0.9,
+            "support": 20
+          },
+          "VIOLENCE_CRIME": {
+            "precision": 1.0,
+            "recall": 0.9375,
+            "f1": 0.967741935483871,
+            "support": 16
+          },
+          "NON_EMERGENCY": {
+            "precision": 0.9285714285714286,
+            "recall": 1.0,
+            "f1": 0.9629629629629629,
+            "support": 13
+          }
+        },
+        "emergency_recall": 0.9893617021276596,
+        "false_alarm_rate": 0.0,
+        "confusion_matrix": [
+          [
+            13,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            10,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            9,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            10,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            14,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            18,
+            0,
+            1
+          ],
+          [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            15,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            13
+          ]
+        ],
+        "critical_recall": 0.9833333333333333
+      },
+      "test_public": {
+        "n": 7755,
+        "accuracy": 0.7950999355254674,
+        "macro_precision": 0.7906102811731354,
+        "macro_recall": 0.7445382475589605,
+        "macro_f1": 0.7463359894715245,
+        "weighted_f1": 0.7962655440266501,
+        "classes_evaluated": [
+          "FIRE",
+          "FLOOD",
+          "STORM_CYCLONE",
+          "EARTHQUAKE_COLLAPSE",
+          "TRANSPORT_ACCIDENT",
+          "VIOLENCE_CRIME",
+          "NON_EMERGENCY"
+        ],
+        "per_class": {
+          "FIRE": {
+            "precision": 0.817531305903399,
+            "recall": 0.643661971830986,
+            "f1": 0.7202521670606777,
+            "support": 710
+          },
+          "FLOOD": {
+            "precision": 0.5979381443298969,
+            "recall": 0.7552083333333334,
+            "f1": 0.667433831990794,
+            "support": 768
+          },
+          "STORM_CYCLONE": {
+            "precision": 0.9579710144927536,
+            "recall": 0.869450838539954,
+            "f1": 0.91156697121186,
+            "support": 3041
+          },
+          "EARTHQUAKE_COLLAPSE": {
+            "precision": 0.7357954545454546,
+            "recall": 0.886986301369863,
+            "f1": 0.8043478260869565,
+            "support": 876
+          },
+          "TRANSPORT_ACCIDENT": {
+            "precision": 0.9361022364217252,
+            "recall": 0.4500768049155146,
+            "f1": 0.6078838174273858,
+            "support": 651
+          },
+          "MEDICAL": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "VIOLENCE_CRIME": {
+            "precision": 0.876984126984127,
+            "recall": 0.7129032258064516,
+            "f1": 0.7864768683274022,
+            "support": 620
+          },
+          "NON_EMERGENCY": {
+            "precision": 0.6119496855345912,
+            "recall": 0.8934802571166207,
+            "f1": 0.7263904441955954,
+            "support": 1089
+          }
+        },
+        "emergency_recall": 0.9074407440744074,
+        "false_alarm_rate": 0.10651974288337925,
+        "confusion_matrix": [
+          [
+            457,
+            7,
+            50,
+            7,
+            8,
+            0,
+            52,
+            129
+          ],
+          [
+            19,
+            580,
+            33,
+            10,
+            8,
+            0,
+            0,
+            118
+          ],
+          [
+            8,
+            267,
+            2644,
+            35,
+            1,
+            0,
+            1,
+            85
+          ],
+          [
+            0,
+            34,
+            16,
+            777,
+            0,
+            0,
+            0,
+            49
+          ],
+          [
+            63,
+            0,
+            2,
+            226,
+            293,
+            0,
+            1,
+            66
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            2,
+            0,
+            4,
+            0,
+            1,
+            1,
+            442,
+            170
+          ],
+          [
+            10,
+            82,
+            11,
+            1,
+            2,
+            2,
+            8,
+            973
+          ]
+        ],
+        "per_source": {
+          "crisislex": {
+            "n": 3884,
+            "accuracy": 0.6403192584963955
+          },
+          "humaid": {
+            "n": 3274,
+            "accuracy": 0.9462431276725718
+          },
+          "kaggle_disaster": {
+            "n": 597,
+            "accuracy": 0.9731993299832495
+          }
+        }
+      },
+      "gold": {
+        "n": 144,
+        "accuracy": 0.75,
+        "macro_precision": 0.7577875952875953,
+        "macro_recall": 0.7943224259400729,
+        "macro_f1": 0.7650078144851663,
+        "weighted_f1": 0.7472072304389378,
+        "classes_evaluated": [
+          "FIRE",
+          "FLOOD",
+          "STORM_CYCLONE",
+          "EARTHQUAKE_COLLAPSE",
+          "TRANSPORT_ACCIDENT",
+          "VIOLENCE_CRIME",
+          "NON_EMERGENCY"
+        ],
+        "per_class": {
+          "FIRE": {
+            "precision": 0.8,
+            "recall": 0.8,
+            "f1": 0.8,
+            "support": 15
+          },
+          "FLOOD": {
+            "precision": 0.6,
+            "recall": 0.5,
+            "f1": 0.5454545454545454,
+            "support": 18
+          },
+          "STORM_CYCLONE": {
+            "precision": 0.5769230769230769,
+            "recall": 0.9375,
+            "f1": 0.7142857142857143,
+            "support": 16
+          },
+          "EARTHQUAKE_COLLAPSE": {
+            "precision": 0.9,
+            "recall": 0.8181818181818182,
+            "f1": 0.8571428571428571,
+            "support": 22
+          },
+          "TRANSPORT_ACCIDENT": {
+            "precision": 0.7333333333333333,
+            "recall": 1.0,
+            "f1": 0.8461538461538461,
+            "support": 11
+          },
+          "MEDICAL": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "VIOLENCE_CRIME": {
+            "precision": 0.9375,
+            "recall": 0.8823529411764706,
+            "f1": 0.9090909090909091,
+            "support": 17
+          },
+          "NON_EMERGENCY": {
+            "precision": 0.7567567567567568,
+            "recall": 0.6222222222222222,
+            "f1": 0.6829268292682927,
+            "support": 45
+          }
+        },
+        "emergency_recall": 0.9090909090909091,
+        "false_alarm_rate": 0.37777777777777777,
+        "confusion_matrix": [
+          [
+            12,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            2
+          ],
+          [
+            1,
+            9,
+            2,
+            1,
+            0,
+            0,
+            0,
+            5
+          ],
+          [
+            0,
+            1,
+            15,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            3,
+            18,
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            11,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            15,
+            1
+          ],
+          [
+            2,
+            5,
+            5,
+            1,
+            3,
+            0,
+            1,
+            28
+          ]
+        ],
+        "critical_recall": 0.9821428571428571
+      }
+    }
+  },
+  "severity": {
+    "distilbert": {
+      "test_synth": {
+        "n": 107,
+        "mse": 0.5688056074766354,
+        "rmse": 0.7541920229468324,
+        "mae": 0.5125233644859812,
+        "bucket_accuracy": 0.6448598130841121,
+        "within_one": 0.8691588785046729
+      },
+      "gold": {
+        "n": 144,
+        "mse": 1.765363888888889,
+        "rmse": 1.328669969890525,
+        "mae": 1.0390277777777779,
+        "bucket_accuracy": 0.3819444444444444,
+        "within_one": 0.5
+      }
+    }
+  },
+  "extraction": {
+    "flan_t5": {
+      "test_synth": {
+        "n": 107,
+        "location_exact": 0.6355140186915887,
+        "location_token_f1": 0.7789171887302729,
+        "people_exact_match": 0.6074766355140186,
+        "injuries": {
+          "precision": 0.5466666666666666,
+          "recall": 0.5256410256410257,
+          "f1": 0.5359477124183005,
+          "tp": 41,
+          "fp": 34,
+          "fn": 37
+        },
+        "hazards": {
+          "precision": 0.43037974683544306,
+          "recall": 0.3469387755102041,
+          "f1": 0.384180790960452,
+          "tp": 34,
+          "fp": 45,
+          "fn": 64
+        },
+        "injuries_lenient": {
+          "precision": 0.6533333333333333,
+          "recall": 0.6282051282051282,
+          "f1": 0.6405228758169934,
+          "tp": 49,
+          "fp": 26,
+          "fn": 29
+        },
+        "hazards_lenient": {
+          "precision": 0.6582278481012658,
+          "recall": 0.5306122448979592,
+          "f1": 0.5875706214689265,
+          "tp": 52,
+          "fp": 27,
+          "fn": 46
+        },
+        "summary_rougeL": 0.501790001379835,
+        "parse_rate": 1.0
+      },
+      "gold": {
+        "n": 144,
+        "location_exact": 0.4097222222222222,
+        "location_token_f1": 0.4901104931742187,
+        "people_exact_match": 0.2847222222222222,
+        "injuries": {
+          "precision": 0.16666666666666666,
+          "recall": 0.17073170731707318,
+          "f1": 0.16867469879518074,
+          "tp": 7,
+          "fp": 35,
+          "fn": 34
+        },
+        "hazards": {
+          "precision": 0.30434782608695654,
+          "recall": 0.25301204819277107,
+          "f1": 0.2763157894736842,
+          "tp": 21,
+          "fp": 48,
+          "fn": 62
+        },
+        "injuries_lenient": {
+          "precision": 0.38095238095238093,
+          "recall": 0.3902439024390244,
+          "f1": 0.3855421686746988,
+          "tp": 16,
+          "fp": 26,
+          "fn": 25
+        },
+        "hazards_lenient": {
+          "precision": 0.5072463768115942,
+          "recall": 0.42168674698795183,
+          "f1": 0.4605263157894737,
+          "tp": 35,
+          "fp": 34,
+          "fn": 48
+        },
+        "summary_rougeL": 0.4284918934563874,
+        "parse_rate": 0.9930555555555556
+      }
+    }
+  },
+  "voice": null,
+  "latency_ms": null,
+  "confusion_matrix_png": "reports/confusion_matrix_gold_ml2.png",
+  "warnings": []
+}
