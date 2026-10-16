@@ -17,6 +17,19 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-16 · Public-data pipeline, v0 splits (PR #4)
+**Who:** Gaurav (ML1) · **Area:** Data
+- Added `src/data/labels.py` (types, label map, event → type maps, HumAID keep list, CrisisLex held-out crises),
+  `src/data/clean.py` (`clean_text`) and `scripts/build_public.py`.
+- Output: `data/processed/public_{train,val,test}.csv` in the SCHEMA §2 format. 37,086 rows after removing
+  2,086 duplicates and too-short texts: train 16,850 / val 3,470 / test 7,755.
+- Choices: HumAID's own splits kept; **CrisisLexT26 split by crisis** (West Texas, Queensland, Pablo, Bohol, Spain
+  train crash and LA airport are never trained on); Kaggle `target == 0` rows are `NON_EMERGENCY`; training rows
+  capped at 3,000 per type so `STORM_CYCLONE` doesn't dominate.
+- **Known gaps:** no `MEDICAL` rows (synthetic only); `VIOLENCE_CRIME` has only 363 real training rows; real text is
+  news-style rather than call-style, and CrisisLex contains some non-English tweets. Synthetic data covers these.
+- Follow-ups: upload to Kaggle for ML2; Claude synthetic generation next.
+
 ## 2026-10-16 · Update log and presentation guide (PR #3)
 **Who:** Gaurav · **Area:** Docs
 - Added this `UPDATE.md` log; every future change is recorded here.
