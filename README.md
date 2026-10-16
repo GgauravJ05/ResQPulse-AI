@@ -152,7 +152,7 @@ The full specification is in **[docs/SCHEMA.md](docs/SCHEMA.md)** (schema v1). T
 |---|---|---|
 | **A: Real crisis posts** | [HumAID](https://crisisnlp.qcri.org/humaid_dataset) set 1 (~43k tweets, 13 disasters), [CrisisLexT26](https://crisislex.org/data-collections.html) (~28k tweets, 26 crises), [Kaggle *NLP with Disaster Tweets*](https://www.kaggle.com/competitions/nlp-getting-started) | Incident type (mapped from event/crisis name), emergency vs. not |
 | **B: Generated call-style reports** | ~3,000 reports from **Claude**, using a type × severity × style × city grid | Everything: type, severity, all fields |
-| **Gold test set** | HumAID official test split + 150–200 real reports pre-labelled by Claude and verified by a person | Human-checked, **never trained on** |
+| **Gold test set** | 144 real reports labelled by Claude, then re-reviewed in a second pass, with a 30-row human audit to measure agreement | Real text with type, severity and fields; **never trained on** |
 | **Voice** | ~50 teammate recordings + ~300 TTS clips with added noise | For demo, voice evaluation, and speech-style training text |
 
 - All links, file formats and label mappings: **[docs/DATASETS.md](docs/DATASETS.md)**.
@@ -208,7 +208,7 @@ ResQPulse_AI/
 ├── data/
 │   ├── raw/             # downloaded datasets          (git-ignored)
 │   ├── processed/       # cleaned splits               (git-ignored)
-│   ├── gold/            # human-verified test set      (committed, small)
+│   ├── gold/            # gold test set (real text, Claude-labelled + audited) (committed, small)
 │   └── audio/           # voice recordings             (git-ignored, personal data)
 ├── docs/
 │   ├── RESEARCH_BRIEF.md  # problem, approach, decisions

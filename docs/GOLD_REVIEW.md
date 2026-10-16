@@ -1,7 +1,13 @@
 # Gold set review guide
 
-The gold set is the only test data where **real text has labels checked by a human**. Claude pre-labelled 146 real
-tweets; your job is to check each row. About 10 seconds per row, 70 rows each.
+> **How the gold set was actually built:** Claude pre-labelled 146 real tweets and then re-reviewed every row in a
+> second pass (10 corrections: 5 type changes, 3 severity changes, 2 near-duplicates dropped; 144 rows kept in
+> `data/gold/gold.csv`). Because the same model did both passes, we do **not** call it human-verified. Instead a person
+> audits a random sample of 30 rows (`data/gold/gold_audit.csv`, see the end of this file) and we report the agreement rate.
+> The rules below are what the labels follow, and what the auditor checks.
+
+The gold set is the only test data where **real text has severity and extracted-field labels**. To do the full human
+review instead of the audit, check each row of `gold_review.csv` (about 10 seconds per row).
 
 **File:** `data/gold/gold_review.csv` → open it in Google Sheets or Excel (UTF-8).
 **Split:** Gaurav reviews rows 2–74, BE2 reviews rows 75–147 (spreadsheet row numbers, header is row 1).
@@ -56,3 +62,11 @@ Save the sheet as `data/gold/gold_review.csv` (CSV UTF-8) and tell Gaurav. Then 
 ```bash
 .venv/bin/python scripts/build_gold.py finalize     # writes data/gold/gold.csv
 ```
+
+## Human audit (30 rows, about 5 minutes)
+
+1. Open `data/gold/gold_audit.csv`.
+2. For each row read `text`, `incident_type` and `severity`. Fill `agree` with `1` if both are right, `0` if not.
+   If the type is wrong, write the right one in `correct_type`.
+3. Save the file and run `.venv/bin/python scripts/build_gold.py audit-score`. It prints the agreement rate
+   and the rows you disagreed with. Put the number on the data slide.
