@@ -1,7 +1,8 @@
 """TF-IDF + Logistic Regression baseline for incident_type (SCHEMA §1.1).
 
 Run in a Kaggle notebook (or locally):
-    python scripts/baseline_tfidf_lr.py --data /kaggle/input/resqpulse-data --out outputs/baseline
+    python scripts/baseline_tfidf_lr.py --data /kaggle/input/resqpulse-data --out outputs/baseline \
+        --train_file train.csv --val_file val.csv --eval_files val.csv test_public.csv test_synth.csv
 
 Prints macro precision / recall / F1 on val and test, and writes prediction CSVs in the
 same format as the DistilBERT model (id, pred_type, p_<TYPE> x8, pred_severity).
@@ -34,9 +35,6 @@ except ImportError:  # identical to SCHEMA §9
                  "TRANSPORT_ACCIDENT": 4, "MEDICAL": 5, "VIOLENCE_CRIME": 6, "NON_EMERGENCY": 7}
 LABELS = sorted(LABEL_MAP, key=LABEL_MAP.get)          # index order 0..7
 IDX = list(range(len(LABELS)))
-
-SPLIT_FILES = {"train": "public_train.csv", "val": "public_val.csv", "test": "public_test.csv"}
-
 
 def load(data_dir, name):
     df = pd.read_csv(Path(data_dir) / name, dtype={"id": str}, keep_default_na=False)
@@ -83,11 +81,20 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", default="/kaggle/input/resqpulse-data")
     ap.add_argument("--out", default="outputs/baseline")
+    ap.add_argument("--train_file", default="train.csv")
+    ap.add_argument("--val_file", default="val.csv", help="used only to pick C")
+    ap.add_argument("--eval_files", nargs="*", default=["val.csv", "test_public.csv", "test_synth.csv"],
+                    help="labelled files to score and write predictions for")
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
 
-    dfs = {k: load(args.data, v) for k, v in SPLIT_FILES.items()}
+    dfs = {"train": load(args.data, args.train_file), "val": load(args.data, args.val_file)}
+    for name in args.eval_files:
+        if (Path(args.data) / name).exists():
+            dfs[Path(name).stem] = load(args.data, name)
+        else:
+            print(f"skip {name}: not found")
     for k, d in dfs.items():
         print(f"{k}: {len(d)} rows | " + ", ".join(f"{l}={c}" for l, c in d["incident_type"].value_counts().items()))
 
@@ -95,7 +102,9 @@ def main():
     char = TfidfVectorizer(analyzer="char_wb", ngram_range=(2, 5), min_df=2, sublinear_tf=True, lowercase=True)
     tr_text = dfs["train"]["text"]
     X = {"train": hstack([word.fit_transform(tr_text), char.fit_transform(tr_text)]).tocsr()}
-    for k in ("val", "test"):
+    for k in dfs:
+        if k == "train":
+            continue
         X[k] = hstack([word.transform(dfs[k]["text"]), char.transform(dfs[k]["text"])]).tocsr()
 
     # choose C on val macro-F1 (classes present); test is never used for selection
@@ -111,13 +120,13 @@ def main():
     print(f"selected C={C}")
 
     results = {"model": "baseline_tfidf_lr", "C": C}
-    for k in ("val", "test"):
+    for k in [Path(n).stem for n in args.eval_files if Path(n).stem in dfs]:
         p_trained = clf.predict_proba(X[k])                   # columns = clf.classes_ (classes seen in train)
         probs = np.zeros((p_trained.shape[0], len(LABELS)))
         probs[:, clf.classes_] = p_trained
         pred = probs.argmax(1)
-        results[k] = evaluate(f"public_{k}", dfs[k]["y"].to_numpy(), pred)
-        write_predictions(dfs[k], probs, out / f"baseline_public_{k}_predictions.csv")
+        results[k] = evaluate(k, dfs[k]["y"].to_numpy(), pred)
+        write_predictions(dfs[k], probs, out / f"baseline_{k}_predictions.csv")
     (out / "baseline_metrics.json").write_text(json.dumps(results, indent=2))
     print(f"wrote {out / 'baseline_metrics.json'}")
 
