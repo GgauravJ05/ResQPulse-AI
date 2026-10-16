@@ -17,6 +17,10 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · System architecture diagram (PR #27)
+**Who:** Data lead · **Area:** Docs
+- Added `docs/architecture_diagram.png`, made with the Archify skill (checks passed; the HTML version is local in `.archify/`, git-ignored). Shows caller, Streamlit dashboard, FastAPI backend, Whisper, DistilBERT, Flan-T5, geocoder and alert store inside the offline-laptop boundary. Can replace the drawn diagram on deck slide 3.
+
 ## 2026-10-17 · GenHack submission deck (PR #26)
 **Who:** Data lead · **Area:** Docs
 - Filled the official template (`docs/Final minihackathon genhack template.pptx`) into `docs/ResQPulse_AI_GenHack.pptx`: title slide + 6 content slides (the instructions slide is removed). Template header, section titles, logos and footer are unchanged; only the body was rebuilt in the template's fonts and colours.

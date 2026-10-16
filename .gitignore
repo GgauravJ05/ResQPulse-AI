@@ -47,3 +47,4 @@ predictions/
 reports/alerts.jsonl
 reports/corrections.jsonl
 output/
+.archify/
