@@ -17,6 +17,12 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-16 · Demo samples for the Streamlit app (PR #12)
+**Who:** Gaurav (ML1) · **Area:** Data, UI support
+- `app/demo_samples.json`: 9 ready-made reports for the app's sample buttons (one per incident type, a non-emergency and a
+  vague report), each with the expected type and severity. They come from the held-out `test_synth` set, so the demo does not
+  show the models text they were trained on.
+
 ## 2026-10-16 · Gold set audit result (PR #11)
 **Who:** Gaurav (ML1) · **Area:** Data, Docs
 - Gaurav audited a random 30-row sample of the gold set (`data/gold/gold_audit.csv`): all 30 rows agreed on type and
