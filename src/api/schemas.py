@@ -76,3 +76,9 @@ class AlertQueueResponse(BaseModel):
 class HealthResponse(BaseModel):
     status: str
     models: Dict[str, bool]
+
+class TranscribeResult(BaseModel):
+    transcript: str
+    confidence: float
+    low_confidence: bool
+    duration_s: float

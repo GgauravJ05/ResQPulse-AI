@@ -18,6 +18,7 @@ from src.api.schemas import (
     AlertExplanation, AlertQueueResponse, HealthResponse, ErrorResponse, ErrorDetail
 )
 from src.services.geocoding import geocode_location
+from src.services.deduplication import find_duplicate, register_embedding   # safe to import: degrades to "no duplicates"
 
 load_dotenv()
 
@@ -156,29 +157,19 @@ async def transcribe_endpoint(file: UploadFile = File(...)):
         return format_error("MODEL_NOT_READY", "ASR model is not ready.", status.HTTP_503_SERVICE_UNAVAILABLE)
 
     filename = file.filename or ""
-    allowed_exts = (".wav", ".mp3", ".m4a", ".webm")
-    if not filename.lower().endswith(allowed_exts):
+    if not filename.lower().endswith((".wav", ".mp3", ".m4a", ".webm")):
         return format_error("AUDIO_UNREADABLE", "Unsupported file extension.", status.HTTP_400_BAD_REQUEST)
-
-    with tempfile.NamedTemporaryFile(delete=False, suffix=Path(filename).suffix) as tmp:
-        content = await file.read()
-        if len(content) == 0:
-            return format_error("AUDIO_UNREADABLE", "Empty audio file.", status.HTTP_400_BAD_REQUEST)
-        tmp.write(content)
-        tmp_path = tmp.name
+    content = await file.read()
+    if len(content) == 0:
+        return format_error("AUDIO_UNREADABLE", "Empty audio file.", status.HTTP_400_BAD_REQUEST)
 
     try:
-        res = transcribe_fn(tmp_path)
-        if res.duration_s > 60.0:
-            return format_error("AUDIO_UNREADABLE", "Audio exceeds 60 seconds limit.", status.HTTP_400_BAD_REQUEST)
-        if not res.transcript.strip():
-            return format_error("AUDIO_UNREADABLE", "Audio contains no recognizable speech.", status.HTTP_400_BAD_REQUEST)
-        return res
+        res = transcribe_fn(content)             # audio is decoded in memory (60 s limit enforced in the ASR module)
     except Exception as e:
         return format_error("AUDIO_UNREADABLE", f"Could not decode audio: {str(e)}", status.HTTP_400_BAD_REQUEST)
-    finally:
-        if os.path.exists(tmp_path):
-            os.remove(tmp_path)
+    if not res.transcript.strip():
+        return format_error("AUDIO_UNREADABLE", "Audio contains no recognizable speech.", status.HTTP_400_BAD_REQUEST)
+    return res
 
 @app.post("/analyze", response_model=Alert)
 def analyze_endpoint(payload: AnalyzeRequest):
@@ -217,6 +208,9 @@ def analyze_endpoint(payload: AnalyzeRequest):
     # 3. Geocode
     lat, lon, geocoded = geocode_location(ext_res.location)
 
+   # ---> NEW: Run the deduplication check
+    duplicate_id, new_embedding = find_duplicate(payload.text, alert_store)
+
     # 4. Construct Alert
     global alert_counter
     with counter_lock:
@@ -253,7 +247,10 @@ def analyze_endpoint(payload: AnalyzeRequest):
         responders=responders,
         sdg_targets=sdg_targets,
         explanation=AlertExplanation(attention=cls_res.attention),
-        duplicate_of=None,
+        
+        # ---> NEW: Pass the found duplicate ID here
+        duplicate_of=duplicate_id, 
+        
         extractor=ext_res.extractor,
         model_versions=dict(model_versions),
         latency_ms=latency_ms
@@ -261,6 +258,9 @@ def analyze_endpoint(payload: AnalyzeRequest):
 
     # In-memory store
     alert_store[alert_id] = alert
+    
+    # ---> NEW: Save the embedding for future comparisons
+    register_embedding(alert_id, new_embedding)
 
     # Append to reports/alerts.jsonl
     with open(ALERTS_LOG, "a", encoding="utf-8") as f:

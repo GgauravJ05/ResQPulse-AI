@@ -17,6 +17,31 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · Real models wired into the API, BE2 services integrated (Gaurav, with ML2, ML3, BE2)
+**Who:** Gaurav (integration and fixes); code by ML2 (classifier), ML3 (model), BE2 (Whisper, geocoding, dedupe) · **Area:** API, ML
+- **Real models in the backend.** ML2's `classify()` (merged from `feat/classifier`; attention rollout) and a new
+  `src/models/generator.py` (`extract()`: Flan-T5 loaded once, retry with a wider beam, rule-based fallback that works offline,
+  ML3's people-count rule). `USE_FAKE_MODELS=false` runs them; `/health` now reports a model as loaded only if its weights
+  loaded. Weights live in `models/classifier/` and `models/generator/` (git-ignored). Verified: the classifier reproduces ML2's
+  CSV on 50 of 50 sampled rows (CPU 10 to 25 ms); the generator reproduces ML3's CSV exactly and takes 1 to 2.5 s per report.
+  The 9 demo reports are classified correctly end to end (first request after startup takes about 6 s, warm it up before the demo).
+- **BE2's `BE2_Tasks` branch was not mergeable as submitted**: `main.py` imported `geocode_location` but the module defined
+  `get_coordinates` (ImportError on startup), `whisper.py` imported a `TranscribeResult` that did not exist and exposed no
+  `transcribe()`, and the dedupe module loaded a model at import and needed an uninstalled package. Fixed while integrating:
+  name alias, `TranscribeResult` added to `schemas.py`, `transcribe` alias, dedupe made lazy and optional (the API degrades to
+  `duplicate_of: null` if `sentence-transformers` is missing), the extension/empty-speech checks BE2 removed from `/transcribe`
+  restored, `rapidfuzz` added.
+- **Two bugs found only by running it.** (1) `pydub` fails on Python 3.13 and newer (`audioop` was removed from the standard
+  library): `audioop-lts` added to requirements. (2) The geocoder's fuzzy match put "Barrackpore Kalyani expressway" (West Bengal)
+  at Lonavala; it now matches only whole known place names (longest wins) and uses fuzzy matching only for typos. Offline city
+  table grown to about 55 names; 7 of 9 demo alerts now get a correct pin.
+- **Whisper verified**: a spoken demo report (9 s) transcribed in about 4 s on CPU, 79% confidence, one misheard word
+  ("Lenavala"), which shows why the transcript box is editable. Whisper accuracy was not evaluated on a test set.
+- **Evaluation now uses the real pipeline.** `scripts/predict_generator.py` regenerates the ML3 prediction files through
+  `extract()`. Gold people-count exact match 0.285 to 0.500; 143 of 144 gold outputs come from the model and 1 from the fallback
+  (replacing ML3's hand repair); synthetic scores unchanged. ML3's original CSVs were kept as a backup. Slide 6 updated.
+- 34 tests pass (`pytest tests`).
+
 ## 2026-10-16 · Incident classifier: baseline, DistilBERT two-head, classify() (PR #7)
 **Who:** Vansh · **Area:** Classifier
 - `scripts/baseline_tfidf_lr.py`: TF-IDF (word 1–2-grams + char 2–5-grams) + Logistic Regression. C picked on

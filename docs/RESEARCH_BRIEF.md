@@ -561,8 +561,8 @@ Updated with every merged change. The full history is in [UPDATE.md](UPDATE.md).
 | Baseline (TF-IDF + LR) | ML2 | ✅ Done and scored | `scripts/baseline_tfidf_lr.py` |
 | DistilBERT classifier + attention | ML2 | ✅ Trained, scored; `classify()` with attention rollout verified against ML2's CSV (50 of 50 rows) | Weights in `models/classifier/` (git-ignored); heatmap contrast is flat, stretch scores in the UI |
 | Flan-T5 generator + fallback | ML3 | ✅ Trained, scored; `src/models/generator.py` (`extract()` + rule fallback + people rule) written and tested; ML3 to review | Weights in `models/generator/`; 1 to 2 s per report on CPU |
-| Whisper ASR | BE2 | ⏳ Not in the repo; `/transcribe` returns MODEL_NOT_READY | Needs `src/asr/whisper.py` |
-| FastAPI backend | BE1 | ✅ API merged; real classifier + generator wired (`USE_FAKE_MODELS=false`), 9 of 9 demo reports correct end to end | Geocoding has no city fallback (5 of 9 demo alerts got no map pin) |
+| Whisper ASR | BE2 | ✅ Integrated and verified: 9 s spoken report to text in about 4 s on CPU | Needs ffmpeg and, on Python 3.13+, `audioop-lts`; accuracy not evaluated on a test set |
+| FastAPI backend | BE1 | ✅ API merged; real classifier + generator wired (`USE_FAKE_MODELS=false`), 9 of 9 demo reports correct end to end | Geocoding: offline city table + cache + Nominatim, 7 of 9 demo alerts get a pin; duplicate detection is optional (needs `sentence-transformers`) |
 | Streamlit dashboard | FE | ⏳ Not started | |
 | Evaluation + metrics.json | ML1 | ✅ Scored on real ML2 + baseline + ML3 predictions; rerun if any file is resent | `reports/results.md`; slide 6 filled in |
 | Slides + backup video | FE + all | ⏳ Not started | |
@@ -688,8 +688,10 @@ This is the strongest evidence for using a transformer.
 | Real tweets, gold | 1.33 | 1.77 | 50% |
 
 **Field extraction (Flan-T5), call-style reports:** output parses 100% of the time; location F1 0.78, people count exact
-61%, injuries F1 0.54 (0.64 lenient), hazards F1 0.38 (0.59 lenient), summary ROUGE-L 0.50. On real tweets these are lower
-(location F1 0.49). Update these if ML3 resends after the people-count rule.
+60%, injuries F1 0.54 (0.64 lenient), hazards F1 0.38 (0.59 lenient), summary ROUGE-L 0.50. On real tweets these are lower:
+location F1 0.50, people count 50% (it was 28% before the people-count rule), injuries F1 0.17. These scores come from the
+real pipeline that runs in the demo (`extract()`: generation, retry, rule fallback, people rule). The model alone parsed
+143 of 144 real reports; the rule-based fallback handled the last one.
 
 **Show one failure and say why (pick one):**
 - *False alarm:* "Photo of dummy presented as wounded LAX shooter by media" is predicted `VIOLENCE_CRIME`. The text is

@@ -241,7 +241,7 @@ ResQPulse_AI/
 
 ## 11. Setup
 
-**Requirements:** Python 3.11 recommended (matches Kaggle), `ffmpeg` (for audio).
+**Requirements:** Python 3.11 recommended (matches Kaggle), `ffmpeg` (for audio). On Python 3.13 or newer `pip install -r requirements.txt` also installs `audioop-lts`, which `pydub` needs.
 
 ```bash
 git clone https://github.com/GgauravJ05/ResQPulse_AI.git

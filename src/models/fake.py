@@ -101,7 +101,7 @@ def extract(text: str) -> ExtractResult:
         extractor="flan_t5"
     )
 
-def transcribe(audio_path: str) -> TranscribeResult:
+def transcribe(audio_bytes: bytes) -> TranscribeResult:
     return TranscribeResult(
         transcript="Accident on Mumbai-Pune expressway near Lonavala exit, truck hit two cars, one guy not moving, lot of blood, traffic blocked",
         confidence=0.88,
