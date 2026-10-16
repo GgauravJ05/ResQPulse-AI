@@ -3,6 +3,10 @@
 > Read this before the hackathon starts. It covers the problem, our solution, what makes it different,
 > how it works, how we'll be scored, and what each of us does in the 12 hours.
 > Items marked **[DECIDE]** are still open and will be settled in the first hour.
+>
+> **This is a living document.** It is updated with every change to the project, so by the end it describes
+> what we actually built, and **§17 becomes the doc we read from when presenting**. Each change is also logged
+> in [UPDATE.md](UPDATE.md).
 
 ---
 
@@ -541,6 +545,124 @@ model with a broken app scores badly.
 - [ ] Teammates' consent to record voice clips
 - [ ] Role assignments (§11)
 - [ ] Which stretch features (duplicate merge?) we attempt if ahead of schedule
+
+---
+
+## 16. Project status (kept current)
+
+Updated with every merged change. The full history is in [UPDATE.md](UPDATE.md).
+
+| Part | Owner | Status | Notes |
+|---|---|---|---|
+| Repo, docs, schema v1 | – | ✅ Done | README, this brief, [SCHEMA.md](SCHEMA.md), [DATASETS.md](DATASETS.md) |
+| Datasets downloaded + mapped | ML1 | ⏳ Not started | Links verified in DATASETS.md |
+| Synthetic reports (Claude) | ML1 | ⏳ Not started | |
+| Gold test set | ML1 + BE2 | ⏳ Not started | |
+| Baseline (TF-IDF + LR) | ML2 | ⏳ Not started | |
+| DistilBERT classifier + attention | ML2 | ⏳ Not started | |
+| Flan-T5 generator + fallback | ML3 | ⏳ Not started | |
+| Whisper ASR | BE2 | ⏳ Not started | |
+| FastAPI backend | BE1 | ⏳ Not started | |
+| Streamlit dashboard | FE | ⏳ Not started | |
+| Evaluation + metrics.json | ML1–3 | ⏳ Not started | |
+| Slides + backup video | FE + all | ⏳ Not started | |
+
+**Changes from the original plan** (record every change here, because judges like to hear *why* a plan changed):
+
+| Date | Change | Why |
+|---|---|---|
+| 2026-10-16 | Added `STORM_CYCLONE` class | Hurricanes/cyclones are the largest share of HumAID; dropping them wasted real data |
+| 2026-10-16 | `ROAD_ACCIDENT` → `TRANSPORT_ACCIDENT` | CrisisLexT26 has real train and helicopter crashes that fit only a broader class |
+| 2026-10-16 | Claude chosen for synthetic data | Structured outputs guarantee valid labelled JSON for every report |
+
+---
+
+## 17. Presentation reading guide
+
+**Read this on the day.** It follows the deck (§13) slide by slide. Each block says who speaks, what to say,
+and which marks it earns. Anything in `[brackets]` is filled in from the final results (`reports/metrics.json`)
+before the presentation. **Update this section whenever something we built changes the story.**
+
+Target time: about 7 minutes of talk + 3 minutes of demo, then questions.
+
+### Slide 1: Hook (≈30 s) · *Problem Understanding*
+**Speaker:** [name]
+> "[Cited statistic about emergency response delay or call volume.] When a disaster hits, control rooms get
+> flooded with messages like this one: *'bhai there's a huge fire near the petrol pump on FC road, 2-3 people
+> stuck inside...'*. Someone has to read it, work out what happened, how bad it is and where, and send the
+> right help. Every minute spent doing that by hand is a minute lost."
+
+### Slide 2: Problem and user (≈45 s) · *Problem Understanding*
+**Speaker:** [name]
+- Our user is the **112 dispatcher**. Reports arrive as unstructured text and calls, and during disasters
+  they arrive in floods, many of them duplicates.
+- Manual triage is slow, varies between operators, and leaves no machine-readable record.
+- **We assist the dispatcher. We don't replace them**: every alert is confirmed by a human.
+
+### Slide 3: Our solution (≈45 s) · *Innovation*
+**Speaker:** [name]
+> "ResQPulse turns a messy report, typed or spoken, into a structured, prioritised, explainable alert in about
+> [latency] seconds."
+- Point to the architecture: **Whisper hears it, DistilBERT understands it, Flan-T5 writes it up.**
+- Our differentiators: a full alert, not just a label; attention-based explanations; a continuous severity
+  score; voice input; a live priority queue and map; small models that run offline. [Add duplicate merging if built.]
+
+### Slide 4: How attention works (≈45 s) · *Technical Implementation*
+**Speaker:** [ML2]
+- Every word looks at every other word and decides how much it matters (Q, K, V → softmax weights).
+- We combine attention across all layers (**attention rollout**) to show which words drove the decision.
+- Be honest: *"Attention shows what the model focused on. It's an indicator, not proof, which is why a human confirms every alert."*
+
+### Slide 5: Data (≈45 s) · *Technical Implementation*
+**Speaker:** [ML1]
+- Real crisis posts: HumAID ([n] tweets, 13 disasters), CrisisLexT26 ([n] tweets, 26 crises), and Kaggle Disaster Tweets as negatives.
+- [n] call-style reports generated with Claude, with every field labelled, covering everyday emergencies that no
+  public dataset has.
+- **Gold test set:** [n] human-verified reports that we never trained on.
+- 8 incident types; a severity rubric from 1 to 5.
+
+### Slide 6: Results (≈60 s) · *Metrics*
+**Speaker:** [ML2 / ML3]
+| | Baseline | Ours |
+|---|---|---|
+| Incident type, macro F1 (gold) | [x] | [x] |
+| Precision / Recall (gold) | [x] / [x] | [x] / [x] |
+| Severity MSE / RMSE | – | [x] / [x] |
+| Field extraction F1 | – | [x] |
+| Voice: typed vs. spoken F1 | – | [x] vs. [x] (WER [x]%) |
+
+- Point out **recall on critical incidents**: missing a real emergency costs more than a false alarm.
+- Show the confusion matrix and **one failure case and why it failed**.
+
+### Slide 7: Live demo (≈3 min) · *Functionality / Presentation & Demo*
+**Driver:** [FE] · **Narrator:** [BE1]
+1. Type a report → alert card: type, severity, location on the map, responders, summary.
+2. Open the **Explain** tab → the attention heatmap. Say which words lit up and why that makes sense.
+3. Play the **pre-recorded noisy voice clip** → the transcript appears, gets corrected if needed → alert.
+4. Show the **priority queue**: the critical alert jumps to the top.
+5. Type a non-emergency ("is the mall open today?") → *"No emergency detected"*.
+6. If anything breaks, switch to the backup video without commentary.
+
+### Slide 8: SDG impact (≈30 s) · *SDG Implementation*
+**Speaker:** [name]
+- 3.6 (road deaths) · 3.d (health risks) · 11.5 (disaster deaths) · 13.1 (climate resilience) · 16.1 (violence) · 16.6 (accountable institutions).
+- Point out that the **SDG badge appears on each alert in the app**, not just on this slide.
+
+### Slide 9: Limitations and future work (≈30 s) · *Problem Understanding / Communication*
+**Speaker:** [name]
+- Everyday emergencies rely on generated data → future work: real anonymised 112 transcripts.
+- English only → Hindi, Marathi and Hinglish next (MuRIL, multilingual Whisper).
+- Learning from dispatcher corrections (they are already logged); integration with 112 ERSS.
+
+### Slide 10: Team (≈15 s)
+Each person says their name and the one part they built.
+
+### Before presenting: checklist
+- [ ] Every `[bracket]` above is filled from `reports/metrics.json`
+- [ ] Statistic on slide 1 has a cited source
+- [ ] Demo laptop has the models, the cached geocodes and the voice clip available offline
+- [ ] Backup video is on the laptop and on a phone
+- [ ] Each speaker has rehearsed their part and the Q&A in §13
 
 ---
 

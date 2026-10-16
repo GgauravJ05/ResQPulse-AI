@@ -12,6 +12,7 @@ GenHack v1.0 · Gen AI course · **PS 15: EmergencyScribe — Convert Emergency 
 > - **[docs/RESEARCH_BRIEF.md](docs/RESEARCH_BRIEF.md)**: the problem, our approach and the reasoning behind every decision
 > - **[docs/SCHEMA.md](docs/SCHEMA.md)**: every data format: enums, training CSV, Claude generation, model interfaces, API, alert, metrics
 > - **[docs/DATASETS.md](docs/DATASETS.md)**: verified download links for all datasets and models, and how each maps to our labels
+> - **[docs/UPDATE.md](docs/UPDATE.md)**: log of every change to the project, newest first
 
 ---
 
@@ -212,7 +213,8 @@ ResQPulse_AI/
 ├── docs/
 │   ├── RESEARCH_BRIEF.md  # problem, approach, decisions
 │   ├── SCHEMA.md          # all data formats and the API contract
-│   └── DATASETS.md        # dataset and model links
+│   ├── DATASETS.md        # dataset and model links
+│   └── UPDATE.md          # change log, one entry per PR
 ├── models/              # trained weights from Kaggle  (git-ignored)
 ├── notebooks/           # Kaggle training / eval notebooks
 ├── reports/             # metrics JSON, confusion matrices, model cards
@@ -289,6 +291,9 @@ The Pydantic definitions are in [SCHEMA.md §5](docs/SCHEMA.md#5-model-interface
 - **Commit often**: small commits that each do one thing, so a broken change is easy to revert.
 - **Pull requests** use the template in `.github/`: what it does, how it was tested, checklist.
   Another teammate reviews if time allows; during the hackathon, a quick look is enough.
+- **Every PR adds an entry to [docs/UPDATE.md](docs/UPDATE.md)** and updates the status table in
+  [RESEARCH_BRIEF.md §16](docs/RESEARCH_BRIEF.md#16-project-status-kept-current). If the change affects what we
+  say on stage, update the presentation guide in §17 too. By the end, the brief is the doc we present from.
 - **Never commit** secrets (`.env`, `kaggle.json`), raw data, audio recordings or model weights.
 
 ```bash

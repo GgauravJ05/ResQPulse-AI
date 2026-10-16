@@ -21,3 +21,5 @@
 - [ ] No secrets, raw data, audio recordings or model weights committed
 - [ ] Follows the API contract / alert schema in the README
 - [ ] Metrics updated in `reports/` if a model changed
+- [ ] Entry added to `docs/UPDATE.md`
+- [ ] Status table in `docs/RESEARCH_BRIEF.md` §16 updated (and §17 if the presentation story changed)
