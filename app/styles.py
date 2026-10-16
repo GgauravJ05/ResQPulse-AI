@@ -98,7 +98,9 @@ RESPONDER_ICONS: Dict[str, str] = {
 
 CUSTOM_CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+/* Fonts are served from app/static/fonts (Streamlit static serving), so the demo works with no internet. OFL licences sit beside them. */
+@font-face { font-family: 'Figtree'; src: url('app/static/fonts/Figtree-Variable.ttf') format('truetype'); font-weight: 300 900; font-display: swap; }
+@font-face { font-family: 'JetBrains Mono'; src: url('app/static/fonts/JetBrainsMono-Variable.ttf') format('truetype'); font-weight: 100 800; font-display: swap; }
 
 :root {
     --ground: #F5F5F3;
@@ -110,7 +112,6 @@ CUSTOM_CSS = """
     --hair-2: #D4D4D0;
     --signal: #FFCC00;
     --signal-tint: #FFF4CC;
-    --signal-deep: #8A6D00;
     --ease: cubic-bezier(0.22, 1, 0.36, 1);
     --sans: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -147,7 +148,6 @@ hr { border: none !important; border-top: 1px solid var(--hair) !important; marg
 .rail-brand { display: flex; align-items: center; gap: 0.6rem; padding: 0.2rem 0.4rem 1.2rem; }
 .rail-brand svg { width: 26px; height: 26px; flex: none; }
 .rail-brand b { font-size: 1.12rem; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }
-.rail-label { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); padding: 0 0.6rem; margin: 0.4rem 0 0.3rem; }
 .st-key-nav_screen_selection [data-testid="stWidgetLabel"] { display: none; }
 .st-key-nav_screen_selection [role="radiogroup"] { gap: 2px; }
 .st-key-nav_screen_selection [role="radiogroup"] label {

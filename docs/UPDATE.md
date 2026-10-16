@@ -17,6 +17,11 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · Dashboard works fully offline (PR #31)
+**Who:** Data lead · **Area:** UI
+- Figtree and JetBrains Mono are now served from `app/static/fonts/` (Streamlit static serving, `enableStaticServing = true`) instead of Google Fonts, with their OFL licences beside them. The browser-tab icon is a local PNG of the brand mark instead of a Google-hosted icon. Checked with Google blocked: both fonts load.
+- Removed two unused style tokens left from the redesign. Deleted the merged `fix/audio-upload-formats` branch.
+
 ## 2026-10-17 · Dashboard redesign: Kaggle / Motion / Impeccable references, no emoji (PR #29)
 **Who:** Data lead (with the Impeccable design skill) · **Area:** UI
 - New light console look taken from kaggle.com, motion.dev and impeccable.style: grey ground, white panels with hairlines, black pill buttons, one signal yellow (live dot, active nav, attention heatmap), Figtree for text, JetBrains Mono only for IDs, coordinates and scores.

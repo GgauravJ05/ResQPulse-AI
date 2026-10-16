@@ -57,7 +57,7 @@ from app.components import (
 # -----------------------------------------------------------------------------
 st.set_page_config(
     page_title="ResQPulse AI · Dispatch console",
-    page_icon=":material/ecg_heart:",
+    page_icon=str(Path(__file__).resolve().parent / "static" / "favicon.png"),
     layout="wide",
     initial_sidebar_state="auto",
 )
