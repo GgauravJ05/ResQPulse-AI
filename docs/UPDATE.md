@@ -17,6 +17,20 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-16 · Interim evaluation on real predictions (PR #13)
+**Who:** Gaurav (ML1) · **Area:** Evaluation
+- First real scores from ML2 (DistilBERT + TF-IDF baseline) and ML3 (Flan-T5), committed as `reports/metrics.json`,
+  `results.md`, `error_analysis.md` and confusion matrices so the Streamlit metrics page can be built on real output.
+  **Interim**: the baseline has no gold-set predictions yet and ML3 may resend after a post-processing change.
+- Incident type, macro F1: synthetic test 0.957 (baseline 0.869); real test tweets 0.746 (baseline 0.625); gold 0.765.
+  On the 6 held-out CrisisLex crises (events never seen) DistilBERT scores 0.640 accuracy vs 0.483 for the baseline.
+- Weak spots, to state openly: on the gold set 17 of 45 NON_EMERGENCY tweets (mostly commentary that mentions a disaster) are
+  flagged as emergencies (false alarm 0.378), and severity generalises poorly from call-style training data to news tweets
+  (gold RMSE 1.33 vs 0.75 on synthetic; predictions shrink toward the middle, true 5.0 averages 3.66).
+  Emergency recall on gold is 0.909 and critical recall (severity >= 4) is 0.982.
+- ML2 delivered files with different names in `predictions/ml2/`; copied to the expected names. Still missing:
+  `baseline_gold.csv`.
+
 ## 2026-10-16 · Demo samples for the Streamlit app (PR #12)
 **Who:** Gaurav (ML1) · **Area:** Data, UI support
 - `app/demo_samples.json`: 9 ready-made reports for the app's sample buttons (one per incident type, a non-emergency and a
