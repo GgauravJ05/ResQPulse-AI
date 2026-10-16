@@ -1,126 +1,239 @@
 # ResQPulse AI
 
-**Turning messy emergency reports into structured, prioritised, explainable alerts.**
+**Turning messy emergency reports, typed or spoken, into structured, prioritised, explainable alerts for a 112 dispatcher.**
 
-GenHack v1.0 · Gen AI course · **PS 15: EmergencyScribe — Convert Emergency Reports Into Structured Alerts**
-· Technique: **Transformer + Attention**
+GenHack v1.0 (Mini Hackathon) · Gen AI course · **Problem statement 15: EmergencyScribe** · Technique: **Transformer + Attention**
+· Team **P 25** · [MIT licence](LICENSE)
 
-> **Status:** repository set up, development not started. Results and run commands are filled in as
-> each part is built.
->
-> **Team docs, read before your first task:**
-> - **[docs/RESEARCH_BRIEF.md](docs/RESEARCH_BRIEF.md)**: the problem, our approach and the reasoning behind every decision
-> - **[docs/SCHEMA.md](docs/SCHEMA.md)**: every data format: enums, training CSV, Claude generation, model interfaces, API, alert, metrics
-> - **[docs/DATASETS.md](docs/DATASETS.md)**: verified download links for all datasets and models, and how each maps to our labels
-> - **[docs/UPDATE.md](docs/UPDATE.md)**: log of every change to the project, newest first
+<p align="center"><img src="docs/architecture_diagram.png" alt="ResQPulse AI system architecture" width="900" /></p>
+
+A caller says: *"bhai there's a huge fire near the petrol pump on FC road, 2-3 people stuck inside the shop, smoke everywhere."*
+ResQPulse returns an alert: **FIRE · severity 4.5 (CRITICAL) · FC road · 3 people · smoke · send the fire brigade**, with the words that drove the
+decision highlighted, a pin on the map, and a place in the priority queue. A human dispatcher confirms every alert.
+
+> **Status:** complete and running end to end with the real models. 52 automated tests; the full pipeline was run in a browser with typed
+> and voice reports. Measured results and their limits are in [Results](#results) and [Limitations](#limitations).
+
+**Docs:** [Research brief](docs/RESEARCH_BRIEF.md) (the reasoning, and the doc to present from) ·
+[Schema](docs/SCHEMA.md) (every data format and the API contract) · [Datasets](docs/DATASETS.md) ·
+[Update log](docs/UPDATE.md) · [GenHack deck](docs/ResQPulse_AI_GenHack.pptx)
 
 ---
 
 ## Contents
 
-1. [The problem](#1-the-problem)
-2. [Our solution](#2-our-solution)
-3. [What makes it different](#3-what-makes-it-different)
-4. [Architecture](#4-architecture)
-5. [Alert schema](#5-alert-schema)
-6. [Data](#6-data)
-7. [Models](#7-models)
-8. [Evaluation](#8-evaluation)
-9. [SDG alignment](#9-sdg-alignment)
-10. [Repository structure](#10-repository-structure)
-11. [Setup](#11-setup)
-12. [Team and roles](#12-team-and-roles)
-13. [12-hour plan](#13-12-hour-plan)
-14. [Git workflow](#14-git-workflow)
-15. [Open decisions](#15-open-decisions)
-16. [Limitations and future work](#16-limitations-and-future-work)
+1. [The problem](#the-problem)
+2. [What it does](#what-it-does)
+3. [Architecture](#architecture)
+4. [Models](#models)
+5. [Data](#data)
+6. [Results](#results)
+7. [Claims and the evidence behind them](#claims-and-the-evidence-behind-them)
+8. [Limitations](#limitations)
+9. [Quick start](#quick-start)
+10. [Using the dashboard](#using-the-dashboard)
+11. [API](#api)
+12. [Alert format](#alert-format)
+13. [Reproducing the results](#reproducing-the-results)
+14. [Repository structure](#repository-structure)
+15. [SDG alignment](#sdg-alignment)
+16. [Team and workflow](#team-and-workflow)
+17. [Future work](#future-work)
 
 ---
 
-## 1. The problem
+## The problem
 
-People report emergencies in messy, unstructured language, through calls, SMS, WhatsApp and social media:
+During a disaster, control rooms are flooded with unstructured reports from calls, SMS, WhatsApp and social media. Many are duplicates,
+and urgent ones get buried. Triage is done by hand, so it is slow, varies between operators and leaves no machine-readable record.
 
-> "bhai there's a huge fire near the petrol pump on FC road, 2-3 people stuck inside the shop, smoke everywhere, pls send help fast"
+ResQPulse **assists** the dispatcher; it does not replace them. Every alert is reviewed and confirmed by a person.
 
-A dispatcher has to work out **what** happened, **how bad** it is, **where**, **how many** people are
-affected, **what hazards** exist and **whom to send**, quickly and under pressure. During disasters,
-report volume spikes, many reports are duplicates, and urgent ones get buried. Manual triage is slow,
-inconsistent between operators, and leaves no machine-readable record.
+## What it does
 
-**User:** the emergency dispatcher / control-room operator (e.g. India's 112 ERSS). ResQPulse **assists**
-them and does not replace them: every alert is confirmed by a human.
+| | |
+|---|---|
+| **Input** | A typed report, a microphone recording, or an uploaded audio file |
+| **Understands** | Incident type (8 classes) and a continuous severity score from 1 to 5 |
+| **Extracts** | Location, people affected, injuries, hazards and a one-line summary |
+| **Explains** | An attention heatmap showing which words drove the decision |
+| **Acts** | Geocodes the place, suggests responders, tags UN SDG targets, flags likely duplicate reports |
+| **Dashboard** | Report input, alert card, heatmap, severity-sorted queue with an incident map, and model metrics |
+| **Human in the loop** | The dispatcher confirms, dispatches or dismisses; every correction is logged |
 
-## 2. Our solution
+## Architecture
 
-ResQPulse takes a **typed or spoken** report and, in about a second, produces a **structured alert**:
-incident type, severity score, location on a map, people affected, injuries, hazards, responders to send,
-and a one-line summary. An **attention heatmap** shows which words drove the decision. Alerts appear on a
-**live dispatcher dashboard**, sorted by severity.
+The diagram at the top shows the system. In words:
 
-**Example**
+1. The **Streamlit dashboard** takes a typed or spoken report and calls the **FastAPI backend** (`POST /analyze`, `POST /transcribe`).
+2. Voice goes to **Whisper small.en** first; the transcript can be edited before analysis.
+3. The backend sends the text to **DistilBERT** (incident type, severity, attention scores) and **Flan-T5-base** (location, people, injuries, hazards, summary).
+4. The backend geocodes the place, adds responders and SDG tags by rule, checks for duplicates, and saves the alert (in memory plus JSONL logs).
+5. The dashboard shows the alert, the heatmap, the priority queue and the map.
 
-Input:
-> "Accident on Mumbai–Pune expressway near Lonavala exit, truck hit two cars, one guy not moving, lot of blood, traffic blocked"
+Everything runs offline on one laptop once the models are downloaded. If a model fails, the backend falls back: a rule-based extractor replaces
+Flan-T5, and an offline mock mode keeps the dashboard working with no backend at all.
 
-Output: `TRANSPORT_ACCIDENT` · severity **4.4 (CRITICAL)** · Lonavala exit (mapped) · 1 person unresponsive,
-heavy bleeding · hazards: traffic blocked, multiple vehicles · send **ambulance + traffic police**.
+## Models
 
-## 3. What makes it different
-
-| | Feature | Why it matters |
+| Component | Model | Notes |
 |---|---|---|
-| 1 | **Full structured alert, not just a label** | Prior work (CrisisNLP, HumAID) classifies tweets; we produce a dispatch-ready record |
-| 2 | **Attention-based explainability** | Dispatchers see *why* an alert is critical |
-| 3 | **Continuous severity score (1–5)** | Fine-grained priority ordering |
-| 4 | **Voice input (Whisper)** | Real emergencies are mostly calls |
-| 5 | **Live priority queue + map** | A dispatch tool, not just a model |
-| 6 | **Small, offline, free models** | Emergency data is sensitive; no per-call cost or internet dependency |
-| 7 | *(stretch)* **Duplicate-report merging** | 10 reports of one fire become 1 alert |
+| Baseline | TF-IDF + logistic regression | Exists to show the transformer is better |
+| Classifier | `distilbert-base-uncased` with two heads | Type (cross-entropy) and severity (masked MSE); heatmap from attention rollout |
+| Generator | `google/flan-t5-base` (fp32) | Writes a flat `key: value \| ...` line (T5 has no `{}` tokens), parsed to JSON; retry with a wider beam, then rule fallback, then a people-count rule |
+| Speech | `faster-whisper` `small.en` (int8, VAD on) | Not trained by us; low-confidence transcripts are flagged for review |
+| Duplicates | `all-MiniLM-L6-v2` (sentence-transformers) | Cosine similarity above 0.75 marks `duplicate_of` |
 
-## 4. Architecture
+Training ran on Kaggle T4 GPUs ([classifier notebook](notebooks/classifier-notebook.ipynb), [generator notebook](notebooks/flan-t5-train.ipynb)).
+Inference runs on a laptop CPU.
 
-Three transformers work together: **Whisper hears the report, DistilBERT understands it, Flan-T5 writes the alert.**
+## Data
 
+| Kind | Source | Used for |
+|---|---|---|
+| Real crisis tweets | [HumAID](https://crisisnlp.qcri.org/humaid_dataset), [CrisisLexT26](https://crisislex.org/data-collections.html), [Kaggle Disaster Tweets](https://www.kaggle.com/competitions/nlp-getting-started) (negatives) | Teaching the models disasters; about 37,000 tweets after cleaning and de-duplication |
+| Call-style reports | 710 reports written by Claude, 8 writing styles, every field labelled and validated | Everyday emergencies and the demo style; each phrase checked to appear word for word in the text |
+| Gold test set | 144 real reports labelled by Claude, re-reviewed in a second pass, then audited by a person on 30 random rows (30 of 30 agreed) | Never trained on; the main test of real-world performance |
+
+- Training set: 9,551 rows (7,563 real, plus 497 unique call-style reports each repeated 4 times).
+- Held out and never trained on: 107 call-style reports, 7,755 real tweets (including 6 crises the models never saw) and the gold set.
+- **A finding:** naming a tweet's label by its disaster was wrong for about 16% of tweets (donation appeals, jokes, commentary mention a disaster but report nothing). That is why we built the gold set.
+- Raw data, processed data and model weights are not committed. Links, formats and label mappings: [docs/DATASETS.md](docs/DATASETS.md). Dataset on Kaggle: [ggauravj05/resqpulse-data](https://www.kaggle.com/datasets/ggauravj05/resqpulse-data).
+
+## Results
+
+One script ([scripts/evaluate.py](scripts/evaluate.py)) scores every model from prediction files; the models never see the test labels. Full tables: [reports/results.md](reports/results.md).
+
+**Incident type: baseline (TF-IDF + logistic regression) → our DistilBERT**
+
+| Test set | Macro precision | Macro recall | Macro F1 |
+|---|---|---|---|
+| **Gold: 144 real reports** | 0.61 → **0.76** | 0.59 → **0.79** | 0.56 → **0.77** |
+| Call-style: 107 reports | 0.89 → **0.96** | 0.86 → **0.96** | 0.87 → **0.96** |
+| Real tweets: 7,755 | 0.73 → **0.79** | 0.62 → **0.75** | 0.63 → **0.75** |
+
+On the 6 crises the models never saw, accuracy is **64% vs 48%** for the baseline: the strongest evidence for using a transformer.
+
+**Safety numbers (gold set).** A missed emergency costs more than a false alarm.
+
+| | Baseline | Ours |
+|---|---|---|
+| Real emergencies caught (emergency recall) | 0.71 | **0.91** |
+| Severity 4 or 5 reports not dismissed as non-emergency | 0.75 | **0.98** |
+| False alarms on non-emergencies | 0.36 | 0.38 |
+
+**Severity (1 to 5):** RMSE **0.75** / MSE 0.57 on call-style reports (87% within one point); RMSE 1.33 / MSE 1.77 on real tweets.
+
+**Field extraction (Flan-T5):** output parses 100% of the time; on call-style reports location F1 0.78, injuries F1 0.54 (0.64 lenient),
+hazards F1 0.38 (0.59 lenient), summary ROUGE-L 0.50. Scores come from the real pipeline that runs in the demo (generation, retry, fallback, people-count rule).
+
+**Voice:** word error rate **9.9% clean, 15.5% noisy** on 20 held-out reports spoken by 4 text-to-speech voices ([scripts/eval_whisper.py](scripts/eval_whisper.py)).
+The incident type from speech matched the typed-text result in 18 of 20 clips (clean) and 16 of 20 (noisy). Most errors are place names and digits.
+
+<p align="center"><img src="reports/confusion_matrix_gold_ml2.png" alt="Confusion matrix on the gold set" width="520" /></p>
+
+## Claims and the evidence behind them
+
+| Claim | Evidence |
+|---|---|
+| Beats the baseline on real, checked reports | Gold macro F1 0.77 vs 0.56; [reports/results.md](reports/results.md) |
+| Catches 91% of real emergencies and keeps 98% of severe reports | Gold set, `emergency_recall` and `critical_recall` in [reports/metrics.json](reports/metrics.json) |
+| Generalises to events it has not seen | 64% vs 48% accuracy on 6 held-out crises |
+| Explains its decisions | Attention rollout heatmap on every alert; the dashboard states it is an indicator, not proof |
+| Voice works end to end | Tested through the real models; word error rate 9.9% clean, 15.5% noisy ([reports/whisper_wer.json](reports/whisper_wer.json)) |
+| Flags duplicate reports | Reworded reports of one fire scored 0.78 to 0.93 similarity, unrelated incidents under 0.25 |
+| Runs offline on a laptop | Both models and Whisper run locally; about 2 to 4 s per report once warm |
+| Raising the emergency threshold does not fix false alarms | Sweep on all three test sets: false alarms 0.38 to 0.31 costs emergency recall 0.93 to 0.87 and critical recall 0.98 to 0.95, so the default stays |
+| Averaging with the baseline does not help | Gold macro F1 stays at 0.765 or drops, so it was not added |
+| Works as a system, not only as models | 52 automated tests (metrics, API, generator, services, dashboard) |
+
+## Limitations
+
+Stated plainly, because the scores depend on them:
+
+- **False alarms:** 37.8% of non-emergency tweets on the gold set are flagged (commentary that uses disaster vocabulary). The model reads the topic, not the intent. The human dispatcher is the safeguard.
+- **Severity on real tweets is weaker** (RMSE 1.33 vs 0.75). The severity head was trained on call-style reports only, so scores shrink toward the middle on news-style text.
+- **No real 112 calls:** everyday emergencies rely on generated data. `MEDICAL` has no real tweets at all.
+- **Gold labels are Claude's,** checked by a person on 30 rows (30 of 30 agreed, meaning at least about 90% agreement at 95% confidence), not hand-labelled throughout.
+- **Voice was tested on synthetic speech, 20 clips,** not real callers. Place names and numbers are the usual errors, which is why the transcript is editable.
+- **English only.** Attention is an indicator of focus, not proof of reasoning.
+- The first request after start-up takes about 6 seconds while models warm up.
+
+## Quick start
+
+You need Python 3.10 or newer, and ffmpeg for voice (`brew install ffmpeg`, `winget install ffmpeg` or `sudo apt install ffmpeg`).
+
+```bash
+git clone https://github.com/GgauravJ05/ResQPulse_AI.git
+cd ResQPulse_AI
+python3 -m venv .venv
+source .venv/bin/activate              # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env
 ```
- Text ─────────────────────────────┐
-                                   ▼
- Voice ─► Whisper (speech→text) ─► editable transcript (dispatcher check)
-                                   │
-                                   ▼
-            ┌─────────────────────────────────────┐
-            │ DistilBERT, multi-task               │──► incident type   (classification)
-            │                                      │──► severity 1–5    (regression)
-            │                                      │──► attention heatmap (rollout)
-            └─────────────────┬───────────────────┘
-                              ▼
-            ┌─────────────────────────────────────┐
-            │ Flan-T5-base, fine-tuned             │──► location, people, injuries,
-            │ report → structured fields          │    hazards, summary
-            └─────────────────┬───────────────────┘
-                              ▼
-            Post-processing: Pydantic validation · geocoding · type→responders · (stretch) dedupe
-                              ▼
-            FastAPI  (/transcribe · /analyze · /alerts)
-                              ▼
-            Streamlit dashboard: input · alert card · heatmap · priority queue · map · metrics
+
+**Models.** The trained weights are not in git (about 1.2 GB). Copy them into the repo as `models/classifier/` (6 files) and
+`models/generator/` (6 files, including the 944 MB `model.safetensors`). Whisper (about 480 MB) and the duplicate-check model (about 90 MB)
+download themselves the first time they are used, so run once with internet.
+
+**Run (two terminals, both in the repo folder with the venv active):**
+
+```bash
+# Terminal 1: backend. Wait for "Application startup complete".
+USE_FAKE_MODELS=false python -m uvicorn src.api.main:app --port 8000
+
+# Terminal 2: dashboard
+python -m streamlit run app/streamlit_app.py       # opens http://localhost:8501
 ```
 
-**Why two models?** Each does what it is best at (understanding vs. generating), two ML members can train
-them in parallel, and each has a fallback if the other struggles.
+On Windows PowerShell set the variable first: `$env:USE_FAKE_MODELS="false"`. To let others on your Wi-Fi open the dashboard,
+add `--server.address 0.0.0.0` and share `http://<your-ip>:8501` (the microphone only works on localhost).
 
-## 5. Alert schema
+**Check it:**
 
-The full specification is in **[docs/SCHEMA.md](docs/SCHEMA.md)** (schema v1). The essentials:
+```bash
+curl http://localhost:8000/health
+# {"status":"ok","models":{"classifier":true,"generator":true,"asr":true}}
+```
 
-**Incident types (8):** `FIRE` · `FLOOD` · `STORM_CYCLONE` · `EARTHQUAKE_COLLAPSE` · `TRANSPORT_ACCIDENT` ·
-`MEDICAL` · `VIOLENCE_CRIME` · `NON_EMERGENCY`
+The sidebar of the dashboard should say **Live mode: real models**. Send one report first to warm the models up.
 
-**Severity:** 1.0–5.0 using a shared rubric → `LOW` < 2 ≤ `MEDIUM` < 3 ≤ `HIGH` < 4 ≤ `CRITICAL`
+**No models yet?** Start the backend with `USE_FAKE_MODELS=true` for fake alerts, or start only the dashboard and it falls back to offline
+mock mode. Every screen still works, so teammates can develop the UI without any weights.
 
-**Responders:** `FIRE_BRIGADE` · `AMBULANCE` · `POLICE` · `TRAFFIC_POLICE` · `DISASTER_RESPONSE`
+**Start order matters:** the dashboard picks Live mode only if the backend is already running when it starts.
 
-**Alert (shortened):**
+## Using the dashboard
+
+| Screen | What to do |
+|---|---|
+| **Report Input** | Click a demo sample, type a report, record with the microphone, or upload audio. For voice, click *Transcribe Audio Now*, fix any misheard word, then *Analyze Report*. |
+| **Alert Card** | Type, severity bar, summary, location with coordinates, people affected, confidence, responders, SDG targets, injuries, hazards, JSON download. Possible duplicates are flagged. |
+| **Attention Heatmap** | Words coloured by how much the model focused on them, plus the class probabilities. |
+| **Dispatcher Dashboard** | Severity-sorted queue, filters, confirm / dispatch / dismiss buttons, and the incident map. |
+| **Model Metrics** | Baseline vs DistilBERT tables, severity regression, extraction scores and confusion matrices. |
+
+Suggested live demo: type a report → alert card → heatmap → play `demo_assets/noisy_phone_report.wav` (phone-quality audio; Whisper hears
+"Lonavala" as "La Navalan", a good moment to correct the transcript) → queue and map → a non-emergency such as "is the mall open today?" → calm
+"No emergency detected" card.
+
+## API
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /health` | Which models are loaded |
+| `POST /transcribe` | Audio file → transcript, confidence, duration |
+| `POST /analyze` | Report text → full alert |
+| `GET /alerts` | Severity-sorted queue (filter by status) |
+| `GET /alerts/{id}`, `PATCH /alerts/{id}` | Read an alert; confirm, dispatch or dismiss it (logged as a correction) |
+| `GET /metrics` | Stored evaluation numbers for the dashboard |
+
+Details and error codes: [docs/SCHEMA.md §7](docs/SCHEMA.md).
+
+## Alert format
+
+Full specification in [docs/SCHEMA.md](docs/SCHEMA.md) (schema v1). Incident types: `FIRE`, `FLOOD`, `STORM_CYCLONE`, `EARTHQUAKE_COLLAPSE`,
+`TRANSPORT_ACCIDENT`, `MEDICAL`, `VIOLENCE_CRIME`, `NON_EMERGENCY`. Severity 1.0 to 5.0 → `LOW` < 2 ≤ `MEDIUM` < 3 ≤ `HIGH` < 4 ≤ `CRITICAL`.
 
 ```json
 {
@@ -139,224 +252,83 @@ The full specification is in **[docs/SCHEMA.md](docs/SCHEMA.md)** (schema v1). T
   "summary": "Truck hit two cars near Lonavala exit; one person unresponsive and bleeding heavily; road blocked.",
   "responders": ["AMBULANCE", "TRAFFIC_POLICE"],
   "sdg_targets": ["3.6"],
+  "duplicate_of": null,
   "explanation": { "attention": [["moving", 1.0], ["blood", 0.88]] }
 }
 ```
 
-**API:** `GET /health` · `POST /transcribe` · `POST /analyze` · `GET /alerts` · `GET|PATCH /alerts/{id}` ·
-`GET /metrics` (details and error codes in SCHEMA.md §7).
-
-## 6. Data
-
-| Kind | Source | Labels |
-|---|---|---|
-| **A: Real crisis posts** | [HumAID](https://crisisnlp.qcri.org/humaid_dataset) set 1 (~43k tweets, 13 disasters), [CrisisLexT26](https://crisislex.org/data-collections.html) (~28k tweets, 26 crises), [Kaggle *NLP with Disaster Tweets*](https://www.kaggle.com/competitions/nlp-getting-started) | Incident type (mapped from event/crisis name), emergency vs. not |
-| **B: Generated call-style reports** | ~3,000 reports from **Claude**, using a type × severity × style × city grid | Everything: type, severity, all fields |
-| **Gold test set** | 144 real reports labelled by Claude, then re-reviewed in a second pass, with a 30-row human audit to measure agreement | Real text with type, severity and fields; **never trained on** |
-| **Voice** | ~50 teammate recordings + ~300 TTS clips with added noise | For demo, voice evaluation, and speech-style training text |
-
-- All links, file formats and label mappings: **[docs/DATASETS.md](docs/DATASETS.md)**.
-- Train on A + B, demo on B-style reports. CrisisLexT26 also serves as a **cross-dataset test**. Split 70/15/15, stratified, deduplicated across splits.
-- Gold-set and synthetic-set scores are **always reported separately**.
-- Raw data, processed data, audio recordings and model weights are **not committed** (see `.gitignore`).
-  Data lives on Kaggle; only small gold/sample files go in git.
-
-## 7. Models
-
-| Component | Model | Notes |
-|---|---|---|
-| Baseline | TF-IDF + Logistic Regression | Exists to show the transformer is better |
-| Classifier | `distilbert-base-uncased` + 2 heads | Type (cross-entropy) + severity (masked MSE); heatmap via attention rollout |
-| Generator | `google/flan-t5-base` | Outputs a flat `key: value \| …` line (T5 has no `{}` tokens), parsed to JSON; trained in fp32 |
-| Fallback extractor | `dslim/bert-base-NER` + rules | Used if Flan-T5 underperforms |
-| Speech | `faster-whisper` `small.en` (int8) | Not trained; VAD on; confidence flags |
-
-Training runs on **Kaggle T4 GPUs** (separate accounts, so models train in parallel). Inference runs on a laptop CPU.
-
-## 8. Evaluation
-
-Results are filled in after training.
-
-| Task | Metric | Baseline | Ours (gold) | Ours (synthetic) |
-|---|---|---|---|---|
-| Incident type | Macro Precision / Recall / F1 | – | – | – |
-| Severity | MSE / RMSE / MAE | – | – | – |
-| Field extraction | Per-field P / R / F1, JSON validity % | – | – | – |
-| Summary | ROUGE-L | – | – | – |
-| Voice | WER; type F1 typed vs. spoken | – | – | – |
-| System | Latency per report (CPU) | – | – | – |
-
-We emphasise **recall on critical incidents**, because missing a real emergency is worse than a false alarm.
-Confusion matrices and error analysis go in `reports/`.
-
-**All numbers come from one script**, so every model is scored the same way and the models never see the test labels:
+## Reproducing the results
 
 ```bash
-# teammates' prediction CSVs go in predictions/ (formats: docs/SCHEMA.md §8.1)
-.venv/bin/python scripts/evaluate.py          # writes reports/metrics.json, results.md, error_analysis.md, confusion matrices
-.venv/bin/python tests/test_metrics.py        # metric unit tests (hand-computed values)
-.venv/bin/python scripts/make_fake_predictions.py --out /tmp/fake   # fake files to try the pipeline; numbers are meaningless
+.venv/bin/python -m pytest tests -q                      # 52 tests
+.venv/bin/python scripts/evaluate.py                     # scores every prediction file in predictions/ → reports/
+.venv/bin/python scripts/eval_whisper.py --n 20          # voice word error rate (backend running, macOS `say` voices)
+.venv/bin/python scripts/predict_generator.py --out predictions   # re-run the real extractor over the test inputs
+.venv/bin/python scripts/build_deck.py                   # rebuild the GenHack deck from the template
 ```
 
-## 9. SDG alignment
+The data pipeline scripts are in [scripts/](scripts/) (`build_public.py`, `validate_synthetic.py`, `make_splits.py`, `build_gold.py`).
+Prediction CSV formats are in [docs/SCHEMA.md §8.1](docs/SCHEMA.md).
 
-| SDG target | How ResQPulse supports it |
-|---|---|
-| **3.6**: halve road-traffic deaths and injuries | Faster triage of accident reports → faster ambulance dispatch |
-| **3.d**: early warning and management of health risks | Severity-ranked medical alerts |
-| **11.5**: reduce deaths and people affected by disasters | Structured, prioritised alerts during disaster report surges |
-| **13.1**: resilience to climate-related hazards | Processes flood and cyclone reports at scale |
-| **16.1**: reduce all forms of violence | Faster police + ambulance dispatch for violence/crime reports |
-| **16.6**: effective, accountable, transparent institutions | Explainable decisions + JSON audit log of every alert |
-
-## 10. Repository structure
+## Repository structure
 
 ```
 ResQPulse_AI/
-├── app/                 # Streamlit dashboard (FE)
-├── data/
-│   ├── raw/             # downloaded datasets          (git-ignored)
-│   ├── processed/       # cleaned splits               (git-ignored)
-│   ├── gold/            # gold test set (real text, Claude-labelled + audited) (committed, small)
-│   └── audio/           # voice recordings             (git-ignored, personal data)
-├── docs/
-│   ├── RESEARCH_BRIEF.md  # problem, approach, decisions
-│   ├── SCHEMA.md          # all data formats and the API contract
-│   ├── DATASETS.md        # dataset and model links
-│   └── UPDATE.md          # change log, one entry per PR
-├── models/              # trained weights from Kaggle  (git-ignored)
-├── notebooks/           # Kaggle training / eval notebooks
-├── reports/             # metrics JSON, confusion matrices, model cards
-├── scripts/             # one-off scripts (data generation, TTS, downloads)
+├── app/                  Streamlit dashboard (5 screens, mock and live modes)
 ├── src/
-│   ├── data/            # loaders, label mapping, synthetic generation (ML1)
-│   ├── models/          # classifier + generator inference (ML2, ML3)
-│   ├── explain/         # attention rollout, heatmaps (ML2)
-│   ├── asr/             # Whisper wrapper (BE2)
-│   └── api/             # FastAPI app (BE1)
-├── .env.example
-├── requirements.txt
+│   ├── api/              FastAPI app and schemas
+│   ├── models/           classifier (DistilBERT two-head), generator (Flan-T5), fake models for development
+│   ├── services/         geocoding, duplicate detection
+│   ├── asr/              Whisper wrapper
+│   ├── data/             label mapping, cleaning, Flan input/target format
+│   └── eval/             metric functions
+├── scripts/              data pipeline, evaluation, voice evaluation, deck builder
+├── notebooks/            Kaggle training notebooks (classifier, generator)
+├── data/gold/            the 144-report gold set (committed; raw and processed data are git-ignored)
+├── reports/              metrics, results tables, confusion matrices, Whisper evaluation
+├── tests/                52 automated tests
+├── docs/                 research brief, schema, datasets, update log, architecture diagram, GenHack deck
+├── demo_assets/          noisy phone-quality voice clip for the demo
+├── models/               trained weights (git-ignored, about 1.2 GB)
+├── .env.example · requirements.txt
 └── README.md
 ```
 
-## 11. Setup
+## SDG alignment
 
-**Requirements:** Python 3.11 recommended (matches Kaggle), `ffmpeg` (for audio). On Python 3.13 or newer `pip install -r requirements.txt` also installs `audioop-lts`, which `pydub` needs.
+| SDG target | How ResQPulse supports it |
+|---|---|
+| **3.6** halve road-traffic deaths and injuries | Faster triage of accident reports leads to faster ambulance dispatch |
+| **3.d** early warning and management of health risks | Severity-ranked medical alerts |
+| **11.5** reduce deaths and people affected by disasters | Structured, prioritised alerts during surges of disaster reports |
+| **13.1** resilience to climate-related hazards | Processes flood and cyclone reports at scale |
+| **16.1** reduce all forms of violence | Faster police and ambulance dispatch for violence and crime reports |
+| **16.6** effective, accountable, transparent institutions | Explainable decisions and a JSON log of every alert and correction |
 
-```bash
-git clone https://github.com/GgauravJ05/ResQPulse_AI.git
-cd ResQPulse_AI
-python3.11 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env          # then fill in the values
-brew install ffmpeg           # macOS; use apt on Linux
-```
+Each alert carries its SDG tags in the app, not only in this table.
 
-### Run the backend
-
-```bash
-# Fake models (no weights needed, good for developing the app):
-USE_FAKE_MODELS=true .venv/bin/python -m uvicorn src.api.main:app --port 8000
-
-# Real models: put the trained folders in models/ (git-ignored, ~1.2 GB in total), set USE_FAKE_MODELS=false in .env
-#   models/classifier/   config.json, model.safetensors, heads.pt, label_map.json, tokenizer files   (ML2, DistilBERT)
-#   models/generator/    config.json, model.safetensors, tokenizer files                              (ML3, Flan-T5)
-.venv/bin/python -m uvicorn src.api.main:app --port 8000
-curl localhost:8000/health       # classifier / generator are true only if the weights actually loaded
-```
-
-The first request after startup takes a few seconds (warm-up); later ones take about 1 to 2 seconds on a laptop CPU.
-If the Flan-T5 model cannot load, extraction falls back to rules (`extractor: "fallback_rules"`) and the API keeps working.
-Tests: `.venv/bin/python -m pytest tests -q`.
-
-### Run the dashboard
-
-```bash
-.venv/bin/python -m streamlit run app/streamlit_app.py     # opens on http://localhost:8501
-```
-
-It starts in **Live mode** when the backend answers on `API_URL` (default `http://localhost:8000`) and falls back to Mock Mode
-otherwise; the sidebar shows the mode and can switch it. Screens: report input (text, 9 demo samples, microphone or audio file
-with an editable transcript), alert card, attention heatmap, dispatcher dashboard (priority queue and map) and model metrics.
-
-## 12. Team and roles
+## Team and workflow
 
 | Role | Owns |
 |---|---|
-| **ML1: Data** | Synthetic generation, public-data mapping, splits, gold set, evaluation report |
-| **ML2: Classifier** | Baseline, DistilBERT multi-task, attention rollout heatmap |
-| **ML3: Generator** | Flan-T5 fine-tuning, parsing/validation, fallback extractor |
-| **BE1: API** | FastAPI, model loading, inference pipeline, error handling |
-| **BE2: Services** | Whisper, geocoding, alert store + priority queue, TTS pipeline, gold-set verification |
-| **FE: UI** | Streamlit screens, map, heatmap view, metrics page, slide design |
+| **ML1: Data** (Gaurav Jadhav) | Synthetic data, public-data mapping, splits, gold set, evaluation, integration |
+| **ML2: Classifier** | Baseline, DistilBERT two-head model, attention heatmap |
+| **ML3: Generator** | Flan-T5 fine-tuning, parsing, fallback extractor |
+| **BE1: API** | FastAPI, model loading, inference pipeline |
+| **BE2: Services** | Whisper, geocoding, alert store and queue, duplicate detection |
+| **FE: UI** | Streamlit screens, map, heatmap view, metrics page |
 
-**Interfaces agreed in hour 0**, so the backend can use fake versions until the models are ready:
+Every change goes on a branch and into `main` through a pull request, and is logged in [docs/UPDATE.md](docs/UPDATE.md).
+The research brief ([docs/RESEARCH_BRIEF.md](docs/RESEARCH_BRIEF.md)) is kept current as the document to present from.
 
-```python
-classify(text: str) -> ClassifyResult          # ML2: incident_type, probs, severity, attention
-extract(text: str) -> ExtractResult            # ML3: location, people_affected, injuries, hazards, summary
-transcribe(audio_path: str) -> TranscribeResult  # BE2: transcript, confidence, low_confidence, duration_s
-```
+## Future work
 
-The Pydantic definitions are in [SCHEMA.md §5](docs/SCHEMA.md#5-model-interfaces-python).
-
-## 13. 12-hour plan
-
-| Hours | Work | Exit criterion |
-|---|---|---|
-| 0–1 | Lock incident types, schema, API contract; repo + Kaggle setup; generation prompt | Contract committed |
-| 1–3 | Data generation · baseline · training code · FastAPI with fake responses · Whisper + geocoding · UI against the fake API | Fake alert shown end to end |
-| 3–6 | Real training runs · real models wired in · map + alert card | **Hour 6: full app works with real models** |
-| 6–9 | Heatmap · gold-set evaluation · validation/fallback · metrics page | All metrics on the gold set |
-| 9–10 | Fixes and polish; stretch features only if everything works | **Code freeze at hour 10** |
-| 10–12 | Slides, backup demo video, README results, two timed rehearsals | Ready to present |
-
-**Rule:** a rough working version first, then improve.
-
-## 14. Git workflow
-
-- **`main` is always demo-able.** Nobody pushes directly to it.
-- **Every major change goes on a branch and is merged through a Pull Request.** Small fixes can go in the
-  same branch as the feature they belong to.
-- **Branch names:** `<type>/<short-description>`, e.g. `feat/classifier-training`, `feat/whisper-asr`,
-  `fix/geocode-timeout`, `docs/readme-results`, `chore/repo-setup`.
-- **Commit messages:** `<type>: <what changed>`, with types `feat`, `fix`, `docs`, `chore`, `refactor`,
-  `test`, `data`. Example: `feat: add masked severity loss to classifier`.
-- **Commit often**: small commits that each do one thing, so a broken change is easy to revert.
-- **Pull requests** use the template in `.github/`: what it does, how it was tested, checklist.
-  Another teammate reviews if time allows; during the hackathon, a quick look is enough.
-- **Every PR adds an entry to [docs/UPDATE.md](docs/UPDATE.md)** and updates the status table in
-  [RESEARCH_BRIEF.md §16](docs/RESEARCH_BRIEF.md#16-project-status-kept-current). If the change affects what we
-  say on stage, update the presentation guide in §17 too. By the end, the brief is the doc we present from.
-- **Never commit** secrets (`.env`, `kaggle.json`), raw data, audio recordings or model weights.
-
-```bash
-git checkout main && git pull
-git checkout -b feat/my-feature
-# ...work, commit often...
-git push -u origin feat/my-feature
-gh pr create --fill          # or open the PR on GitHub
-```
-
-## 15. Open decisions
-
-To settle in hour 0:
-
-- [x] Incident types: 8 classes, schema v1 ([SCHEMA.md](docs/SCHEMA.md))
-- [x] Synthetic data generator: Claude
-- [ ] Claude model for generation (`claude-opus-5-5` default; Sonnet/Haiku 5.5 are cheaper), which is a budget call
-- [ ] Whether preparation before the event is allowed (dataset downloads, cached models, generated data)
-- [ ] Teammates' consent to record voice clips
-- [ ] Role assignments and which stretch features to attempt
-
-## 16. Limitations and future work
-
-- Everyday emergencies (accidents, medical, crime) rely on generated data, because no public dataset of
-  Indian emergency calls exists. Future work: train on real anonymised 112 transcripts.
-- English only for now. Next: Hindi, Marathi and Hinglish (MuRIL / XLM-R, multilingual Whisper).
-- Attention shows what the model focused on; it is an indicator, not proof of reasoning.
-- Learning from dispatcher corrections (active learning) and integration with 112 ERSS.
+- Train on real anonymised 112 transcripts, which would also fix the missing real `MEDICAL` data.
+- Hindi, Marathi and Hinglish (MuRIL or XLM-R, multilingual Whisper).
+- Retrain the severity head on news-style text and add more hard negatives to cut false alarms.
+- Learn from the dispatcher corrections that are already logged; integrate with 112 ERSS.
+- Human-labelled gold labels, a persistent database and authentication.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) © 2026 Gaurav Jadhav

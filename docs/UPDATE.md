@@ -17,6 +17,10 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · Final README (PR #28)
+**Who:** Data lead · **Area:** Docs
+- Rewrote README.md for the finished project: architecture diagram, what it does, models, data, measured results, a claims-and-evidence table, honest limitations, quick start for other machines, dashboard guide, API, reproduction commands, repo structure, SDG table, team and workflow. Removed the outdated "development not started" status, the 12-hour plan and open decisions.
+
 ## 2026-10-17 · System architecture diagram (PR #27)
 **Who:** Data lead · **Area:** Docs
 - Added `docs/architecture_diagram.png`, made with the Archify skill (checks passed; the HTML version is local in `.archify/`, git-ignored). Shows caller, Streamlit dashboard, FastAPI backend, Whisper, DistilBERT, Flan-T5, geocoder and alert store inside the offline-laptop boundary. Can replace the drawn diagram on deck slide 3.
