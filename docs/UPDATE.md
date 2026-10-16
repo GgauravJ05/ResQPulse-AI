@@ -17,6 +17,12 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · GenHack submission deck (PR #26)
+**Who:** Data lead · **Area:** Docs
+- Filled the official template (`docs/Final minihackathon genhack template.pptx`) into `docs/ResQPulse_AI_GenHack.pptx`: title slide + 6 content slides (the instructions slide is removed). Template header, section titles, logos and footer are unchanged; only the body was rebuilt in the template's fonts and colours.
+- `scripts/build_deck.py` regenerates it. All numbers come from `reports/results.md` and `reports/whisper_wer.json`.
+- To submit: open in PowerPoint or Google Slides (Inter and Poppins are Google Fonts), check the layout, add the other team members' names on slide 1, export as PDF.
+
 ## 2026-10-17 · Whisper word error rate and ensemble test (PR #25)
 **Who:** Data lead · **Area:** ASR, Docs
 - Added `scripts/eval_whisper.py` and `reports/whisper_wer.json`: 20 held-out reports spoken by 4 TTS voices, clean and phone-noisy. WER 9.9% clean, 15.5% noisy; type matches the typed result 18/20 and 16/20. Synthetic speech, disclosed in the brief.
