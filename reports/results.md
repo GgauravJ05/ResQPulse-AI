@@ -11,6 +11,7 @@ Test sets: `test_synth` = call-style synthetic reports; `test_public` = real twe
 | test_synth | 107 | distilbert | 0.953 | 0.961 | 0.956 | 0.957 | 0.989 | 0.000 | 0.983 |
 | test_public | 7755 | baseline_tfidf_lr | 0.717 | 0.732 | 0.618 | 0.625 | 0.805 | 0.062 | - |
 | test_public | 7755 | distilbert | 0.795 | 0.791 | 0.745 | 0.746 | 0.907 | 0.107 | - |
+| gold | 144 | baseline_tfidf_lr | 0.590 | 0.608 | 0.589 | 0.560 | 0.707 | 0.356 | 0.750 |
 | gold | 144 | distilbert | 0.750 | 0.758 | 0.794 | 0.765 | 0.909 | 0.378 | 0.982 |
 
 ## Severity (regression)

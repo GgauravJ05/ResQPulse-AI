@@ -564,7 +564,7 @@ Updated with every merged change. The full history is in [UPDATE.md](UPDATE.md).
 | Whisper ASR | BE2 | ⏳ Not started | |
 | FastAPI backend | BE1 | ⏳ Not started | |
 | Streamlit dashboard | FE | ⏳ Not started | |
-| Evaluation + metrics.json | ML1 | 🔶 Interim: real ML2 and ML3 predictions scored; baseline-on-gold and a final ML3 resend pending | `reports/results.md`; rerun `scripts/evaluate.py` when files change |
+| Evaluation + metrics.json | ML1 | ✅ Scored on real ML2 + baseline + ML3 predictions; rerun if any file is resent | `reports/results.md`; slide 6 filled in |
 | Slides + backup video | FE + all | ⏳ Not started | |
 
 **Changes from the original plan** (record every change here, because judges like to hear *why* a plan changed):
@@ -655,16 +655,53 @@ handful of events, mostly news-style rather than call-style.
 
 ### Slide 6: Results (≈60 s) · *Metrics*
 **Speaker:** [ML2 / ML3]
+
+All numbers come from one script (`scripts/evaluate.py`) run on prediction files; the models never saw the test labels.
+Source of truth: `reports/results.md`. **If ML2 or ML3 resend files, rerun the script and update this table.**
+
+**Incident type: baseline (TF-IDF + logistic regression) vs our fine-tuned DistilBERT**
+
+| Test set | Macro precision | Macro recall | Macro F1 |
+|---|---|---|---|
+| **Gold: 144 real reports** | 0.61 → **0.76** | 0.59 → **0.79** | 0.56 → **0.77** |
+| Synthetic call-style, 107 | 0.89 → **0.96** | 0.86 → **0.96** | 0.87 → **0.96** |
+| Real tweets, 7,755 | 0.73 → **0.79** | 0.62 → **0.75** | 0.63 → **0.75** |
+
+**Safety numbers on the gold set** (a missed emergency costs more than a false alarm):
+
 | | Baseline | Ours |
 |---|---|---|
-| Incident type, macro F1 (gold) | [x] | [x] |
-| Precision / Recall (gold) | [x] / [x] | [x] / [x] |
-| Severity MSE / RMSE | – | [x] / [x] |
-| Field extraction F1 | – | [x] |
-| Voice: typed vs. spoken F1 | – | [x] vs. [x] (WER [x]%) |
+| Real emergencies caught (emergency recall) | 0.71 | **0.91** |
+| Reports with severity 4 or 5 not dismissed as non-emergency | 0.75 | **0.98** |
 
-- Point out **recall on critical incidents**: missing a real emergency costs more than a false alarm.
-- Show the confusion matrix and **one failure case and why it failed**.
+**Say:** "On real reports with checked labels our model catches 91% of emergencies and misses only 1 of the 27 most severe
+ones. The biggest gains are where word counting fails: violent crime F1 0.19 to 0.91, fire 0.36 to 0.80."
+
+**Generalisation to events the model never saw** (6 held-out crises): accuracy **64% vs 48%** for the baseline.
+This is the strongest evidence for using a transformer.
+
+**Severity (1 to 5), RMSE / MSE**
+
+| Test set | RMSE | MSE | Within ±1 point |
+|---|---|---|---|
+| Call-style reports (what the demo uses) | **0.75** | 0.57 | 87% |
+| Real tweets, gold | 1.33 | 1.77 | 50% |
+
+**Field extraction (Flan-T5), call-style reports:** output parses 100% of the time; location F1 0.78, people count exact
+61%, injuries F1 0.54 (0.64 lenient), hazards F1 0.38 (0.59 lenient), summary ROUGE-L 0.50. On real tweets these are lower
+(location F1 0.49). Update these if ML3 resends after the people-count rule.
+
+**Show one failure and say why (pick one):**
+- *False alarm:* "Photo of dummy presented as wounded LAX shooter by media" is predicted `VIOLENCE_CRIME`. The text is
+  commentary about media, but it uses shooting vocabulary. The model reads the topic, not the intent. On gold, 17 of 45
+  non-emergency tweets (mostly commentary that mentions a disaster) are flagged, false alarm 0.38 vs 0.36 for the baseline.
+- *Severity shrinks toward the middle on tweets:* reports we labelled 5.0 average 3.7, labelled 1.0 average 1.8. The severity
+  head was trained only on call-style reports, so it generalises only partly to news-style tweets.
+
+**Say plainly what we did not measure:** speech recognition (Whisper) accuracy and typed-versus-spoken results were not
+evaluated; we have no voice test set. Do not show a voice row.
+
+Show `reports/confusion_matrix_gold_ml2.png` next to the table.
 
 ### Slide 7: Live demo (≈3 min) · *Functionality / Presentation & Demo*
 **Driver:** [FE] · **Narrator:** [BE1]
