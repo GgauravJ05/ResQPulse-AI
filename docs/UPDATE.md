@@ -17,6 +17,12 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · Frontend visual redesign (PR #24)
+**Who:** Data lead (with the Impeccable design skill) · **Area:** UI
+- New look: warm paper background, navy masthead with a drawn pulse mark, Newsreader serif for titles and numbers, Hanken Grotesk for text, red kept for critical only. Added `.streamlit/config.toml` (theme).
+- Removed emoji from navigation, headings, labels and buttons; removed "Screen N" prefixes; flat severity colours (no gradients, no coloured side borders); calmer queue and metric labels.
+- Behaviour unchanged. Navigation label strings changed, so `tests/test_frontend_app.py` was updated. 51 tests pass.
+
 ## 2026-10-17 · Duplicate detection on, demo voice clip, threshold study (PR #23)
 **Who:** Data lead · **Area:** API, UI, Docs
 - Installed `sentence-transformers` (now in requirements.txt). Duplicate threshold lowered from 0.85 to 0.75 because a reworded report of the same fire scored 0.78 (unrelated incidents score under 0.25). The alert card and queue now show "Possible duplicate of RQP-…".

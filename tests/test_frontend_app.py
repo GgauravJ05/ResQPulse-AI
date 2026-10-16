@@ -6,8 +6,8 @@ import pytest
 from streamlit.testing.v1 import AppTest
 
 APP = str(Path(__file__).resolve().parents[1] / "app" / "streamlit_app.py")
-SCREENS = ["1. 📝 Report Input", "2. 🚨 Alert Card", "3. 🔍 Attention Heatmap",
-           "4. 📊 Dispatcher Dashboard", "5. 📈 Model Metrics"]
+SCREENS = ["Report Input", "Alert Card", "Attention Heatmap",
+           "Dispatcher Dashboard", "Model Metrics"]
 
 
 def _app():
@@ -41,7 +41,7 @@ def test_heatmap_stretches_contrast_across_the_report():
         "alert_id": "RQP-000001", "incident_type": "FIRE", "severity": 4.0, "severity_label": "CRITICAL",
         "explanation": {"attention": [["Fire", 1.0], ["in", 0.84], ["a", 0.75], ["flat", 0.55], ["trapped", 0.62], ["everywhere", 0.95]]},
     }
-    _goto(at, "3. 🔍 Attention Heatmap")
+    _goto(at, "Attention Heatmap")
     html = " ".join(m.value for m in at.markdown)
     alphas = [float(x) for x in re.findall(r"background-color: rgba\(239, 68, 68, ([0-9.]+)\)", html)]
     assert len(alphas) == 6
@@ -55,7 +55,7 @@ def test_heatmap_escapes_html_in_words():
         "alert_id": "RQP-000002", "incident_type": "FIRE", "severity": 3.0, "severity_label": "HIGH",
         "explanation": {"attention": [["<script>alert(1)</script>", 0.9], ["fire", 0.5]]},
     }
-    _goto(at, "3. 🔍 Attention Heatmap")
+    _goto(at, "Attention Heatmap")
     html = " ".join(m.value for m in at.markdown)
     assert "<script>" not in html and "&lt;script&gt;" in html
 

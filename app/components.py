@@ -37,13 +37,16 @@ def render_header():
         _flat("""
         <div class="app-header">
             <div class="header-top-row">
-                <div>
-                    <h1 class="app-title">🚨 ResQPulse AI</h1>
-                    <p class="app-tagline">Transforming emergency reports into structured, actionable alerts.</p>
+                <div class="brand">
+                    <span class="brand-mark"><svg viewBox="0 0 32 32" fill="none" stroke="#F3B7AE" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 17h7l3-9 5 17 4-11 2 3h7"/></svg></span>
+                    <div>
+                        <h1 class="app-title">ResQPulse <em>AI</em></h1>
+                        <p class="app-tagline">Turns emergency reports, typed or spoken, into structured, prioritised, explainable alerts.</p>
+                    </div>
                 </div>
                 <div class="system-beacon">
                     <span class="pulse-dot"></span>
-                    <span>112 ERSS • TRIAGE ENGINE ACTIVE</span>
+                    <span>Triage engine active</span>
                 </div>
             </div>
         </div>
@@ -101,7 +104,7 @@ def render_non_emergency_card(alert: Dict[str, Any]):
                 <span><strong>Classification Confidence:</strong> {conf_str}</span>
                 <span><strong>Severity:</strong> 1.0 (Non-urgent Inquiry / Non-emergency)</span>
                 <span><strong>Status:</strong> DISMISSED (Filtered out of priority queue)</span>
-                <span><strong>Inference Latency:</strong> {latency} ms</span>
+                <span><strong>Response time:</strong> {latency} ms</span>
             </div>
         </div>
         """),
@@ -155,7 +158,7 @@ def render_alert_card(alert: Dict[str, Any]):
         lat, lon, geocoded = None, None, False
 
     coords_badge = (
-        f'<span class="rq-chip rq-chip-responder" style="font-size: 0.75rem; font-family: monospace;">📍 {lat:.4f}, {lon:.4f}</span>'
+        f'<span class="rq-chip rq-chip-responder" style="font-size: 0.75rem; font-family: monospace;">{lat:.4f}, {lon:.4f}</span>'
         if (geocoded and lat is not None and lon is not None)
         else '<span class="rq-chip" style="background:#F1F5F9; color:#64748B; font-size:0.75rem;">Ungeocoded</span>'
     )
@@ -184,18 +187,17 @@ def render_alert_card(alert: Dict[str, Any]):
     card_border_class = f"rq-card-{severity_label.lower()}"
     st.markdown(
         _flat(f"""
-        <div class="rq-card {card_border_class}" style="background: {sev_style.get('gradient', sev_style['bg'])};">
+        <div class="rq-card {card_border_class}" >
             <!-- Top bar: Alert ID, Type, and Severity -->
             <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 0.6rem;">
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <span style="font-size: 2.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">{type_meta['icon']}</span>
                     <div>
-                        <div style="font-size: 1.5rem; font-weight: 800; color: #0F172A; letter-spacing: -0.02em;">{type_meta['name']}</div>
+                        <div style="font-family: 'Newsreader', Georgia, serif; font-size: 1.7rem; font-weight: 600; color: #171A21; letter-spacing: -0.02em;">{type_meta['name']}</div>
                         <div style="font-size: 0.85rem; color: #475569; font-family: 'JetBrains Mono', monospace; font-weight: 600;">INCIDENT ID: {alert_id}</div>
                     </div>
                 </div>
                 <div>
-                    <span class="rq-badge" style="background-color: {sev_style['badge_bg']}; color: {sev_style['badge_text']}; font-size: 1rem; padding: 0.45rem 1.1rem; box-shadow: 0 4px 10px {sev_style.get('glow', 'rgba(0,0,0,0.1)')};">
+                    <span class="rq-badge" style="background-color: {sev_style['badge_bg']}; color: {sev_style['badge_text']}; font-size: 1rem; padding: 0.45rem 1.1rem; ">
                         {severity_label} • {sev_num:.1f} / 5.0
                     </span>
                 </div>
@@ -205,17 +207,17 @@ def render_alert_card(alert: Dict[str, Any]):
             <!-- Severity visual bar -->
             <div style="margin-bottom: 1.4rem;">
                 <div style="display: flex; justify-content: space-between; font-size: 0.82rem; color: #475569; font-weight: 700; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.04em;">
-                    <span>Continuous Severity Gauge (1.0 — 5.0)</span>
-                    <span>Level {sev_num:.1f} ({severity_label})</span>
+                    <span>Severity, 1 to 5</span>
+                    <span>{sev_num:.1f} of 5</span>
                 </div>
-                <div style="background-color: rgba(203, 213, 225, 0.6); border-radius: 9999px; height: 12px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);">
-                    <div style="background: {sev_style['bar_color']}; height: 100%; width: {sev_pct}%; transition: width 0.4s ease; border-radius: 9999px;"></div>
+                <div style="background-color: #ECE8DD; border-radius: 9999px; height: 8px; overflow: hidden;">
+                    <div style="background: {sev_style['bar_color']}; height: 100%; width: {sev_pct}%;  border-radius: 9999px;"></div>
                 </div>
             </div>
 
             <!-- Summary block -->
-            <div style="background: #FFFFFF; border: 1px solid rgba(226, 232, 240, 0.9); border-radius: 10px; padding: 1.15rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
-                <div style="font-size: 0.78rem; font-weight: 800; text-transform: uppercase; color: #64748B; margin-bottom: 0.4rem; letter-spacing: 0.06em;">Triage Incident Summary</div>
+            <div style="background: #F7F5F0; border-radius: 12px; padding: 1.1rem 1.2rem; margin-bottom: 1.25rem;">
+                <div style="font-size: 0.78rem; font-weight: 800; text-transform: uppercase; color: #64748B; margin-bottom: 0.4rem; letter-spacing: 0.06em;">Summary</div>
                 <div style="font-size: 1.15rem; font-weight: 600; color: #1E293B; line-height: 1.6;">{html.escape(summary)}</div>
             </div>
 
@@ -223,14 +225,14 @@ def render_alert_card(alert: Dict[str, Any]):
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
                 <!-- Location -->
                 <div class="rq-stat-box">
-                    <div class="rq-stat-label">📍 Incident Location</div>
+                    <div class="rq-stat-label">Location</div>
                     <div style="font-size: 1.02rem; font-weight: 700; color: #0F172A; margin: 0.2rem 0 0.4rem 0;">{html.escape(loc_text)}</div>
                     <div>{coords_badge}</div>
                 </div>
 
                 <!-- People Affected -->
                 <div class="rq-stat-box">
-                    <div class="rq-stat-label">👥 Casualties / At Risk</div>
+                    <div class="rq-stat-label">People affected</div>
                     <div class="rq-stat-val" style="color: {'#DC2626' if (isinstance(people_affected, int) and people_affected > 0) else '#0F172A'};">
                         {people_str}
                     </div>
@@ -238,14 +240,14 @@ def render_alert_card(alert: Dict[str, Any]):
 
                 <!-- Confidence -->
                 <div class="rq-stat-box">
-                    <div class="rq-stat-label">🎯 Model Confidence</div>
+                    <div class="rq-stat-label">Confidence</div>
                     <div class="rq-stat-val">{conf_str}</div>
                     <div style="font-size: 0.78rem; color: #64748B; margin-top: 0.2rem;">DistilBERT Multi-task</div>
                 </div>
 
                 <!-- Latency -->
                 <div class="rq-stat-box">
-                    <div class="rq-stat-label">⚡ Inference Latency</div>
+                    <div class="rq-stat-label">Response time</div>
                     <div class="rq-stat-val">{latency} <span style="font-size: 0.9rem; font-weight: 600; color: #64748B;">ms</span></div>
                     <div style="font-size: 0.78rem; color: #64748B; margin-top: 0.2rem;">Flan-T5 + DistilBERT</div>
                 </div>
@@ -258,7 +260,7 @@ def render_alert_card(alert: Dict[str, Any]):
     # Detailed Chips and Badges in two columns
     c1, c2 = st.columns(2)
     with c1:
-        st.markdown("#### 🚑 Recommended Responders")
+        st.markdown("#### Recommended responders")
         if responders:
             resp_html = "".join(
                 [f'<span class="rq-chip rq-chip-responder">{RESPONDER_ICONS.get(r, html.escape(r))}</span>' for r in responders]
@@ -267,7 +269,7 @@ def render_alert_card(alert: Dict[str, Any]):
         else:
             st.info("No emergency responders assigned.")
 
-        st.markdown("#### 🎯 UN SDG Target Alignment")
+        st.markdown("#### UN SDG targets")
         if sdg_targets:
             sdg_html = "".join(
                 [
@@ -282,7 +284,7 @@ def render_alert_card(alert: Dict[str, Any]):
             st.markdown('<span style="color:#64748B; font-size:0.9rem;">None specified</span>', unsafe_allow_html=True)
 
     with c2:
-        st.markdown("#### 🩹 Extracted Injuries / Medical Needs")
+        st.markdown("#### Injuries and medical needs")
         if injuries:
             inj_html = "".join(
                 [f'<span class="rq-chip rq-chip-injury">⚠️ {html.escape(str(i))}</span>' for i in injuries]
@@ -291,7 +293,7 @@ def render_alert_card(alert: Dict[str, Any]):
         else:
             st.markdown('<span style="color:#64748B; font-size:0.95rem;">None reported in call transcript</span>', unsafe_allow_html=True)
 
-        st.markdown("#### ⚠️ Environmental / Situational Hazards")
+        st.markdown("#### Hazards")
         if hazards:
             haz_html = "".join(
                 [f'<span class="rq-chip rq-chip-hazard">🔥 {html.escape(str(h))}</span>' for h in hazards]
@@ -333,7 +335,7 @@ def render_attention_heatmap(alert: Dict[str, Any]):
         st.info("No attention token scores found for this alert.")
         return
 
-    st.markdown("### 🔍 Model Interpretability & Attention Weights")
+    st.markdown("### Which words drove the decision")
     st.caption("Token-level attention rollout from DistilBERT. Colours are relative within this report: the darkest words mattered most.")
 
     # Attention Legend
@@ -471,7 +473,7 @@ def render_incident_map(alerts: List[Dict[str, Any]]):
 
         # Popup HTML
         popup_html = f"""
-        <div style="font-family: 'Plus Jakarta Sans', sans-serif; min-width: 220px;">
+        <div style="font-family: 'Hanken Grotesk', sans-serif; min-width: 220px;">
             <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px; color: #0F172A;">
                 {meta['icon']} {inc_type} <span style="font-family: monospace; font-size: 11px; color: #64748B;">[{alert_id}]</span>
             </div>
