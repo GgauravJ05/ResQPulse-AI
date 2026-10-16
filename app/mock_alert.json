@@ -1,0 +1,42 @@
+{
+  "alert_id": "RQP-000123",
+  "created_at": "2026-10-20T14:32:05+05:30",
+  "status": "NEW",
+  "is_emergency": true,
+
+  "input": {
+    "text": "Accident on Mumbai-Pune expressway near Lonavala exit, truck hit two cars, one guy not moving, lot of blood, traffic blocked",
+    "source": "voice",
+    "transcript_confidence": 0.82
+  },
+
+  "incident_type": "TRANSPORT_ACCIDENT",
+  "type_confidence": 0.91,
+  "type_probs": { "TRANSPORT_ACCIDENT": 0.91, "MEDICAL": 0.05, "FIRE": 0.01 },
+
+  "severity": 4.4,
+  "severity_label": "CRITICAL",
+
+  "location": {
+    "text": "Mumbai-Pune expressway near Lonavala exit",
+    "lat": 18.7546,
+    "lon": 73.4062,
+    "geocoded": true
+  },
+  "people_affected": 1,
+  "injuries": ["not moving", "lot of blood"],
+  "hazards": ["traffic blocked"],
+  "summary": "Truck hit two cars near Lonavala exit; one person unresponsive and bleeding heavily; road blocked.",
+
+  "responders": ["AMBULANCE", "TRAFFIC_POLICE"],
+  "sdg_targets": ["3.6"],
+
+  "explanation": {
+    "attention": [["accident", 0.71], ["not", 0.64], ["moving", 1.0], ["blood", 0.88]]
+  },
+
+  "duplicate_of": null,
+  "extractor": "flan_t5",
+  "model_versions": { "classifier": "distilbert-v1", "generator": "flan-t5-v1", "asr": "small.en" },
+  "latency_ms": 840
+}

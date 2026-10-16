@@ -563,7 +563,7 @@ Updated with every merged change. The full history is in [UPDATE.md](UPDATE.md).
 | Flan-T5 generator + fallback | ML3 | 🔶 Trained and scored; model zip (877 MB) on the Kaggle notebook output; `extract()` and fallback not in the repo yet | `notebooks/flan-t5-train.ipynb` |
 | Whisper ASR | BE2 | ⏳ Not started | |
 | FastAPI backend | BE1 | ✅ API + fake models merged, 10 tests pass; real models not wired yet | Waiting on `classify()`, `extract()`, Whisper |
-| Streamlit dashboard | FE | ⏳ Not started | |
+| Streamlit dashboard | FE | ✅ Done | 5 screens, mock + live modes, map, attention heatmap, queue |
 | Evaluation + metrics.json | ML1 | ✅ Scored on real ML2 + baseline + ML3 predictions; rerun if any file is resent | `reports/results.md`; slide 6 filled in |
 | Slides + backup video | FE + all | ⏳ Not started | |
 

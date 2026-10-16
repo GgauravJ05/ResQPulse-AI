@@ -17,6 +17,19 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · Complete ResQPulse AI Streamlit Frontend (PR #18)
+**Who:** Frontend Lead · **Area:** UI, API, Tests
+- Implemented the complete 5-screen ResQPulse AI Streamlit frontend (`app/streamlit_app.py`) matching `docs/SCHEMA.md`:
+  1. **Report Input:** Multiline input with validation (2,000 char limit), 9 quick demo sample buttons from `demo_samples.json`, live microphone recording (`st.audio_input`), audio file upload, editable Whisper ASR transcript box, and low-confidence dispatcher verification alert (`Please verify the transcript`).
+  2. **Alert Card:** Full structured alert representation with incident-type badge and icon, continuous severity bar (1.0–5.0), location text with coordinates badge, people affected counter, injury and hazard tag chips, responder badges (`AMBULANCE`, `FIRE_BRIGADE`, etc.), SDG target badges (SDG 3.6, 3.d, 11.5, 13.1, 16.1), latency indicator, and JSON download button (`st.download_button`). Calm, neutral card for `NON_EMERGENCY` reports (`No emergency detected`).
+  3. **Explain (Attention Heatmap):** Word-level token highlight visualization using attention rollout weights (`alert.explanation.attention`), safe HTML escaping, token-level hover tooltips, and the required mandatory disclaimer note: *"Highlighted words are what the model focused on. This is an indicator, not proof."*
+  4. **Dispatcher Dashboard:** Executive KPI status ribbon, live emergency triage queue sorted strictly by severity descending, status filter tabs, interactive Folium incident map skipping ungeocoded/invalid coordinates with severity-colored markers, and status transition action controls (`CONFIRMED`, `DISPATCHED`, `DISMISSED`) calling `PATCH /alerts/{id}`.
+  5. **Metrics Page:** Full quantitative benchmark tables comparing TF-IDF + Logistic Regression baseline against fine-tuned DistilBERT (accuracy, macro precision, recall, F1, emergency recall on Gold, Test Synth, and Test Public sets), critical safety metrics, severity continuous regression metrics (RMSE, MSE, MAE), Flan-T5 field extraction evaluation table, and confusion matrix PNG viewer with graceful fallback.
+- Centralized all backend communication in `app/api_client.py` covering `POST /analyze`, `POST /transcribe`, `GET /alerts`, `PATCH /alerts/{id}`, `GET /metrics`, and `GET /health` with timeout resilience, error code parsing, and connection failure handling (`backend not reachable`).
+- Added `app/mock_alert.json` copied exactly from Section 6 of `docs/SCHEMA.md`, and created shared styling system in `app/styles.py` and reusable UI widgets in `app/components.py`.
+- Added automated test suite `tests/test_frontend.py` (11 unit tests covering schema compliance, sample completeness, validation, mock/live error flows, and styling tokens) — all passing.
+- How to start: `streamlit run app/streamlit_app.py` or `python -m streamlit run app/streamlit_app.py`. Default operates in Mock Mode offline; can toggle to Live Backend API via sidebar with configurable `API_URL` (default: `http://localhost:8000`).
+
 ## 2026-10-16 · ML3 Flan-T5 training notebook added (ML3, reviewed by Gaurav)
 **Who:** rugvedas (ML3), committed and reviewed by Gaurav · **Area:** Generator
 - `notebooks/flan-t5-train.ipynb`: Kaggle notebook that fine-tunes `google/flan-t5-base` and produces `ml3_test_flan.csv` and
