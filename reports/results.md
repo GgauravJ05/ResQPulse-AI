@@ -11,6 +11,7 @@ Test sets: `test_synth` = call-style synthetic reports; `test_public` = real twe
 | test_synth | 107 | distilbert | 0.953 | 0.961 | 0.956 | 0.957 | 0.989 | 0.000 | 0.983 |
 | test_public | 7755 | baseline_tfidf_lr | 0.717 | 0.732 | 0.618 | 0.625 | 0.805 | 0.062 | - |
 | test_public | 7755 | distilbert | 0.795 | 0.791 | 0.745 | 0.746 | 0.907 | 0.107 | - |
+| gold | 144 | baseline_tfidf_lr | 0.590 | 0.608 | 0.589 | 0.560 | 0.707 | 0.356 | 0.750 |
 | gold | 144 | distilbert | 0.750 | 0.758 | 0.794 | 0.765 | 0.909 | 0.378 | 0.982 |
 
 ## Severity (regression)
@@ -25,7 +26,7 @@ Test sets: `test_synth` = call-style synthetic reports; `test_public` = real twe
 | Test set | n | Parse rate | Location F1 | Location exact | People exact | Injuries F1 (strict / lenient) | Hazards F1 (strict / lenient) | ROUGE-L |
 |---|---|---|---|---|---|---|---|---|
 | test_synth | 107 | 1.000 | 0.779 | 0.636 | 0.607 | 0.536 / 0.641 | 0.384 / 0.588 | 0.502 |
-| gold | 144 | 0.993 | 0.490 | 0.410 | 0.285 | 0.169 / 0.386 | 0.276 / 0.461 | 0.428 |
+| gold | 144 | 1.000 | 0.490 | 0.410 | 0.285 | 0.169 / 0.386 | 0.276 / 0.461 | 0.429 |
 
 ## test_public accuracy by data source
 

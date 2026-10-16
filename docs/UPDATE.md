@@ -17,6 +17,24 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-16 · ML3 gold file resent, predictions folder cleaned (PR #15)
+**Who:** Gaurav (ML1) · **Area:** Evaluation
+- ML3 resent `ml3_gold.csv`: one previously truncated output is now complete (gold parse rate 99.3% to 100%, ROUGE-L 0.428 to
+  0.429, all other extraction scores unchanged). `ml3_test_flan.csv` was resent byte-identical. The people-count rule was
+  not applied (the model still predicts a people number for 119 of 144 real tweets), so people exact match on gold stays 0.285.
+- `predictions/` now holds exactly the 8 required files (`ml2_*`, `baseline_*` for test_synth, test_public and gold, plus
+  `ml3_test_flan.csv` and `ml3_gold.csv`); the validation-set predictions and duplicate copies were moved out, not deleted.
+- `reports/` regenerated.
+
+## 2026-10-16 · Baseline on gold and the results slide (PR #14)
+**Who:** Gaurav (ML1) · **Area:** Evaluation, Docs
+- ML2's `baseline_gold.csv` arrived; `reports/` regenerated with the full baseline vs DistilBERT comparison on all three test sets.
+- Gold set (144 real reports), macro F1: baseline 0.560, DistilBERT 0.765; emergency recall 0.707 vs 0.909; critical recall
+  (severity >= 4) 0.750 vs 0.982. Largest per-class gains: VIOLENCE_CRIME F1 0.19 to 0.91, FIRE 0.36 to 0.80.
+- False alarm on gold is similar for both (0.356 baseline, 0.378 DistilBERT), so it is reported as a weakness, not a win.
+- Slide 6 (Results) of the presentation guide filled in with real numbers, one failure case with the reason, the
+  generalisation result (64% vs 48% on unseen crises) and an explicit note that voice was not evaluated.
+
 ## 2026-10-16 · Interim evaluation on real predictions (PR #13)
 **Who:** Gaurav (ML1) · **Area:** Evaluation
 - First real scores from ML2 (DistilBERT + TF-IDF baseline) and ML3 (Flan-T5), committed as `reports/metrics.json`,
