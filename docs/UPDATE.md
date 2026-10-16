@@ -17,6 +17,17 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-16 · Gold set second pass and audit sample (PR #8)
+**Who:** Gaurav (ML1) · **Area:** Data
+- Instead of a full human review, Claude re-reviewed all 146 pre-labelled rows against the written rules. It found
+  10 problems in its own first pass: 5 rows changed to NON_EMERGENCY (commentary, relief aircraft, a relief appeal,
+  a wind caution the original annotators marked unrelated, thanks to volunteers), 3 severities lowered for follow-up
+  news, and 2 near-duplicate retweets dropped. Result: `data/gold/gold.csv`, 144 rows (NON_EMERGENCY 45,
+  EARTHQUAKE_COLLAPSE 22, FLOOD 18, VIOLENCE_CRIME 17, STORM_CYCLONE 16, FIRE 15, TRANSPORT_ACCIDENT 11).
+- **Honest labelling:** the same model labelled and reviewed, so the gold set is called "Claude-labelled, second-pass
+  reviewed", not human-verified. `build_gold.py audit-sample` draws 30 random rows for a person to check and
+  `audit-score` reports the agreement rate to quote on the slide. README, brief and review guide were reworded.
+
 ## 2026-10-16 · Gold set pre-labels and review pipeline (PR #7)
 **Who:** Gaurav (ML1) · **Area:** Data
 - `scripts/sample_gold.py` samples 154 real tweets (22 per mapped type) from `test_public.csv`, the data the models never
