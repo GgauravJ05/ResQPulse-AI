@@ -48,3 +48,5 @@ reports/alerts.jsonl
 reports/corrections.jsonl
 output/
 .archify/
+.impeccable/review/
+.impeccable/*.local.json

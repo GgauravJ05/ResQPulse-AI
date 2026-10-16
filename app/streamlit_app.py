@@ -43,21 +43,23 @@ from app.styles import (
 )
 from app.components import (
     render_header,
+    render_rail_brand,
+    render_page_title,
     render_alert_card,
     render_attention_heatmap,
     render_incident_map,
     render_empty_state,
-    render_severity_pill,
+    render_queue_row,
 )
 
 # -----------------------------------------------------------------------------
 # Streamlit App Configuration
 # -----------------------------------------------------------------------------
 st.set_page_config(
-    page_title="ResQPulse AI — Emergency Alert System",
-    page_icon="🚨",
+    page_title="ResQPulse AI · Dispatch console",
+    page_icon=":material/ecg_heart:",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="auto",
 )
 
 # Inject custom CSS
@@ -104,9 +106,7 @@ if "queue_filter_status" not in st.session_state:
 # Sidebar Navigation and Global Controls
 # -----------------------------------------------------------------------------
 with st.sidebar:
-    st.markdown("### ResQPulse AI")
-    
-    # Navigation Radio
+    render_rail_brand()
     screen = st.radio(
         "Navigation Screens",
         options=[
@@ -121,74 +121,66 @@ with st.sidebar:
     )
 
     st.markdown("---")
-    st.markdown("### Backend")
+    with st.expander("Backend settings", expanded=False):
+        mock_choice = st.radio(
+            "Data source",
+            options=["Mock Mode (Offline Demo)", "Live Backend API"],
+            index=0 if st.session_state.mock_mode else 1,
+            help="Mock mode uses a stored sample alert and the demo reports, with no FastAPI server.",
+        )
+        st.session_state.mock_mode = (mock_choice == "Mock Mode (Offline Demo)")
 
-    # Mock vs Live Mode Toggle
-    mock_choice = st.radio(
-        "Operation Mode",
-        options=["Mock Mode (Offline Demo)", "Live Backend API"],
-        index=0 if st.session_state.mock_mode else 1,
-        help="Mock mode uses local Section 6 schema alert and demo samples without requiring a running FastAPI server.",
+        api_url_input = st.text_input(
+            "Backend URL",
+            value=st.session_state.api_url,
+            help="FastAPI base URL. Default: http://localhost:8000",
+        )
+        st.session_state.api_url = api_url_input.rstrip("/")
+
+        if st.button("Test connection", use_container_width=True):
+            try:
+                check_health(base_url=st.session_state.api_url)
+                st.success("Backend online, models ready")
+            except BackendNotReachableError as e:
+                st.error(f"backend not reachable: {e}")
+            except Exception as e:
+                st.error(f"Connection error: {e}")
+
+    st.markdown(
+        '<div class="rail-foot">ResQPulse AI v1.0<br>GenHack · PS 15 EmergencyScribe</div>',
+        unsafe_allow_html=True,
     )
-    st.session_state.mock_mode = (mock_choice == "Mock Mode (Offline Demo)")
-
-    if st.session_state.mock_mode:
-        st.success("Mock mode: offline demo data")
-    else:
-        st.warning("Live mode: real models")
-
-    # API Base URL input
-    api_url_input = st.text_input(
-        "Backend Base URL",
-        value=st.session_state.api_url,
-        help="FastAPI base URL. Default: http://localhost:8000",
-    )
-    st.session_state.api_url = api_url_input.rstrip("/")
-
-    # Health Check Button
-    if st.button("Test Backend Connection", use_container_width=True):
-        try:
-            health = check_health(base_url=st.session_state.api_url)
-            st.success("Backend Online: Models Ready")
-        except BackendNotReachableError as e:
-            st.error(f"backend not reachable: {e}")
-        except Exception as e:
-            st.error(f"Connection error: {e}")
-
-    st.markdown("---")
-    st.caption("ResQPulse AI v1.0 • Disaster Response & Emergency Dispatch Triage")
 
 
 # Render Global Header
-render_header()
+render_header(mock_mode=st.session_state.mock_mode, screen=screen)
 
 
 # =============================================================================
 # SCREEN 1: REPORT INPUT
 # =============================================================================
 if screen == "Report Input":
-    st.markdown("## Report an emergency")
-    st.markdown(
-        "Submit unstructured emergency reports via **typed text**, **microphone recording**, or **audio upload**. "
-        "Select from standard demo samples or provide custom inputs."
+    render_page_title(
+        "Report an emergency",
+        "Type a report, record a call or upload audio. ResQPulse returns a structured, prioritised alert in a few seconds.",
     )
 
     # Demo Samples Section
     demo_samples = _load_json_file(DEMO_SAMPLES_PATH) or []
     if demo_samples:
-        st.markdown("### Quick Demo Samples")
-        st.caption("Click any demo sample below to populate the report input:")
+        st.markdown("### Try a sample report")
+        st.caption("Each sample fills the report box below. Expected type and severity are shown on hover.")
 
         # Group samples into neat rows of buttons
-        cols = st.columns(3)
         for i, sample in enumerate(demo_samples):
+            if i % 3 == 0:
+                cols = st.columns(3)               # one row of three at a time, so phones stack them in reading order
             col = cols[i % 3]
             sample_label = sample.get("label", f"Sample {i+1}")
             exp_type = sample.get("expected_type", "")
             exp_sev = sample.get("expected_severity", "")
-            btn_title = f"{sample_label} ({exp_type}, {exp_sev})"
-
-            if col.button(btn_title, key=f"btn_sample_{i}", use_container_width=True):
+            if col.button(sample_label, key=f"btn_sample_{i}", use_container_width=True,
+                          help=f"Expected: {exp_type}, severity {exp_sev}"):
                 st.session_state.current_report_text = sample.get("text", "")
                 st.session_state.main_report_text_area = sample.get("text", "")
                 st.session_state.report_source = "text"
@@ -197,18 +189,81 @@ if screen == "Report Input":
                 st.session_state.voice_confidence = None
                 st.rerun()
 
-    st.markdown("---")
+    # A transcript from the voice section below arrives on the next run; apply it before the text box is drawn
+    if "pending_report_text" in st.session_state:
+        pending = st.session_state.pop("pending_report_text")
+        st.session_state.current_report_text = pending
+        st.session_state.main_report_text_area = pending
+
+    # Main Text Area
+    st.markdown("### Report text")
+    if st.session_state.voice_low_confidence:
+        st.markdown(
+            '<div class="warn"><b>Check the transcript.</b> Speech recognition was not confident on this audio. Fix any misheard words before analysing.</div>',
+            unsafe_allow_html=True,
+        )
+    report_input = st.text_area(
+        label="Type, paste or correct the transcript",
+        value=st.session_state.current_report_text,
+        height=140,
+        max_chars=2200,
+        help="Max 2,000 characters allowed per API schema.",
+        key="main_report_text_area",
+    )
+    st.session_state.current_report_text = report_input
+
+    # Character count and validation indicator
+    char_count = len(report_input)
+    if char_count > 2000:
+        st.error(f"Input exceeds maximum limit of 2,000 characters (Current: {char_count}). Please shorten report.")
+    elif char_count > 0:
+        st.caption(f"{char_count} / 2,000 characters · source: {st.session_state.report_source}")
+
+    # Analyze Button
+    c_btn, c_info = st.columns([1, 3])
+    with c_btn:
+        analyze_clicked = st.button("Analyze Report", type="primary", use_container_width=True)
+
+    if analyze_clicked:
+        cleaned_text = report_input.strip()
+        if not cleaned_text:
+            st.warning("Report text cannot be empty. Please enter or record an emergency report.")
+        elif len(cleaned_text) > 2000:
+            st.error("Cannot analyze: Report text exceeds 2,000 characters.")
+        else:
+            with st.spinner("Analyzing emergency report with DistilBERT and Flan-T5..."):
+                try:
+                    alert = get_alert(
+                        cleaned_text,
+                        source=st.session_state.report_source,
+                        transcript_confidence=st.session_state.voice_confidence,
+                        mock_mode=st.session_state.mock_mode,
+                        base_url=st.session_state.api_url,
+                    )
+                    st.session_state.current_alert = alert
+                    st.success("Alert generated. Open Alert Card for the full breakdown.")
+                    
+                    # Quick Summary Preview below
+                    
+                    render_alert_card(alert)
+                except BackendNotReachableError:
+                    st.error("backend not reachable")
+                except APIResponseError as e:
+                    st.error(f"API Error: {e.message}")
+                except Exception as e:
+                    st.error(f"Analysis failed: {e}")
+
 
     # Audio Input Section
-    st.markdown("### Voice Report Input (Speech-to-Text)")
+    st.markdown("### Or report by voice")
     audio_col1, audio_col2 = st.columns(2)
 
     with audio_col1:
-        recorded_audio = st.audio_input("Record Live Voice Call", key="mic_audio_input")
+        recorded_audio = st.audio_input("Record a call", key="mic_audio_input")
 
     with audio_col2:
         uploaded_audio = st.file_uploader(
-            "Or Upload Pre-Recorded Audio File",
+            "Or upload a recording",
             type=["wav", "mp3", "m4a", "webm", "ogg", "oga", "opus", "mpeg", "mpga", "flac", "aac"],
             key="file_audio_input",
         )
@@ -237,8 +292,7 @@ if screen == "Report Input":
                     st.session_state.voice_transcript = asr_res.get("transcript", "")
                     st.session_state.voice_confidence = asr_res.get("confidence")
                     st.session_state.voice_low_confidence = asr_res.get("low_confidence", False)
-                    st.session_state.current_report_text = st.session_state.voice_transcript
-                    st.session_state.main_report_text_area = st.session_state.voice_transcript
+                    st.session_state.pending_report_text = st.session_state.voice_transcript
                     st.session_state.report_source = "voice"
                     st.success(
                         f"Audio transcribed successfully ({asr_res.get('duration_s', 0):.1f}s, "
@@ -250,81 +304,18 @@ if screen == "Report Input":
                 except Exception as e:
                     st.error(f"Audio transcription failed: {e}")
 
-    # Editable Transcript verification box if low confidence
-    if st.session_state.voice_low_confidence:
-        st.markdown(
-            '<div class="rq-warning-box">Please verify the transcript: The speech recognition model reported low confidence on this audio. Please review and edit before analysis.</div>',
-            unsafe_allow_html=True,
-        )
-
-    st.markdown("---")
-
-    # Main Text Area
-    st.markdown("### Report Text for Analysis")
-    report_input = st.text_area(
-        label="Emergency Report Text (Type, paste, or edit transcribed audio below):",
-        value=st.session_state.current_report_text,
-        height=140,
-        max_chars=2200,
-        help="Max 2,000 characters allowed per API schema.",
-        key="main_report_text_area",
-    )
-    st.session_state.current_report_text = report_input
-
-    # Character count and validation indicator
-    char_count = len(report_input)
-    if char_count > 2000:
-        st.error(f"Input exceeds maximum limit of 2,000 characters (Current: {char_count}). Please shorten report.")
-    elif char_count > 0:
-        st.caption(f"Character count: {char_count} / 2,000 • Source: **{st.session_state.report_source.upper()}**")
-
-    # Analyze Button
-    c_btn, c_info = st.columns([1, 3])
-    with c_btn:
-        analyze_clicked = st.button("Analyze Report", type="primary", use_container_width=True)
-
-    if analyze_clicked:
-        cleaned_text = report_input.strip()
-        if not cleaned_text:
-            st.warning("Report text cannot be empty. Please enter or record an emergency report.")
-        elif len(cleaned_text) > 2000:
-            st.error("Cannot analyze: Report text exceeds 2,000 characters.")
-        else:
-            with st.spinner("Analyzing emergency report with DistilBERT and Flan-T5..."):
-                try:
-                    alert = get_alert(
-                        cleaned_text,
-                        source=st.session_state.report_source,
-                        transcript_confidence=st.session_state.voice_confidence,
-                        mock_mode=st.session_state.mock_mode,
-                        base_url=st.session_state.api_url,
-                    )
-                    st.session_state.current_alert = alert
-                    st.success("Alert generated successfully! Open Alert Card for the full breakdown.")
-                    
-                    # Quick Summary Preview below
-                    st.markdown("#### Quick Analysis Preview:")
-                    render_alert_card(alert)
-                except BackendNotReachableError:
-                    st.error("backend not reachable")
-                except APIResponseError as e:
-                    st.error(f"API Error: {e.message}")
-                except Exception as e:
-                    st.error(f"Analysis failed: {e}")
 
 
 # =============================================================================
 # SCREEN 2: ALERT CARD
 # =============================================================================
 elif screen == "Alert Card":
-    st.markdown("## Alert")
-    st.markdown("Detailed breakdown of the current structured alert generated by the ResQPulse AI pipeline.")
+    render_page_title("Alert", "The structured alert for the current report, with the evidence beside each field.")
 
     if not st.session_state.current_alert:
         render_empty_state(
             title="No alert available",
             description="Submit an emergency report on Report Input to generate and inspect the structured alert.",
-            icon="🚨",
         )
     else:
         render_alert_card(st.session_state.current_alert)
@@ -334,17 +325,15 @@ elif screen == "Alert Card":
 # SCREEN 3: EXPLAIN — ATTENTION HEATMAP
 # =============================================================================
 elif screen == "Attention Heatmap":
-    st.markdown("## Why the model decided this")
-    st.markdown(
-        "Inspect which tokens in the unstructured report influenced the transformer's "
-        "incident classification and severity prediction."
+    render_page_title(
+        "Why the model decided this",
+        "Attention rollout from DistilBERT: the words that drove the incident type and severity, shaded by weight.",
     )
 
     if not st.session_state.current_alert:
         render_empty_state(
             title="No alert to explain",
             description="Submit an emergency report on Report Input to inspect its attention score breakdown.",
-            icon="🔍",
         )
     else:
         render_attention_heatmap(st.session_state.current_alert)
@@ -354,28 +343,24 @@ elif screen == "Attention Heatmap":
 # SCREEN 4: DISPATCHER DASHBOARD
 # =============================================================================
 elif screen == "Dispatcher Dashboard":
-    st.markdown("## Dispatcher queue")
-    st.markdown(
-        "Live emergency triage queue sorted strictly by severity (highest priority first), "
-        "paired with an interactive geospatial incident map."
+    render_page_title(
+        "Dispatcher queue",
+        "Every open alert, most severe first, with its place on the map. Confirm, dispatch or dismiss each one.",
     )
 
     # Top Controls: Refresh and Status Filter
-    ctrl_col1, ctrl_col2, ctrl_col3 = st.columns([1, 2, 1])
+    ctrl_col1, ctrl_col2, _ = st.columns([1, 2, 2], vertical_alignment="bottom")
     with ctrl_col1:
-        manual_refresh = st.button("Refresh Queue", use_container_width=True)
+        manual_refresh = st.button("Refresh", use_container_width=True)
 
     with ctrl_col2:
         status_filter = st.selectbox(
-            "Filter by Status",
+            "Status",
             options=["ALL", "NEW", "CONFIRMED", "DISPATCHED", "DISMISSED"],
             index=["ALL", "NEW", "CONFIRMED", "DISPATCHED", "DISMISSED"].index(st.session_state.queue_filter_status),
         )
         st.session_state.queue_filter_status = status_filter
 
-    with ctrl_col3:
-        mode_label = "MOCK QUEUE" if st.session_state.mock_mode else "LIVE API QUEUE"
-        st.markdown(f'<div style="text-align:right; padding-top:10px;"><span class="rq-badge" style="background:#0F172A; color:#FFF;">{mode_label}</span></div>', unsafe_allow_html=True)
 
     # Fetch alerts
     filter_arg = None if status_filter == "ALL" else status_filter
@@ -414,115 +399,70 @@ elif screen == "Dispatcher Dashboard":
         k3.metric(label="Dispatched", value=str(n_dispatched))
         k4.metric(label="On the map", value=f"{n_geocoded} / {n_total}")
 
-        st.markdown("---")
-        # Display Interactive Folium Map
-        st.markdown("### Incident Map (Geocoded Alerts)")
+        st.markdown("### Incident map")
         render_incident_map(alerts_data)
 
-        st.markdown("---")
-        st.markdown(f"### 📋 Live Alert Queue ({len(alerts_data)} Incidents)")
+        st.markdown(f"### Queue · {len(alerts_data)} alert{'s' if len(alerts_data) != 1 else ''}")
 
         if not alerts_data:
             render_empty_state(
                 title="Queue is empty",
                 description=f"No emergency alerts currently found with status filter: {status_filter}.",
-                icon="📭",
             )
         else:
             # Render each alert in queue
             for alert in alerts_data:
                 alert_id = alert.get("alert_id", "RQP-000")
-                inc_type = alert.get("incident_type", "INCIDENT")
-                sev_label = alert.get("severity_label", "LOW")
-                severity = alert.get("severity", 1.0)
-                summary = alert.get("summary") or "No summary provided."
                 status = alert.get("status", "NEW")
-                loc = alert.get("location")
-                if isinstance(loc, dict):
-                    loc_text = loc.get("text") or "Location unavailable"
-                elif loc:
-                    loc_text = str(loc)
-                else:
-                    loc_text = "Location unavailable"
-
-                meta = get_incident_type_meta(inc_type)
-                sev_style = get_severity_style(sev_label)
-                dup_of = alert.get("duplicate_of")
-                dup_chip = (f'<span class="rq-badge" style="background:#EEF2FF; color:#3730A3;">Possible duplicate of {html.escape(str(dup_of))}</span>'
-                            if dup_of else "")
 
                 with st.container():
-                    st.markdown(
-                        f"""
-                        <div class="queue-card">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                <div>
-                                    <span style="font-size: 1.15rem; font-weight: 700; color: #0F172A;">{meta['icon']} {inc_type}</span>
-                                    <span style="font-family: monospace; font-size: 0.9rem; color: #64748B; margin-left: 0.5rem;">[{alert_id}]</span>
-                                    <span style="margin-left: 0.5rem; font-size: 0.85rem; color: #475569;">📍 {html.escape(str(loc_text))}</span>
-                                </div>
-                                <div>
-                                    {render_severity_pill(sev_label, severity)}
-                                    <span class="rq-badge" style="background:#E2E8F0; color:#334155;">{status}</span>
-                                    {dup_chip}
-                                </div>
-                            </div>
-                            <div style="font-size: 0.95rem; color: #1E293B; margin-bottom: 0.75rem;">
-                                {html.escape(str(summary))}
-                            </div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
-                    )
+                    render_queue_row(alert)
 
                     # Status Update Action Controls
-                    c_actions, c_spacer = st.columns([3, 2])
-                    with c_actions:
-                        btn_c1, btn_c2, btn_c3, btn_c4 = st.columns(4)
-                        if btn_c1.button("Confirm", key=f"btn_conf_{alert_id}", disabled=(status == "CONFIRMED")):
-                            try:
-                                update_alert(alert_id, status="CONFIRMED", mock_mode=st.session_state.mock_mode, base_url=st.session_state.api_url)
-                                st.success(f"{alert_id} status updated to CONFIRMED")
-                                st.rerun()
-                            except BackendNotReachableError:
-                                st.error("backend not reachable")
-                            except Exception as e:
-                                st.error(f"Update failed: {e}")
-
-                        if btn_c2.button("Dispatch", key=f"btn_disp_{alert_id}", disabled=(status == "DISPATCHED")):
-                            try:
-                                update_alert(alert_id, status="DISPATCHED", mock_mode=st.session_state.mock_mode, base_url=st.session_state.api_url)
-                                st.success(f"{alert_id} status updated to DISPATCHED")
-                                st.rerun()
-                            except BackendNotReachableError:
-                                st.error("backend not reachable")
-                            except Exception as e:
-                                st.error(f"Update failed: {e}")
-
-                        if btn_c3.button("Dismiss", key=f"btn_dism_{alert_id}", disabled=(status == "DISMISSED")):
-                            try:
-                                update_alert(alert_id, status="DISMISSED", mock_mode=st.session_state.mock_mode, base_url=st.session_state.api_url)
-                                st.info(f"{alert_id} dismissed")
-                                st.rerun()
-                            except BackendNotReachableError:
-                                st.error("backend not reachable")
-                            except Exception as e:
-                                st.error(f"Update failed: {e}")
-
-                        if btn_c4.button("View Details", key=f"btn_view_{alert_id}"):
-                            st.session_state.current_alert = alert
-                            st.session_state.nav_screen_selection = "Alert Card"
+                    actions = st.container(horizontal=True, gap="small")
+                    if actions.button("Confirm", key=f"btn_conf_{alert_id}", disabled=(status == "CONFIRMED")):
+                        try:
+                            update_alert(alert_id, status="CONFIRMED", mock_mode=st.session_state.mock_mode, base_url=st.session_state.api_url)
+                            st.success(f"{alert_id} status updated to CONFIRMED")
                             st.rerun()
+                        except BackendNotReachableError:
+                            st.error("backend not reachable")
+                        except Exception as e:
+                            st.error(f"Update failed: {e}")
+
+                    if actions.button("Dispatch", key=f"btn_disp_{alert_id}", type="primary", disabled=(status == "DISPATCHED")):
+                        try:
+                            update_alert(alert_id, status="DISPATCHED", mock_mode=st.session_state.mock_mode, base_url=st.session_state.api_url)
+                            st.success(f"{alert_id} status updated to DISPATCHED")
+                            st.rerun()
+                        except BackendNotReachableError:
+                            st.error("backend not reachable")
+                        except Exception as e:
+                            st.error(f"Update failed: {e}")
+
+                    if actions.button("Dismiss", key=f"btn_dism_{alert_id}", disabled=(status == "DISMISSED")):
+                        try:
+                            update_alert(alert_id, status="DISMISSED", mock_mode=st.session_state.mock_mode, base_url=st.session_state.api_url)
+                            st.info(f"{alert_id} dismissed")
+                            st.rerun()
+                        except BackendNotReachableError:
+                            st.error("backend not reachable")
+                        except Exception as e:
+                            st.error(f"Update failed: {e}")
+
+                    if actions.button("Open alert", key=f"btn_view_{alert_id}"):
+                        st.session_state.current_alert = alert
+                        st.session_state.nav_screen_selection = "Alert Card"
+                        st.rerun()
 
 
 # =============================================================================
 # SCREEN 5: METRICS PAGE
 # =============================================================================
 elif screen == "Model Metrics":
-    st.markdown("## Model metrics")
-    st.markdown(
-        "Quantitative benchmark results comparing the **TF-IDF + Logistic Regression Baseline** "
-        "against fine-tuned **DistilBERT** (Classifier) and **Flan-T5** (Field Generator) according to Section 8 of `docs/SCHEMA.md`."
+    render_page_title(
+        "Model metrics",
+        "Scores from one evaluation script on held-out data. Baseline is TF-IDF with logistic regression; ours is DistilBERT plus Flan-T5.",
     )
 
     metrics_data = None
@@ -540,7 +480,7 @@ elif screen == "Model Metrics":
         st.info("Results appear after evaluation")
     else:
         # 1. Incident-Type Classification Comparison Table
-        st.markdown("### 1. Incident-Type Classification (Baseline vs DistilBERT)")
+        st.markdown("### Incident type: baseline vs DistilBERT")
         
         clf_data = metrics_data.get("classification", {})
         baseline_res = clf_data.get("baseline_tfidf_lr", {})
@@ -578,25 +518,25 @@ elif screen == "Model Metrics":
         gold_d = distilbert_res.get("gold", {})
         gold_b = baseline_res.get("gold", {})
         if gold_d:
-            st.markdown("#### Critical Safety Metrics on Gold Set (144 Real Reports)")
+            st.markdown("#### Safety on the gold set (144 real reports)")
             m1, m2, m3, m4 = st.columns(4)
             m1.metric(
-                label="Emergency Recall",
+                label="Emergencies caught",
                 value=f"{gold_d.get('emergency_recall', 0)*100:.1f}%",
                 delta=f"+{(gold_d.get('emergency_recall', 0) - gold_b.get('emergency_recall', 0))*100:.1f}% vs baseline",
             )
             m2.metric(
-                label="Critical Recall (Sev ≥ 4)",
+                label="Severe reports kept",
                 value=f"{gold_d.get('critical_recall', 0)*100:.1f}%",
                 delta=f"+{(gold_d.get('critical_recall', 0) - gold_b.get('critical_recall', 0.75))*100:.1f}% vs baseline",
             )
             m3.metric(
-                label="Macro F1 Score",
+                label="Macro F1",
                 value=f"{gold_d.get('macro_f1', 0):.3f}",
                 delta=f"+{gold_d.get('macro_f1', 0) - gold_b.get('macro_f1', 0):.3f} vs baseline",
             )
             m4.metric(
-                label="False Alarm Rate",
+                label="False alarms",
                 value=f"{gold_d.get('false_alarm_rate', 0)*100:.1f}%",
                 delta=f"{(gold_d.get('false_alarm_rate', 0) - gold_b.get('false_alarm_rate', 0))*100:.1f}%",
                 delta_color="inverse",
@@ -605,7 +545,7 @@ elif screen == "Model Metrics":
         st.markdown("---")
 
         # 2. Severity Regression Metrics
-        st.markdown("### 2. Severity Continuous Regression (DistilBERT)")
+        st.markdown("### Severity, 1 to 5 (DistilBERT)")
         sev_data = metrics_data.get("severity", {}).get("distilbert", {})
         sev_rows = []
         for s_set_name, s_vals in sev_data.items():
@@ -626,7 +566,7 @@ elif screen == "Model Metrics":
         st.markdown("---")
 
         # 3. Field-Extraction Evaluation Table (Flan-T5)
-        st.markdown("### 3. Field Extraction Performance (Flan-T5 Generator)")
+        st.markdown("### Field extraction (Flan-T5)")
         extract_data = metrics_data.get("extraction", {}).get("flan_t5", {})
         ext_rows = []
         for e_set_name, e_vals in extract_data.items():
@@ -650,7 +590,7 @@ elif screen == "Model Metrics":
         st.markdown("---")
 
         # 4. Confusion Matrix PNGs
-        st.markdown("### 4. Incident Classification Confusion Matrices")
+        st.markdown("### Confusion matrices, gold set")
         cm_col1, cm_col2 = st.columns(2)
 
         reports_dir = Path(__file__).resolve().parent.parent / "reports"
@@ -658,14 +598,14 @@ elif screen == "Model Metrics":
         cm_gold_base = reports_dir / "confusion_matrix_gold_baseline.png"
 
         with cm_col1:
-            st.markdown("**DistilBERT Classifier (Gold Set)**")
+            st.markdown("**DistilBERT**")
             if cm_gold_ml2.exists():
                 st.image(str(cm_gold_ml2), caption="DistilBERT Confusion Matrix — Gold Test Set", use_container_width=True)
             else:
                 st.info("Confusion matrix for DistilBERT not generated yet.")
 
         with cm_col2:
-            st.markdown("**TF-IDF + Logistic Regression Baseline (Gold Set)**")
+            st.markdown("**TF-IDF + logistic regression baseline**")
             if cm_gold_base.exists():
                 st.image(str(cm_gold_base), caption="Baseline Confusion Matrix — Gold Test Set", use_container_width=True)
             else:

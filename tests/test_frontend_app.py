@@ -43,7 +43,7 @@ def test_heatmap_stretches_contrast_across_the_report():
     }
     _goto(at, "Attention Heatmap")
     html = " ".join(m.value for m in at.markdown)
-    alphas = [float(x) for x in re.findall(r"background-color: rgba\(239, 68, 68, ([0-9.]+)\)", html)]
+    alphas = [float(x) for x in re.findall(r"background-color: rgba\(255, 204, 0, ([0-9.]+)\)", html)]
     assert len(alphas) == 6
     assert max(alphas) - min(alphas) > 0.6          # raw rollout scores span only 0.55 to 1.0; they must be stretched
     assert "indicator, not proof" in html

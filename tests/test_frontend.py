@@ -180,7 +180,7 @@ def test_styles_incident_type_meta():
         assert "name" in meta
 
     fallback = get_incident_type_meta("ALIEN_INVASION")
-    assert fallback["icon"] == "⚠️"
+    assert fallback["icon"] == ""                    # the interface uses words, not pictograms
 
 
 def test_get_metrics_mock():

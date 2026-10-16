@@ -1,25 +1,29 @@
 """
-ResQPulse AI — Reusable UI Components
-Provides styled components for Alert Cards, Attention Heatmaps, Incident Maps,
-Queue Rows, Severity Badges, and Metrics tables with enterprise mission-control aesthetics.
+ResQPulse AI — UI components: top bar, alert card, severity ruler, attention heatmap, queue rows, incident map.
+All user text is HTML-escaped. Multi-line HTML goes through _flat() so Markdown never turns it into a code block.
 """
 
 import html
-import re
 import json
-from pathlib import Path
+import re
 from typing import Any, Dict, List, Optional
-import streamlit as st
+
 import folium
+import streamlit as st
 from streamlit_folium import st_folium
 
 from app.styles import (
-    SEVERITY_COLORS,
-    INCIDENT_TYPE_META,
-    SDG_META,
     RESPONDER_ICONS,
-    get_severity_style,
+    SDG_META,
     get_incident_type_meta,
+    get_severity_style,
+)
+
+BRAND_MARK = (
+    '<svg viewBox="0 0 32 32" fill="none" aria-hidden="true">'
+    '<rect width="32" height="32" rx="9" fill="#141414"/>'
+    '<path d="M5 17h5l2.6-7 4.4 14 3.4-9.5 1.8 2.5H27" stroke="#FFCC00" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>'
+    "</svg>"
 )
 
 
@@ -31,89 +35,88 @@ def _flat(markup: str) -> str:
     return "\n".join(line.strip() for line in markup.splitlines() if line.strip())
 
 
-def render_header():
-    """Renders the master command-center header with live status beacon."""
-    st.markdown(
-        _flat("""
-        <div class="app-header">
-            <div class="header-top-row">
-                <div class="brand">
-                    <span class="brand-mark"><svg viewBox="0 0 32 32" fill="none" stroke="#F3B7AE" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 17h7l3-9 5 17 4-11 2 3h7"/></svg></span>
-                    <div>
-                        <h1 class="app-title">ResQPulse <em>AI</em></h1>
-                        <p class="app-tagline">Turns emergency reports, typed or spoken, into structured, prioritised, explainable alerts.</p>
-                    </div>
-                </div>
-                <div class="system-beacon">
-                    <span class="pulse-dot"></span>
-                    <span>Triage engine active</span>
-                </div>
-            </div>
-        </div>
-        """),
-        unsafe_allow_html=True,
-    )
+def _md(markup: str) -> None:
+    st.markdown(_flat(markup), unsafe_allow_html=True)
 
 
+# ---------------------------------------------------------------- chrome
+def render_rail_brand() -> None:
+    _md(f'<div class="rail-brand">{BRAND_MARK}<b>ResQPulse AI</b></div>')
+
+
+def render_header(mock_mode: bool = False, screen: str = "") -> None:
+    """Slim top bar: where you are, and whether the real models are answering."""
+    pill = ('<span class="status-pill"><span class="status-dot"></span>Mock data</span>' if mock_mode
+            else '<span class="status-pill live"><span class="status-dot"></span>Live · real models</span>')
+    crumb = f"Dispatch console <span>/</span> <b>{html.escape(screen)}</b>" if screen else "Dispatch console"
+    _md(f'<div class="topbar"><div class="topbar-crumb">{crumb}</div>{pill}</div>')
+
+
+def render_page_title(title: str, lede: str) -> None:
+    st.markdown(f"## {title}")
+    _md(f'<p class="page-lede">{html.escape(lede)}</p>')
+
+
+# ---------------------------------------------------------------- small pieces
 def render_severity_pill(severity_label: str, severity_score: Optional[float] = None) -> str:
-    """Return HTML for a styled severity pill with crisp typography."""
+    """HTML for a severity pill."""
     clean_label = str(severity_label).upper().strip() if severity_label else "LOW"
     style = get_severity_style(clean_label)
-    score_text = f" • {severity_score:.1f}" if severity_score is not None else ""
-    return (
-        f'<span class="rq-badge" style="background-color: {style["badge_bg"]}; color: {style["badge_text"]};">'
-        f'{clean_label}{score_text}</span>'
-    )
+    score_text = f" {severity_score:.1f}" if isinstance(severity_score, (int, float)) else ""
+    return (f'<span class="sev-pill" style="background:{style["badge_bg"]};color:{style["badge_text"]};">'
+            f'{html.escape(clean_label.replace("_", " "))}{score_text}</span>')
 
 
-def render_empty_state(title: str, description: str, icon: str = "📋"):
-    """Render a clean, friendly empty state container."""
-    st.markdown(
-        _flat(f"""
-        <div class="rq-empty-state">
-            <div class="rq-empty-icon">{icon}</div>
-            <div class="rq-empty-title">{html.escape(title)}</div>
-            <div class="rq-empty-desc">{html.escape(description)}</div>
-        </div>
-        """),
-        unsafe_allow_html=True,
-    )
+def render_severity_ruler(severity: Any, severity_label: str, mini: bool = False) -> str:
+    """The signature: five cells for severity 1 to 5, filled up to the score."""
+    try:
+        sev = max(1.0, min(5.0, float(severity)))
+    except (TypeError, ValueError):
+        sev = 1.0
+    colour = get_severity_style(severity_label)["bar_color"]
+    cells = []
+    for i in range(5):                                   # cell i covers severity i+1 (a score of 3.4 fills 3 cells and 40% of the 4th)
+        fill = max(0.0, min(1.0, sev - i))
+        cells.append(f'<span class="ruler-cell"><i style="width:{fill * 100:.0f}%;background:{colour};"></i></span>')
+    return (f'<div class="ruler{" mini" if mini else ""}" role="img" aria-label="Severity {sev:.1f} of 5">'
+            f'<div class="ruler-cells">{"".join(cells)}</div>'
+            f'<div class="ruler-val">{sev:.1f}<span> / 5</span></div></div>')
 
 
-def render_non_emergency_card(alert: Dict[str, Any]):
-    """Render calm, neutral card for NON_EMERGENCY alerts."""
+def render_empty_state(title: str, description: str, icon: Optional[str] = None) -> None:
+    """Empty state. `icon` is accepted for compatibility and ignored."""
+    _md(f'<div class="empty"><div class="empty-title">{html.escape(title)}</div>'
+        f'<div class="empty-desc">{html.escape(description)}</div></div>')
+
+
+def _tags(items: List[str], kind: str) -> str:
+    return "".join(f'<span class="tag {kind}"><i></i>{html.escape(str(x))}</span>' for x in items)
+
+
+# ---------------------------------------------------------------- alert card
+def render_non_emergency_card(alert: Dict[str, Any]) -> None:
+    """Calm, neutral card for NON_EMERGENCY alerts."""
     summary = alert.get("summary") or "No emergency situation detected in this report."
     confidence = alert.get("type_confidence")
     conf_str = f"{confidence * 100:.1f}%" if isinstance(confidence, (int, float)) else "N/A"
     latency = alert.get("latency_ms", "N/A")
-
-    st.markdown(
-        _flat(f"""
-        <div class="rq-card-neutral">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
-                <div style="display: flex; align-items: center; gap: 0.65rem;">
-                    <span style="font-size: 1.6rem;">ℹ️</span>
-                    <span style="font-size: 1.4rem; font-weight: 800; color: #1E293B;">No emergency detected</span>
-                </div>
-                <span class="rq-badge" style="background-color: #64748B; color: #FFFFFF;">NON-EMERGENCY</span>
-            </div>
-            <p style="font-size: 1.1rem; color: #334155; margin: 0.5rem 0 1.25rem 0; line-height: 1.6;">
-                {html.escape(summary)}
-            </p>
-            <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; font-size: 0.9rem; color: #475569; border-top: 1px solid #CBD5E1; padding-top: 0.9rem;">
-                <span><strong>Classification Confidence:</strong> {conf_str}</span>
-                <span><strong>Severity:</strong> 1.0 (Non-urgent Inquiry / Non-emergency)</span>
-                <span><strong>Status:</strong> DISMISSED (Filtered out of priority queue)</span>
-                <span><strong>Response time:</strong> {latency} ms</span>
-            </div>
-        </div>
-        """),
-        unsafe_allow_html=True,
-    )
-
-    # Download JSON button
+    _md(f"""
+    <div class="panel">
+      <div class="calm-head">
+        <div class="calm-title">No emergency detected</div>
+        {render_severity_pill("NON_EMERGENCY")}
+      </div>
+      <p class="alert-summary" style="margin:0.9rem 0 0;">{html.escape(summary)}</p>
+      <div class="calm-facts">
+        <div class="meta-row"><div class="field-label">Confidence</div><div class="meta-val">{conf_str}</div></div>
+        <div class="meta-row"><div class="field-label">Severity</div><div class="meta-val">1.0, not urgent</div></div>
+        <div class="meta-row"><div class="field-label">Status</div><div class="meta-val">Dismissed, kept out of the queue</div></div>
+        <div class="meta-row"><div class="field-label">Response time</div><div class="meta-val">{html.escape(str(latency))} ms</div></div>
+      </div>
+    </div>
+    """)
     st.download_button(
-        label="📥 Download Alert JSON",
+        label="Download alert JSON",
         data=json.dumps(alert, indent=2),
         file_name=f"{alert.get('alert_id', 'alert')}.json",
         mime="application/json",
@@ -121,192 +124,92 @@ def render_non_emergency_card(alert: Dict[str, Any]):
     )
 
 
-def render_alert_card(alert: Dict[str, Any]):
-    """
-    Renders structured alert card with all documented schema fields:
-    incident_type, severity bar, location, people affected, injuries, hazards,
-    summary, responders, SDG badges, confidence, and latency.
-    """
+def render_alert_card(alert: Dict[str, Any]) -> None:
+    """Structured alert in a Kaggle-style layout: main column (summary, severity, injuries, hazards) and a meta column."""
     if not alert:
         render_empty_state("No alert generated yet", "Submit a report or choose a demo sample to view the structured alert.")
         return
 
-    # Check for NON_EMERGENCY
     incident_type = alert.get("incident_type", "UNKNOWN")
-    is_emergency = alert.get("is_emergency", True)
-    if incident_type == "NON_EMERGENCY" or not is_emergency:
+    if incident_type == "NON_EMERGENCY" or not alert.get("is_emergency", True):
         render_non_emergency_card(alert)
         return
 
-    severity_label = alert.get("severity_label", "LOW")
+    severity_label = str(alert.get("severity_label", "LOW"))
     severity = alert.get("severity", 1.0)
-    type_meta = get_incident_type_meta(incident_type)
-    sev_style = get_severity_style(severity_label)
+    type_name = get_incident_type_meta(incident_type)["name"]
 
-    # Location handling
     loc_data = alert.get("location")
+    lat = lon = None
+    geocoded = False
     if isinstance(loc_data, dict):
         loc_text = loc_data.get("text") or "Location unavailable"
-        lat = loc_data.get("lat")
-        lon = loc_data.get("lon")
-        geocoded = loc_data.get("geocoded", False)
+        lat, lon, geocoded = loc_data.get("lat"), loc_data.get("lon"), loc_data.get("geocoded", False)
     elif isinstance(loc_data, str) and loc_data.strip():
         loc_text = loc_data.strip()
-        lat, lon, geocoded = None, None, False
     else:
         loc_text = "Location unavailable"
-        lat, lon, geocoded = None, None, False
+    coords = (f'<div class="coords">{lat:.4f}, {lon:.4f}</div>'
+              if geocoded and isinstance(lat, (int, float)) and isinstance(lon, (int, float))
+              else '<div class="coords">Not on the map</div>')
 
-    coords_badge = (
-        f'<span class="rq-chip rq-chip-responder" style="font-size: 0.75rem; font-family: monospace;">{lat:.4f}, {lon:.4f}</span>'
-        if (geocoded and lat is not None and lon is not None)
-        else '<span class="rq-chip" style="background:#F1F5F9; color:#64748B; font-size:0.75rem;">Ungeocoded</span>'
-    )
-
-    people_affected = alert.get("people_affected")
-    people_str = str(people_affected) if people_affected is not None else "Unknown"
-
+    people = alert.get("people_affected")
+    people_str = str(people) if people is not None else "Unknown"
     injuries = alert.get("injuries") or []
     hazards = alert.get("hazards") or []
     responders = alert.get("responders") or []
     sdg_targets = alert.get("sdg_targets") or []
     summary = alert.get("summary") or "No summary provided."
     confidence = alert.get("type_confidence")
-    conf_str = f"{confidence * 100:.1f}%" if isinstance(confidence, (int, float)) else "N/A"
+    conf_str = f"{confidence * 100:.1f}" if isinstance(confidence, (int, float)) else "N/A"
     latency = alert.get("latency_ms", "N/A")
-    alert_id = alert.get("alert_id", "RQP-000000")
+    alert_id = str(alert.get("alert_id", "RQP-000000"))
+    status = str(alert.get("status", "NEW"))
+    source = str((alert.get("input") or {}).get("source", "text")) if isinstance(alert.get("input"), dict) else "text"
+
     dup_of = alert.get("duplicate_of")
-    dup_note = (f'<div style="margin-bottom: 0.8rem;"><span class="rq-badge" style="background:#EEF2FF; color:#3730A3;">'
-                f'Possible duplicate of {html.escape(str(dup_of))}: merge or dismiss</span></div>') if dup_of else ""
+    dup = (f'<div class="dup-flag">Possible duplicate of <b>{html.escape(str(dup_of))}</b>. Merge or dismiss.</div>'
+           if dup_of else "")
+    inj = _tags(injuries, "injury") if injuries else '<span class="muted">None reported</span>'
+    haz = _tags(hazards, "hazard") if hazards else '<span class="muted">None reported</span>'
+    resp = ("".join(f'<span class="tag responder">{html.escape(RESPONDER_ICONS.get(r, str(r)))}</span>' for r in responders)
+            if responders else '<span class="muted">None assigned</span>')
+    sdg = ("".join(
+        f'<span class="tag sdg" title="{html.escape(SDG_META.get(str(t), {}).get("desc", ""))}">'
+        f'<b>{html.escape(str(t))}</b>{html.escape(SDG_META.get(str(t), {}).get("title", ""))}</span>'
+        for t in sdg_targets) if sdg_targets else '<span class="muted">None</span>')
 
-    # Progress percentage for severity (1.0 to 5.0 scale -> 0% to 100%)
-    sev_num = float(severity) if isinstance(severity, (int, float)) else 1.0
-    sev_pct = max(0, min(100, int(((sev_num - 1.0) / 4.0) * 100)))
-
-    # Main Card Container with custom border color according to severity
-    card_border_class = f"rq-card-{severity_label.lower()}"
-    st.markdown(
-        _flat(f"""
-        <div class="rq-card {card_border_class}" >
-            <!-- Top bar: Alert ID, Type, and Severity -->
-            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 0.6rem;">
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <div>
-                        <div style="font-family: 'Newsreader', Georgia, serif; font-size: 1.7rem; font-weight: 600; color: #171A21; letter-spacing: -0.02em;">{type_meta['name']}</div>
-                        <div style="font-size: 0.85rem; color: #475569; font-family: 'JetBrains Mono', monospace; font-weight: 600;">INCIDENT ID: {alert_id}</div>
-                    </div>
-                </div>
-                <div>
-                    <span class="rq-badge" style="background-color: {sev_style['badge_bg']}; color: {sev_style['badge_text']}; font-size: 1rem; padding: 0.45rem 1.1rem; ">
-                        {severity_label} • {sev_num:.1f} / 5.0
-                    </span>
-                </div>
-            </div>
-
-            {dup_note}
-            <!-- Severity visual bar -->
-            <div style="margin-bottom: 1.4rem;">
-                <div style="display: flex; justify-content: space-between; font-size: 0.82rem; color: #475569; font-weight: 700; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.04em;">
-                    <span>Severity, 1 to 5</span>
-                    <span>{sev_num:.1f} of 5</span>
-                </div>
-                <div style="background-color: #ECE8DD; border-radius: 9999px; height: 8px; overflow: hidden;">
-                    <div style="background: {sev_style['bar_color']}; height: 100%; width: {sev_pct}%;  border-radius: 9999px;"></div>
-                </div>
-            </div>
-
-            <!-- Summary block -->
-            <div style="background: #F7F5F0; border-radius: 12px; padding: 1.1rem 1.2rem; margin-bottom: 1.25rem;">
-                <div style="font-size: 0.78rem; font-weight: 800; text-transform: uppercase; color: #64748B; margin-bottom: 0.4rem; letter-spacing: 0.06em;">Summary</div>
-                <div style="font-size: 1.15rem; font-weight: 600; color: #1E293B; line-height: 1.6;">{html.escape(summary)}</div>
-            </div>
-
-            <!-- Stat Boxes Grid -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
-                <!-- Location -->
-                <div class="rq-stat-box">
-                    <div class="rq-stat-label">Location</div>
-                    <div style="font-size: 1.02rem; font-weight: 700; color: #0F172A; margin: 0.2rem 0 0.4rem 0;">{html.escape(loc_text)}</div>
-                    <div>{coords_badge}</div>
-                </div>
-
-                <!-- People Affected -->
-                <div class="rq-stat-box">
-                    <div class="rq-stat-label">People affected</div>
-                    <div class="rq-stat-val" style="color: {'#DC2626' if (isinstance(people_affected, int) and people_affected > 0) else '#0F172A'};">
-                        {people_str}
-                    </div>
-                </div>
-
-                <!-- Confidence -->
-                <div class="rq-stat-box">
-                    <div class="rq-stat-label">Confidence</div>
-                    <div class="rq-stat-val">{conf_str}</div>
-                    <div style="font-size: 0.78rem; color: #64748B; margin-top: 0.2rem;">DistilBERT Multi-task</div>
-                </div>
-
-                <!-- Latency -->
-                <div class="rq-stat-box">
-                    <div class="rq-stat-label">Response time</div>
-                    <div class="rq-stat-val">{latency} <span style="font-size: 0.9rem; font-weight: 600; color: #64748B;">ms</span></div>
-                    <div style="font-size: 0.78rem; color: #64748B; margin-top: 0.2rem;">Flan-T5 + DistilBERT</div>
-                </div>
-            </div>
+    _md(f"""
+    <div class="panel">
+      <div class="alert-head">
+        <div>
+          <div class="alert-title">{html.escape(type_name)}</div>
+          <div class="alert-sub">{html.escape(alert_id)} · {html.escape(source)} report</div>
         </div>
-        """),
-        unsafe_allow_html=True,
-    )
-
-    # Detailed Chips and Badges in two columns
-    c1, c2 = st.columns(2)
-    with c1:
-        st.markdown("#### Recommended responders")
-        if responders:
-            resp_html = "".join(
-                [f'<span class="rq-chip rq-chip-responder">{RESPONDER_ICONS.get(r, html.escape(r))}</span>' for r in responders]
-            )
-            st.markdown(resp_html, unsafe_allow_html=True)
-        else:
-            st.info("No emergency responders assigned.")
-
-        st.markdown("#### UN SDG targets")
-        if sdg_targets:
-            sdg_html = "".join(
-                [
-                    f'<span class="rq-chip rq-chip-sdg" title="{SDG_META.get(str(t), {}).get("desc", "")}">'
-                    f'🌱 <strong>{SDG_META.get(str(t), {}).get("label", f"SDG {t}")}</strong>: {SDG_META.get(str(t), {}).get("title", "")}'
-                    f'</span>'
-                    for t in sdg_targets
-                ]
-            )
-            st.markdown(sdg_html, unsafe_allow_html=True)
-        else:
-            st.markdown('<span style="color:#64748B; font-size:0.9rem;">None specified</span>', unsafe_allow_html=True)
-
-    with c2:
-        st.markdown("#### Injuries and medical needs")
-        if injuries:
-            inj_html = "".join(
-                [f'<span class="rq-chip rq-chip-injury">⚠️ {html.escape(str(i))}</span>' for i in injuries]
-            )
-            st.markdown(inj_html, unsafe_allow_html=True)
-        else:
-            st.markdown('<span style="color:#64748B; font-size:0.95rem;">None reported in call transcript</span>', unsafe_allow_html=True)
-
-        st.markdown("#### Hazards")
-        if hazards:
-            haz_html = "".join(
-                [f'<span class="rq-chip rq-chip-hazard">🔥 {html.escape(str(h))}</span>' for h in hazards]
-            )
-            st.markdown(haz_html, unsafe_allow_html=True)
-        else:
-            st.markdown('<span style="color:#64748B; font-size:0.95rem;">None reported in call transcript</span>', unsafe_allow_html=True)
-
-    st.markdown("---")
-
-    # JSON Download Button
+        <div class="q-right">{render_severity_pill(severity_label, severity if isinstance(severity, (int, float)) else None)}<span class="status-tag">{html.escape(status)}</span></div>
+      </div>
+      <div class="alert-grid">
+        <div>
+          {dup}
+          <p class="alert-summary">{html.escape(summary)}</p>
+          <div class="field-label">Severity</div>
+          {render_severity_ruler(severity, severity_label)}
+          <div class="section-gap"><div class="field-label">Injuries and medical needs</div>{inj}</div>
+          <div class="section-gap"><div class="field-label">Hazards</div>{haz}</div>
+          <div class="section-gap"><div class="field-label">Recommended responders</div>{resp}</div>
+        </div>
+        <aside>
+          <div class="meta-row"><div class="field-label">Location</div><div class="meta-val">{html.escape(loc_text)}</div>{coords}</div>
+          <div class="meta-row"><div class="field-label">People affected</div><div class="meta-num">{html.escape(people_str)}</div></div>
+          <div class="meta-row"><div class="field-label">Type confidence</div><div class="meta-num">{conf_str}<small>%</small></div></div>
+          <div class="meta-row"><div class="field-label">Response time</div><div class="meta-num">{html.escape(str(latency))}<small> ms</small></div></div>
+          <div class="meta-row"><div class="field-label">UN SDG targets</div>{sdg}</div>
+        </aside>
+      </div>
+    </div>
+    """)
     st.download_button(
-        label="📥 Download Structured Alert JSON",
+        label="Download alert JSON",
         data=json.dumps(alert, indent=2),
         file_name=f"{alert_id}.json",
         mime="application/json",
@@ -314,186 +217,128 @@ def render_alert_card(alert: Dict[str, Any]):
     )
 
 
-def render_attention_heatmap(alert: Dict[str, Any]):
-    """
-    Renders the report text with attention heatmap highlights.
-    Attention format: alert.explanation.attention = [[word, score], ...]
-    Clamps scores to 0.0 - 1.0, escapes HTML, preserves word order.
-    Displays required disclaimer note.
-    """
+# ---------------------------------------------------------------- explainability
+def render_attention_heatmap(alert: Dict[str, Any]) -> None:
+    """The report with each word shaded by attention (stretched within the report), plus the class probabilities."""
     if not alert:
         render_empty_state("No alert to explain", "Run an analysis on a report first to inspect model attention.")
         return
-
     explanation = alert.get("explanation")
     if not isinstance(explanation, dict):
         st.info("Attention explanation is not available for this alert.")
         return
-
     attention = explanation.get("attention")
     if not attention or not isinstance(attention, list):
         st.info("No attention token scores found for this alert.")
         return
 
-    st.markdown("### Which words drove the decision")
-    st.caption("Token-level attention rollout from DistilBERT. Colours are relative within this report: the darkest words mattered most.")
-
-    # Attention Legend
-    st.markdown(
-        _flat("""
-        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; font-size: 0.85rem; color: #475569;">
-            <span><strong>Attention Intensity:</strong></span>
-            <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
-                <span style="display: inline-block; width: 14px; height: 14px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(220, 38, 38, 0.3); border-radius: 3px;"></span>
-                <span>Low (0.0 - 0.4)</span>
-            </span>
-            <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
-                <span style="display: inline-block; width: 14px; height: 14px; background: rgba(239, 68, 68, 0.55); border: 1px solid rgba(220, 38, 38, 0.6); border-radius: 3px;"></span>
-                <span>Moderate (0.4 - 0.7)</span>
-            </span>
-            <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
-                <span style="display: inline-block; width: 14px; height: 14px; background: rgba(220, 38, 38, 0.95); border: 1px solid #B91C1C; border-radius: 3px;"></span>
-                <span>High Focus (0.7 - 1.0)</span>
-            </span>
-        </div>
-        """),
-        unsafe_allow_html=True,
-    )
-
     parsed = []
     for item in attention:
         if not isinstance(item, (list, tuple)) or len(item) < 2:
             continue
-        word, score = item[0], item[1]
         try:
-            val = float(score)
+            val = float(item[1])
         except (ValueError, TypeError):
             val = 0.0
-        parsed.append((word, max(0.0, min(1.0, val))))      # clamp to 0.0 - 1.0
-
-    # Attention-rollout scores sit close together (about 0.5 to 1.0), so colouring them directly makes every word dark.
-    # Stretch them over the full range within this report; the tooltip still shows the raw weight.
-    raw_scores = [s for _, s in parsed]
-    lo, hi = (min(raw_scores), max(raw_scores)) if raw_scores else (0.0, 1.0)
-
-    spans = []
-    for word, clamped_score in parsed:
-        shown = ((clamped_score - lo) / (hi - lo)) ** 1.5 if hi > lo else clamped_score
-        # Color: vivid red / coral highlight with opacity proportional to the stretched score
-        alpha = max(0.08, min(0.96, shown * 0.95))
-        # Ensure high contrast text
-        text_color = "#FFFFFF" if alpha > 0.58 else "#0F172A"
-        border_color = f"rgba(220, 38, 38, {max(0.2, alpha)})"
-        bg_color = f"rgba(239, 68, 68, {alpha:.2f})"
-
-        escaped_word = html.escape(str(word))
-        span_html = (
-            f'<span class="heatmap-token" '
-            f'style="background-color: {bg_color}; color: {text_color}; border: 1px solid {border_color};" '
-            f'title="Token: \'{escaped_word}\' • Attention Weight: {clamped_score:.3f}">{escaped_word}</span>'
-        )
-        spans.append(span_html)
-
-    if not spans:
+        parsed.append((item[0], max(0.0, min(1.0, val))))
+    if not parsed:
         st.info("No tokens were available for attention visualization.")
         return
 
-    # Render HTML in container
-    heatmap_html = f'<div class="heatmap-container">{" ".join(spans)}</div>'
-    st.markdown(heatmap_html, unsafe_allow_html=True)
+    # Attention-rollout scores sit close together (about 0.5 to 1.0), so colouring them directly makes every word dark.
+    # Stretch them over the full range within this report; the tooltip still shows the raw weight.
+    scores = [s for _, s in parsed]
+    lo, hi = min(scores), max(scores)
+    spans = []
+    for word, score in parsed:
+        shown = ((score - lo) / (hi - lo)) ** 1.5 if hi > lo else score
+        alpha = max(0.06, min(1.0, shown))
+        w = html.escape(str(word))
+        spans.append(f'<span class="heat-tok" style="background-color: rgba(255, 204, 0, {alpha:.2f});" '
+                     f'title="{w}: attention {score:.3f}">{w}</span>')
 
-    # EXACT MANDATORY EXPLANATORY NOTE
-    st.markdown(
-        '<div class="heatmap-note"><span>ℹ️</span> <span>Highlighted words are what the model focused on. This is an indicator, not proof.</span></div>',
-        unsafe_allow_html=True,
-    )
+    _md('<div class="heat-legend">Less focus <span class="heat-ramp"></span> More focus</div>')
+    st.markdown(f'<div class="heat">{" ".join(spans)}</div>', unsafe_allow_html=True)
+    _md('<div class="heat-note">Highlighted words are what the model focused on. This is an indicator, not proof. '
+        'Shading is relative within this report; hover a word for its raw attention weight.</div>')
 
-    # Display type probability distribution if present
     probs = alert.get("type_probs")
     if isinstance(probs, dict) and probs:
-        st.markdown("#### Incident-Type Class Probabilities")
-        sorted_probs = sorted(probs.items(), key=lambda x: x[1], reverse=True)
-        prob_cols = st.columns(min(len(sorted_probs), 4))
-        for idx, (t, p) in enumerate(sorted_probs[:4]):
-            with prob_cols[idx % len(prob_cols)]:
-                meta = get_incident_type_meta(t)
-                st.metric(label=f"{meta['icon']} {t}", value=f"{p * 100:.1f}%")
+        st.markdown("### Incident type probabilities")
+        rows = []
+        for t, p in sorted(probs.items(), key=lambda x: x[1], reverse=True)[:5]:
+            try:
+                pv = float(p)
+            except (TypeError, ValueError):
+                continue
+            rows.append(f'<div class="prob-row"><div class="prob-name">{html.escape(get_incident_type_meta(t)["name"])}</div>'
+                        f'<div class="prob-bar"><i style="width:{pv * 100:.1f}%"></i></div>'
+                        f'<div class="prob-val">{pv * 100:.1f}%</div></div>')
+        _md(f'<div class="panel" style="padding:0.6rem 1.4rem;">{"".join(rows)}</div>')
 
 
-def render_incident_map(alerts: List[Dict[str, Any]]):
-    """
-    Renders Folium incident map for all geocoded alerts.
-    Skips alerts with geocoded: false, missing coords, invalid/out-of-range coords.
-    """
-    mappable_alerts = []
+# ---------------------------------------------------------------- queue
+def render_queue_row(alert: Dict[str, Any]) -> None:
+    """One alert in the dispatcher queue: type, ID, location, severity ruler, status, summary."""
+    loc = alert.get("location")
+    loc_text = (loc.get("text") if isinstance(loc, dict) else loc) or "Location unavailable"
+    sev_label = str(alert.get("severity_label", "LOW"))
+    severity = alert.get("severity", 1.0)
+    dup_of = alert.get("duplicate_of")
+    dup = (f'<span class="status-tag" style="color:#141414;border-color:#141414;">'
+           f'Duplicate of {html.escape(str(dup_of))}</span>' if dup_of else "")
+    _md(f"""
+    <div class="q-row">
+      <div class="q-top">
+        <div>
+          <span class="q-title">{html.escape(get_incident_type_meta(alert.get("incident_type", ""))["name"])}</span><span class="q-id">{html.escape(str(alert.get("alert_id", "")))}</span>
+          <div class="q-loc">{html.escape(str(loc_text))}</div>
+        </div>
+        <div class="q-right">{render_severity_ruler(severity, sev_label, mini=True)}{render_severity_pill(sev_label)}<span class="status-tag">{html.escape(str(alert.get("status", "NEW")))}</span>{dup}</div>
+      </div>
+      <div class="q-sum">{html.escape(str(alert.get("summary") or "No summary provided."))}</div>
+    </div>
+    """)
+
+
+def render_incident_map(alerts: List[Dict[str, Any]]) -> None:
+    """Light map with one severity-coloured dot per geocoded alert. Skips alerts without valid coordinates."""
+    mappable = []
     for a in alerts:
         loc = a.get("location")
-        if not isinstance(loc, dict):
-            continue
-        if loc.get("geocoded") is False:
-            continue
-        lat = loc.get("lat")
-        lon = loc.get("lon")
-        if lat is None or lon is None:
+        if not isinstance(loc, dict) or loc.get("geocoded") is False:
             continue
         try:
-            flat = float(lat)
-            flon = float(lon)
-        except (ValueError, TypeError):
+            flat, flon = float(loc.get("lat")), float(loc.get("lon"))
+        except (TypeError, ValueError):
             continue
-        # Coordinate bounds check
-        if not (-90.0 <= flat <= 90.0 and -180.0 <= flon <= 180.0):
-            continue
-        mappable_alerts.append((a, flat, flon))
+        if -90.0 <= flat <= 90.0 and -180.0 <= flon <= 180.0:
+            mappable.append((a, flat, flon))
 
-    if not mappable_alerts:
-        render_empty_state("No mappable incidents", "None of the active alerts have valid geocoded coordinates to display on the map.", icon="🗺️")
+    if not mappable:
+        render_empty_state("No incidents on the map yet", "Alerts appear here once their location has been geocoded.")
         return
 
-    # Calculate map center (average of coordinates or default to first)
-    avg_lat = sum(flat for _, flat, _ in mappable_alerts) / len(mappable_alerts)
-    avg_lon = sum(flon for _, _, flon in mappable_alerts) / len(mappable_alerts)
-
-    # Create Folium Map with OpenStreetMap
-    m = folium.Map(
-        location=[avg_lat, avg_lon],
-        zoom_start=7 if len(mappable_alerts) > 1 else 10,
-        tiles="OpenStreetMap",
-    )
-
-    for alert, flat, flon in mappable_alerts:
-        sev_label = alert.get("severity_label", "LOW")
-        sev_val = alert.get("severity", 1.0)
-        inc_type = alert.get("incident_type", "INCIDENT")
-        summary = alert.get("summary", "Emergency incident")
-        alert_id = alert.get("alert_id", "RQP")
-        status = alert.get("status", "NEW")
+    avg_lat = sum(p[1] for p in mappable) / len(mappable)
+    avg_lon = sum(p[2] for p in mappable) / len(mappable)
+    m = folium.Map(location=[avg_lat, avg_lon], zoom_start=7 if len(mappable) > 1 else 10, tiles="Esri.WorldGrayCanvas")
+    for alert, flat, flon in mappable:
+        sev_label = str(alert.get("severity_label", "LOW"))
         style = get_severity_style(sev_label)
-        meta = get_incident_type_meta(inc_type)
-
-        # Popup HTML
-        popup_html = f"""
-        <div style="font-family: 'Hanken Grotesk', sans-serif; min-width: 220px;">
-            <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px; color: #0F172A;">
-                {meta['icon']} {inc_type} <span style="font-family: monospace; font-size: 11px; color: #64748B;">[{alert_id}]</span>
-            </div>
-            <div style="margin-bottom: 6px;">
-                <span style="background-color: {style['badge_bg']}; color: white; padding: 2px 7px; border-radius: 9999px; font-size: 11px; font-weight: bold;">
-                    {sev_label} • {sev_val:.1f}
-                </span>
-                <span style="background-color: #E2E8F0; color: #334155; padding: 2px 7px; border-radius: 9999px; font-size: 11px; margin-left: 4px; font-weight: 600;">
-                    {status}
-                </span>
-            </div>
-            <div style="font-size: 12px; color: #334155; margin-top: 6px; line-height: 1.4;">{html.escape(summary)}</div>
-        </div>
-        """
-
-        folium.Marker(
-            location=[flat, flon],
-            popup=folium.Popup(popup_html, max_width=320),
-            tooltip=f"{meta['icon']} {inc_type} ({sev_label}) - {alert_id}",
-            icon=folium.Icon(color=style["map_color"], icon="info-sign"),
+        name = get_incident_type_meta(alert.get("incident_type", ""))["name"]
+        alert_id = html.escape(str(alert.get("alert_id", "")))
+        try:
+            sev_num = float(alert.get("severity", 1.0))
+        except (TypeError, ValueError):
+            sev_num = 1.0
+        popup = (f'<div style="font-family:Figtree,-apple-system,sans-serif;min-width:220px;">'
+                 f'<div style="font-weight:600;font-size:14px;color:#141414;">{html.escape(name)}</div>'
+                 f'<div style="font-family:monospace;font-size:11px;color:#6B6B68;margin:2px 0 6px;">{alert_id} · {html.escape(sev_label)} '
+                 f'{sev_num:.1f} · {html.escape(str(alert.get("status", "NEW")))}</div>'
+                 f'<div style="font-size:12px;color:#4D4D4D;line-height:1.4;">{html.escape(str(alert.get("summary", "")))}</div></div>')
+        folium.CircleMarker(
+            location=[flat, flon], radius=9, color="#FFFFFF", weight=2, fill=True,
+            fill_color=style["badge_bg"], fill_opacity=0.95,
+            popup=folium.Popup(popup, max_width=320), tooltip=f"{name} · {sev_label} · {alert_id}",
         ).add_to(m)
-
-    st_folium(m, width="100%", height=460)
+    st_folium(m, width="100%", height=440)

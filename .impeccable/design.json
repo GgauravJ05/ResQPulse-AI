@@ -1,0 +1,574 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-16T21:34:27+00:00",
+  "title": "Design System: ResQPulse AI",
+  "extensions": {
+    "colorMeta": {
+      "ground": {
+        "role": "neutral",
+        "displayName": "Ground",
+        "canonical": "#F5F5F3",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424241",
+          "#616160",
+          "#828281",
+          "#A5A5A4",
+          "#C9C9C7",
+          "#EEEEED"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
+        ]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Console Ink",
+        "canonical": "#141414",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Ink 2",
+        "canonical": "#4D4D4D",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
+        ]
+      },
+      "ink-3": {
+        "role": "neutral",
+        "displayName": "Ink 3",
+        "canonical": "#6B6B68",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252524",
+          "#424240",
+          "#61615F",
+          "#828280",
+          "#A5A5A3",
+          "#C9C9C8",
+          "#EEEEEE"
+        ]
+      },
+      "hair": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#E4E4E1",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252524",
+          "#424241",
+          "#616160",
+          "#828281",
+          "#A5A5A3",
+          "#C9C9C7",
+          "#EEEEED"
+        ]
+      },
+      "hair-2": {
+        "role": "neutral",
+        "displayName": "Hairline Strong",
+        "canonical": "#D4D4D0",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252524",
+          "#424241",
+          "#61615F",
+          "#828280",
+          "#A5A5A2",
+          "#C9C9C5",
+          "#EEEEED"
+        ]
+      },
+      "signal": {
+        "role": "primary",
+        "displayName": "Signal Yellow",
+        "canonical": "#FFCC00",
+        "tonalRamp": [
+          "#100A00",
+          "#2F2300",
+          "#524000",
+          "#775E00",
+          "#9F7E00",
+          "#C8A000",
+          "#F4C300",
+          "#FFEEBD"
+        ]
+      },
+      "signal-tint": {
+        "role": "primary",
+        "displayName": "Signal Tint",
+        "canonical": "#FFF4CC",
+        "tonalRamp": [
+          "#0C0B07",
+          "#27251D",
+          "#454236",
+          "#666150",
+          "#89826C",
+          "#ADA589",
+          "#D3C9A8",
+          "#FAEFC8"
+        ]
+      },
+      "hover-wash": {
+        "role": "neutral",
+        "displayName": "Hover Wash",
+        "canonical": "#F2F2F0",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424241",
+          "#616160",
+          "#828281",
+          "#A5A5A4",
+          "#C9C9C7",
+          "#EEEEED"
+        ]
+      },
+      "track": {
+        "role": "neutral",
+        "displayName": "Track",
+        "canonical": "#ECECE9",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252524",
+          "#424241",
+          "#616160",
+          "#828281",
+          "#A5A5A3",
+          "#C9C9C7",
+          "#EFEFEC"
+        ]
+      },
+      "ink-hover": {
+        "role": "neutral",
+        "displayName": "Ink Hover",
+        "canonical": "#2E2E2E",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
+        ]
+      },
+      "disabled-ink": {
+        "role": "neutral",
+        "displayName": "Disabled Ink",
+        "canonical": "#A3A3A0",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252524",
+          "#424241",
+          "#61615F",
+          "#828280",
+          "#A5A5A2",
+          "#C9C9C7",
+          "#EEEEEE"
+        ]
+      },
+      "disabled-fill": {
+        "role": "neutral",
+        "displayName": "Disabled Fill",
+        "canonical": "#B8B8B4",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252524",
+          "#424240",
+          "#61615F",
+          "#828280",
+          "#A5A5A2",
+          "#C9C9C6",
+          "#EEEEED"
+        ]
+      },
+      "disabled-wash": {
+        "role": "neutral",
+        "displayName": "Disabled Wash",
+        "canonical": "#FAFAF9",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A4",
+          "#C9C9C8",
+          "#EEEEED"
+        ]
+      },
+      "severity-critical": {
+        "role": "secondary",
+        "displayName": "Critical Red",
+        "canonical": "#D92D20",
+        "tonalRamp": [
+          "#1D0201",
+          "#490805",
+          "#7B150D",
+          "#B02318",
+          "#DE4435",
+          "#EE8171",
+          "#F9B6AB",
+          "#FFE7E2"
+        ]
+      },
+      "severity-high": {
+        "role": "secondary",
+        "displayName": "High Rust",
+        "canonical": "#C4320A",
+        "tonalRamp": [
+          "#1C0200",
+          "#480C01",
+          "#781B03",
+          "#AD2B08",
+          "#D0563B",
+          "#E38A74",
+          "#F1BAAC",
+          "#FFE8E2"
+        ]
+      },
+      "severity-high-bar": {
+        "role": "secondary",
+        "displayName": "High Orange",
+        "canonical": "#E8590C",
+        "tonalRamp": [
+          "#1A0400",
+          "#431401",
+          "#712702",
+          "#A23C05",
+          "#D6520A",
+          "#F28155",
+          "#FBB69C",
+          "#FFE9E0"
+        ]
+      },
+      "severity-medium": {
+        "role": "secondary",
+        "displayName": "Medium Amber",
+        "canonical": "#F5B301",
+        "tonalRamp": [
+          "#120A00",
+          "#322200",
+          "#573D00",
+          "#7E5A00",
+          "#A77900",
+          "#D39A01",
+          "#F7BF4F",
+          "#FDECCF"
+        ]
+      },
+      "severity-medium-bar": {
+        "role": "secondary",
+        "displayName": "Medium Ochre",
+        "canonical": "#E0A100",
+        "tonalRamp": [
+          "#120900",
+          "#332200",
+          "#573C00",
+          "#7F5A00",
+          "#A97800",
+          "#D59900",
+          "#ECC27A",
+          "#FAEDD8"
+        ]
+      },
+      "severity-low": {
+        "role": "secondary",
+        "displayName": "Low Green",
+        "canonical": "#2F7D4F",
+        "tonalRamp": [
+          "#020F06",
+          "#0C2C19",
+          "#1A4E2F",
+          "#2A7147",
+          "#55926A",
+          "#87B194",
+          "#B7D1BF",
+          "#E7F2EA"
+        ]
+      },
+      "severity-none": {
+        "role": "secondary",
+        "displayName": "Non-emergency Slate",
+        "canonical": "#5C5C59",
+        "tonalRamp": [
+          "#0B0B0A",
+          "#252524",
+          "#424240",
+          "#61615E",
+          "#828280",
+          "#A5A5A3",
+          "#C9C9C8",
+          "#EEEEEE"
+        ]
+      },
+      "severity-none-bar": {
+        "role": "secondary",
+        "displayName": "Slate Grey",
+        "canonical": "#8A8A86",
+        "tonalRamp": [
+          "#0B0B0A",
+          "#252524",
+          "#424240",
+          "#61615E",
+          "#83837F",
+          "#A5A5A2",
+          "#C9C9C7",
+          "#EEEEEE"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "One page title per screen."
+      },
+      "alert-title": {
+        "displayName": "Alert Title",
+        "purpose": "Incident type on the alert panel."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Section headings within a screen."
+      },
+      "summary": {
+        "displayName": "Summary",
+        "purpose": "The alert's one-sentence summary, max 60ch."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Ledes, queue summaries, copy in ink-2, max 72ch."
+      },
+      "numeral": {
+        "displayName": "Numeral",
+        "purpose": "Meta values: people, confidence, response time; tabular figures."
+      },
+      "label": {
+        "displayName": "Mono Label",
+        "purpose": "Uppercase tracked machine facts: field labels, IDs, pills, status."
+      },
+      "button": {
+        "displayName": "Button",
+        "purpose": "Every button label."
+      }
+    },
+    "shadows": [
+      {
+        "name": "live-pulse",
+        "value": "0 0 0 0 rgba(255, 204, 0, 0.7) -> 0 0 0 8px rgba(255, 204, 0, 0)",
+        "purpose": "Animated ring on the live-status dot only; motion, not elevation. Off under reduced motion."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Console ease for background and border transitions."
+      },
+      {
+        "name": "state-transition",
+        "value": "0.2s",
+        "purpose": "Button, nav row and queue row hover transitions."
+      },
+      {
+        "name": "live-pulse",
+        "value": "2.2s infinite",
+        "purpose": "Live status dot ring."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "stack",
+        "value": "900px",
+        "purpose": "Alert grid and probability rows collapse to one column below this width."
+      }
+    ],
+    "borders": [
+      {
+        "name": "hairline",
+        "value": "1px solid #E4E4E1"
+      },
+      {
+        "name": "hairline-strong",
+        "value": "1px solid #D4D4D0"
+      },
+      {
+        "name": "empty",
+        "value": "1px dashed #D4D4D0"
+      },
+      {
+        "name": "focus",
+        "value": "2px solid #141414, offset 2px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one acting control in a group (Analyze Report, Dispatch): a black pill.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Dispatch</button>",
+      "css": "@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap'); .ds-btn{font-family:'Figtree',-apple-system,sans-serif;font-weight:600;font-size:0.93rem;border-radius:999px;padding:0.5rem 1.15rem;border:1px solid #D4D4D0;background:#FFFFFF;color:#141414;cursor:pointer;transition:background 0.2s cubic-bezier(0.22,1,0.36,1),border-color 0.2s cubic-bezier(0.22,1,0.36,1);box-shadow:none;} .ds-btn:hover{border-color:#141414;} .ds-btn:focus-visible{outline:2px solid #141414;outline-offset:2px;} .ds-btn:disabled{color:#A3A3A0;border-color:#E4E4E1;background:#FAFAF9;cursor:default;} .ds-btn-primary{background:#141414;color:#FFFFFF;border-color:#141414;} .ds-btn-primary:hover{background:#2E2E2E;border-color:#141414;} .ds-btn-primary:disabled{background:#B8B8B4;border-color:#B8B8B4;color:#FFFFFF;}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Every other action: white pill with a strong hairline that turns ink on hover.",
+      "html": "<button class=\"ds-btn\">Confirm</button> <button class=\"ds-btn\" disabled>Dismiss</button>",
+      "css": "@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap'); .ds-btn{font-family:'Figtree',-apple-system,sans-serif;font-weight:600;font-size:0.93rem;border-radius:999px;padding:0.5rem 1.15rem;border:1px solid #D4D4D0;background:#FFFFFF;color:#141414;cursor:pointer;transition:background 0.2s cubic-bezier(0.22,1,0.36,1),border-color 0.2s cubic-bezier(0.22,1,0.36,1);box-shadow:none;} .ds-btn:hover{border-color:#141414;} .ds-btn:focus-visible{outline:2px solid #141414;outline-offset:2px;} .ds-btn:disabled{color:#A3A3A0;border-color:#E4E4E1;background:#FAFAF9;cursor:default;} "
+    },
+    {
+      "name": "Queue Action Group",
+      "kind": "custom",
+      "refersTo": "button-primary",
+      "description": "Horizontal button group under each queue row, small gap, Dispatch the only black pill.",
+      "html": "<div class=\"ds-actions\"><button class=\"ds-btn\">Confirm</button><button class=\"ds-btn ds-btn-primary\">Dispatch</button><button class=\"ds-btn\">Dismiss</button><button class=\"ds-btn\">Open alert</button></div>",
+      "css": "@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap'); .ds-btn{font-family:'Figtree',-apple-system,sans-serif;font-weight:600;font-size:0.93rem;border-radius:999px;padding:0.5rem 1.15rem;border:1px solid #D4D4D0;background:#FFFFFF;color:#141414;cursor:pointer;transition:background 0.2s cubic-bezier(0.22,1,0.36,1),border-color 0.2s cubic-bezier(0.22,1,0.36,1);box-shadow:none;} .ds-btn:hover{border-color:#141414;} .ds-btn:focus-visible{outline:2px solid #141414;outline-offset:2px;} .ds-btn:disabled{color:#A3A3A0;border-color:#E4E4E1;background:#FAFAF9;cursor:default;} .ds-actions{display:flex;gap:0.5rem;flex-wrap:wrap;background:#F5F5F3;padding:0.6rem;} .ds-btn-primary{background:#141414;color:#FFFFFF;border-color:#141414;} .ds-btn-primary:hover{background:#2E2E2E;}"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "White field, strong hairline, 12px radius, ink border on focus.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Report text</span><textarea class=\"ds-input\" rows=\"3\">Truck hit two cars near Lonavala exit; road blocked.</textarea></label>",
+      "css": "@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap'); .ds-field{display:block;font-family:'Figtree',-apple-system,sans-serif;max-width:420px;} .ds-field-label{display:block;font-size:0.88rem;font-weight:600;color:#141414;margin-bottom:0.4rem;} .ds-input{width:100%;font:inherit;font-size:1rem;color:#141414;background:#FFFFFF;border:1px solid #D4D4D0;border-radius:12px;padding:0.7rem 0.85rem;resize:vertical;transition:border-color 0.2s cubic-bezier(0.22,1,0.36,1);} .ds-input:focus{outline:none;border-color:#141414;}"
+    },
+    {
+      "name": "Left Rail Navigation",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Kaggle-style plain-text rail; hover wash, signal-tint active row.",
+      "html": "<nav class=\"ds-rail\"><a class=\"ds-nav\" href=\"#\">Report Input</a><a class=\"ds-nav ds-nav-active\" href=\"#\" aria-current=\"page\">Alert Card</a><a class=\"ds-nav\" href=\"#\">Attention Heatmap</a><a class=\"ds-nav\" href=\"#\">Dispatcher Dashboard</a></nav>",
+      "css": "@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap'); .ds-rail{display:flex;flex-direction:column;gap:2px;width:240px;background:#FFFFFF;border-right:1px solid #E4E4E1;padding:0.6rem;font-family:'Figtree',-apple-system,sans-serif;} .ds-nav{display:block;padding:0.62rem 0.9rem;border-radius:12px;font-size:0.97rem;font-weight:500;color:#4D4D4D;text-decoration:none;transition:background 0.2s cubic-bezier(0.22,1,0.36,1);} .ds-nav:hover{background:#F2F2F0;} .ds-nav:focus-visible{outline:2px solid #141414;outline-offset:2px;} .ds-nav-active,.ds-nav-active:hover{background:#FFF4CC;color:#141414;font-weight:600;}"
+    },
+    {
+      "name": "Severity Pill and Status Tag",
+      "kind": "chip",
+      "refersTo": "severity-pill",
+      "description": "Filled mono severity pill beside an outlined mono status tag.",
+      "html": "<span class=\"ds-sev\" style=\"background:#D92D20;color:#FFFFFF\">CRITICAL 4.4</span> <span class=\"ds-sev\" style=\"background:#F5B301;color:#141414\">MEDIUM</span> <span class=\"ds-status\">NEW</span>",
+      "css": "@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap'); .ds-sev,.ds-status{display:inline-flex;align-items:center;border-radius:999px;font-family:'JetBrains Mono',ui-monospace,monospace;text-transform:uppercase;white-space:nowrap;} .ds-sev{padding:0.38rem 0.9rem;font-size:0.74rem;font-weight:600;letter-spacing:0.08em;} .ds-status{padding:0.32rem 0.75rem;font-size:0.7rem;letter-spacing:0.08em;color:#4D4D4D;background:#FFFFFF;border:1px solid #D4D4D0;}"
+    },
+    {
+      "name": "Live Status Pill",
+      "kind": "chip",
+      "refersTo": "status-pill",
+      "description": "Top-bar mono pill; the yellow dot pulses when real models answer.",
+      "html": "<span class=\"ds-live\"><span class=\"ds-dot\"></span>Live · real models</span>",
+      "css": "@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap'); .ds-live{display:inline-flex;align-items:center;gap:0.5rem;padding:0.38rem 0.85rem;border-radius:999px;background:#FFFFFF;border:1px solid #D4D4D0;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:#141414;} .ds-dot{width:8px;height:8px;border-radius:50%;background:#FFCC00;animation:ds-live 2.2s cubic-bezier(0.22,1,0.36,1) infinite;} @keyframes ds-live{0%{box-shadow:0 0 0 0 rgba(255,204,0,0.7);}70%{box-shadow:0 0 0 8px rgba(255,204,0,0);}100%{box-shadow:0 0 0 0 rgba(255,204,0,0);}} @media (prefers-reduced-motion: reduce){.ds-dot{animation:none;}}"
+    },
+    {
+      "name": "Severity Ruler",
+      "kind": "custom",
+      "refersTo": "panel",
+      "description": "The signature: five track cells filled to a continuous 1-5 score, value in mono.",
+      "html": "<div class=\"ds-ruler\" role=\"img\" aria-label=\"Severity 3.4 of 5\"><div class=\"ds-cells\"><span><i style=\"width:100%\"></i></span><span><i style=\"width:100%\"></i></span><span><i style=\"width:100%\"></i></span><span><i style=\"width:40%\"></i></span><span><i style=\"width:0%\"></i></span></div><div class=\"ds-val\">3.4<span> / 5</span></div></div>",
+      "css": "@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap'); .ds-ruler{display:flex;align-items:center;gap:0.9rem;max-width:520px;} .ds-cells{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;flex:1;max-width:420px;} .ds-cells span{height:12px;border-radius:3px;background:#ECECE9;position:relative;overflow:hidden;} .ds-cells i{position:absolute;inset:0 auto 0 0;display:block;background:#E8590C;} .ds-val{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:0.9rem;font-weight:600;color:#141414;font-variant-numeric:tabular-nums;white-space:nowrap;} .ds-val span{color:#6B6B68;font-weight:400;}"
+    },
+    {
+      "name": "Queue Row",
+      "kind": "card",
+      "refersTo": "queue-row",
+      "description": "One alert in the queue: title, mono ID, location, mini ruler, pill, status, summary.",
+      "html": "<div class=\"ds-q\"><div class=\"ds-q-top\"><div><span class=\"ds-q-title\">Transport Accident</span><span class=\"ds-q-id\">RQP-000003</span><div class=\"ds-q-loc\">km 112 of Kolhapur-Pune highway</div></div><div class=\"ds-q-right\"><span class=\"ds-mini\"><b style=\"--f:100%\"></b><b style=\"--f:100%\"></b><b style=\"--f:100%\"></b><b style=\"--f:100%\"></b><b style=\"--f:70%\"></b></span><span class=\"ds-mono\">4.7 / 5</span><span class=\"ds-sev\">CRITICAL</span></div></div><div class=\"ds-q-sum\">Road accident victim with bleeding from nose and ears; unresponsive.</div></div>",
+      "css": "@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap'); .ds-q{font-family:'Figtree',-apple-system,sans-serif;background:#FFFFFF;border:1px solid #E4E4E1;border-radius:14px;padding:1.05rem 1.25rem;transition:border-color 0.2s cubic-bezier(0.22,1,0.36,1);} .ds-q:hover{border-color:#D4D4D0;} .ds-q-top{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;} .ds-q-title{font-size:1.05rem;font-weight:600;color:#141414;} .ds-q-id,.ds-mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:0.74rem;color:#6B6B68;letter-spacing:0.04em;margin-left:0.6rem;} .ds-q-loc{font-size:0.9rem;color:#6B6B68;margin-top:0.15rem;} .ds-q-sum{font-size:0.97rem;color:#4D4D4D;margin-top:0.6rem;} .ds-q-right{display:flex;align-items:center;gap:0.5rem;} .ds-mini{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;width:110px;} .ds-mini b{height:7px;border-radius:2px;background:linear-gradient(90deg,#D92D20 var(--f),#ECECE9 var(--f));} .ds-sev{border-radius:999px;padding:0.38rem 0.9rem;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:0.74rem;font-weight:600;letter-spacing:0.08em;background:#D92D20;color:#FFFFFF;}"
+    },
+    {
+      "name": "Metric Tile",
+      "kind": "card",
+      "refersTo": "metric-tile",
+      "description": "White hairline tile; mono uppercase label, tabular 600 value.",
+      "html": "<div class=\"ds-metric\"><div class=\"ds-metric-label\">Emergencies caught</div><div class=\"ds-metric-val\">90.9%</div></div>",
+      "css": "@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap'); .ds-metric{width:220px;background:#FFFFFF;border:1px solid #E4E4E1;border-radius:14px;padding:1rem 1.15rem;font-family:'Figtree',-apple-system,sans-serif;} .ds-metric-label{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:#6B6B68;} .ds-metric-val{font-size:2.25rem;font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:#141414;margin-top:0.2rem;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Competition Page",
+    "overview": "ResQPulse is a dispatcher console with the evaluation-grade calm of a Kaggle competition page. A light grey ground carries white panels drawn with single hairlines; nothing floats, nothing glows. Black pill buttons do the acting, one signal yellow marks what is live, current or under attention, and every other colour on screen is a severity colour that means severity. The world is built for a projector in a lit hall as much as for a dispatcher's desk, so contrast stays high and ornament stays out.\n\nHierarchy comes from type weight, size and position rather than colour. Figtree sets everything a person reads; JetBrains Mono, small, uppercase and tracked, is reserved for machine facts: IDs, coordinates, scores, field labels and the live status. The signature is the severity ruler, five segmented cells filled to a continuous score with the value beside it in mono, repeated at full size on the alert and in miniature on every queue row.\n\nThe system rejects the dark command-centre cockpit, emoji tiles, gradient mastheads and the cream-and-italic-serif editorial look the previous build used.",
+    "keyCharacteristics": [
+      "Light grey ground, white surfaces, 1px hairlines, no elevation shadows.",
+      "Black pill buttons; one signal yellow for live state, active navigation, selection and attention.",
+      "Severity colours appear only where they encode severity.",
+      "Figtree for reading, JetBrains Mono only for machine facts.",
+      "The five-cell severity ruler as the recurring signature.",
+      "Words, never pictograms or emoji."
+    ],
+    "rules": [
+      {
+        "name": "The One Signal Rule",
+        "body": "Signal yellow marks live state, the active place, selection and model attention. It is never a button, a heading colour or decoration; if a screen has yellow, the yellow means \"this is live, current, or what the model looked at\".",
+        "section": "colors"
+      },
+      {
+        "name": "The Severity Means Severity Rule",
+        "body": "The five severity colours appear only on severity pills, ruler fills, map markers and the injury/hazard dots. A green success or a red error that is not a severity is not drawn in the severity palette.",
+        "section": "colors"
+      },
+      {
+        "name": "The Machine Voice Rule",
+        "body": "Mono is only for things a machine produced or keys on: IDs, coordinates, scores, field and metric labels, status. A sentence a person reads is never set in mono.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Number Rule",
+        "body": "Every number that can change between alerts (scores, counts, percentages, latencies) uses tabular figures so values do not jitter across rows.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hairline Rule",
+        "body": "Surfaces separate by a 1px hairline and a change of tone, never by a drop shadow. Hover strengthens a border (hair to hair-2, or to ink on buttons); it does not lift.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** put content in white panels with a 1px hair border on the ground; separate meta rows with hairlines.",
+      "**Do** make the single most consequential action in a group the only black pill (Analyze Report, Dispatch).",
+      "**Do** use the severity ruler wherever a severity score is shown, full size on detail views and mini in lists.",
+      "**Do** set IDs, coordinates, scores and field labels in small uppercase tracked JetBrains Mono, and everything a person reads in Figtree.",
+      "**Do** use tabular figures for every changing number.",
+      "**Do** keep disabled controls at full opacity with a lighter label, so they stay readable on a projector.",
+      "**Do** stop the live pulse under prefers-reduced-motion."
+    ],
+    "donts": [
+      "**Don't** add drop shadows or lift on hover; depth is tone and hairline.",
+      "**Don't** use signal yellow as a button, heading or decorative fill.",
+      "**Don't** use severity colours for anything that is not severity.",
+      "**Don't** use emoji or pictogram icons for incident types or responders; name them in words.",
+      "**Don't** go dark, add gradient mastheads, or bring back cream grounds with italic serif display type."
+    ]
+  }
+}

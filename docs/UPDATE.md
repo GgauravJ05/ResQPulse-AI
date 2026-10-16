@@ -17,6 +17,13 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · Dashboard redesign: Kaggle / Motion / Impeccable references, no emoji (PR #29)
+**Who:** Data lead (with the Impeccable design skill) · **Area:** UI
+- New light console look taken from kaggle.com, motion.dev and impeccable.style: grey ground, white panels with hairlines, black pill buttons, one signal yellow (live dot, active nav, attention heatmap), Figtree for text, JetBrains Mono only for IDs, coordinates and scores.
+- Every emoji removed (nav, headings, chips, buttons, map, favicon). Kaggle-style left rail; slim top bar with a live/mock status pill; alert card with a summary column and an evidence column; a five-cell severity ruler on the alert card and every queue row; yellow attention heatmap with a probability list; grouped queue actions with Dispatch as the primary button; quiet grey map tiles with severity dots.
+- Report text and Analyze now sit above the voice section (first viewport); a voice transcript is applied before the text box is drawn.
+- Reviewed by a separate finish reviewer (two rounds; the remaining items were fixed and checked). Added PRODUCT.md, DESIGN.md and `.impeccable/` design records. Behaviour unchanged; 51 tests pass (1 skipped while a backend runs).
+
 ## 2026-10-17 · Final README (PR #28)
 **Who:** Data lead · **Area:** Docs
 - Rewrote README.md for the finished project: architecture diagram, what it does, models, data, measured results, a claims-and-evidence table, honest limitations, quick start for other machines, dashboard guide, API, reproduction commands, repo structure, SDG table, team and workflow. Removed the outdated "development not started" status, the 12-hour plan and open decisions.
