@@ -562,7 +562,7 @@ Updated with every merged change. The full history is in [UPDATE.md](UPDATE.md).
 | DistilBERT classifier + attention | ML2 | ⏳ Not started | |
 | Flan-T5 generator + fallback | ML3 | ⏳ Not started | |
 | Whisper ASR | BE2 | ⏳ Not started | |
-| FastAPI backend | BE1 | ⏳ Not started | |
+| FastAPI backend | BE1 | ✅ API + fake models merged, 10 tests pass; real models not wired yet | Waiting on `classify()`, `extract()`, Whisper |
 | Streamlit dashboard | FE | ⏳ Not started | |
 | Evaluation + metrics.json | ML1 | ✅ Scored on real ML2 + baseline + ML3 predictions; rerun if any file is resent | `reports/results.md`; slide 6 filled in |
 | Slides + backup video | FE + all | ⏳ Not started | |

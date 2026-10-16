@@ -42,3 +42,8 @@ wandb/
 
 # Teammates prediction CSVs (scored by scripts/evaluate.py)
 predictions/
+
+# API runtime logs and local Streamlit output
+reports/alerts.jsonl
+reports/corrections.jsonl
+output/
