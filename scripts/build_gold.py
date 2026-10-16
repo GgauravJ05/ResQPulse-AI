@@ -15,7 +15,10 @@ Review rules (give these to the reviewers):
   * If a row is correct, write 1 in `verified`. If you changed anything, edit the cell and write 2.
     If the row is unusable (not English, unreadable), write 0 and it is dropped.
 
-Run from the repo root:  .venv/bin/python scripts/build_gold.py prelabel   (then, after review)  finalize
+  audit-sample  draw 30 random rows for an independent human check -> data/gold/gold_audit.csv
+  audit-score   read the filled audit sheet (`agree` = 1 or 0) and print the agreement rate
+
+Run from the repo root:  .venv/bin/python scripts/build_gold.py prelabel | finalize | audit-sample | audit-score
 """
 import csv
 import json
@@ -100,5 +103,23 @@ def finalize() -> None:
     print(gold["incident_type"].value_counts().to_string())
 
 
+def audit_sample(n: int = 30) -> None:
+    df = pd.read_csv(GOLD / "gold.csv", dtype=str, keep_default_na=False)
+    pick = df.sample(min(n, len(df)), random_state=42)
+    out = pick[["id", "text", "incident_type", "severity"]].assign(agree="", correct_type="", notes="")
+    out.to_csv(GOLD / "gold_audit.csv", index=False, quoting=csv.QUOTE_NONNUMERIC)
+    print(f"wrote data/gold/gold_audit.csv: {len(out)} rows. Fill `agree` with 1 (type and severity right) or 0.")
+
+
+def audit_score() -> None:
+    df = pd.read_csv(GOLD / "gold_audit.csv", dtype=str, keep_default_na=False)
+    done = df[df["agree"].isin(["0", "1"])]
+    agree = (done["agree"] == "1").sum()
+    print(f"audited {len(done)} of {len(df)} rows; agreement {agree}/{len(done)} = {agree / max(len(done), 1):.0%}")
+    for _, r in done[done["agree"] == "0"].iterrows():
+        print(f"  disagreed: {r['id']} labelled {r['incident_type']} {r['severity']} -> {r['correct_type']} | {r['text'][:80]}")
+
+
 if __name__ == "__main__":
-    {"prelabel": prelabel, "finalize": finalize}[sys.argv[1] if len(sys.argv) > 1 else "prelabel"]()
+    {"prelabel": prelabel, "finalize": finalize, "audit-sample": audit_sample, "audit-score": audit_score}[
+        sys.argv[1] if len(sys.argv) > 1 else "prelabel"]()
