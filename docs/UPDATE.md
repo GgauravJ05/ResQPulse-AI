@@ -17,6 +17,13 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · ML2's laptop CPU check script (Gaurav, code by ML2)
+**Who:** VanshBorkar (ML2), added by Gaurav · **Area:** Classifier
+- Added `scripts/check_classifier_cpu.py` from `feat/classifier`: runs `classify()` on a laptop CPU and compares with the
+  Kaggle predictions CSV. Run against `main`: 12 of 12 rows match, probabilities within 0.0003, 9 to 14 ms per call.
+- Only this file was taken from `feat/classifier`. That branch still carries an older `src/models/classifier.py` without the
+  `CLASSIFIER_DIR` fallback, so merging the whole branch would undo a fix already in `main`. ML2: rebase on `main` before any new PR.
+
 ## 2026-10-17 · Real models wired into the API, BE2 services integrated (Gaurav, with ML2, ML3, BE2)
 **Who:** Gaurav (integration and fixes); code by ML2 (classifier), ML3 (model), BE2 (Whisper, geocoding, dedupe) · **Area:** API, ML
 - **Real models in the backend.** ML2's `classify()` (merged from `feat/classifier`; attention rollout) and a new
