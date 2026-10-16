@@ -511,7 +511,7 @@ model with a broken app scores badly.
 | Question | Our answer |
 |---|---|
 | Why not just use ChatGPT? | Cost per call, latency, needs internet, privacy of emergency data. Our small models run offline and free, and we measured their accuracy. |
-| Is your test data synthetic? | No. We report on real tweets (HumAID test split, held-out CrisisLex crises and a 144-row gold set) separately from synthetic. The gold labels are Claude's, re-reviewed in a second pass and audited by a person on a 30-row sample ([x]% agreement). |
+| Is your test data synthetic? | No. We report on real tweets (HumAID test split, held-out CrisisLex crises and a 144-row gold set) separately from synthetic. The gold labels are Claude's, re-reviewed in a second pass and audited by a person on a random 30-row sample, where all 30 rows agreed). |
 | Does attention really explain the decision? | It shows what the model focused on. It's an indicator, not a proof, and the dispatcher always makes the final decision. |
 | What if the model is wrong? | Human-in-the-loop: the dispatcher confirms or edits every alert. Corrections can be logged for retraining. |
 | Why regression for severity? | Severity is ordered (3 is between 2 and 4). Regression keeps that order, and we also report bucketed accuracy. |
@@ -633,7 +633,8 @@ disasters; reports written in call style teach it everyday emergencies, and the 
 - **Held out, never trained on:** 107 synthetic test reports, 7,755 real test tweets (including 6 crises the models never
   saw), and a 144-row **gold set** of real reports.
 - **Gold labels:** written by Claude, re-reviewed in a second pass (10 corrections), then audited by a person on a random
-  30 rows: **[x]% agreement**. Say plainly that these are Claude labels, not hand labels.
+  30 rows: **all 30 agreed**. Say plainly that these are Claude labels, not hand labels, and do not overclaim: 30 of 30
+  means agreement is at least about 90% with 95% confidence, not that the set is perfect.
 - **A finding worth saying:** labelling real tweets by the name of the disaster was wrong for **16%** of them (donation
   appeals, jokes, commentary and follow-up news mention a disaster but report nothing). That is why we built the gold set.
 

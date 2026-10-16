@@ -17,12 +17,19 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-16 · Gold set audit result (PR #11)
+**Who:** Gaurav (ML1) · **Area:** Data, Docs
+- Gaurav audited a random 30-row sample of the gold set (`data/gold/gold_audit.csv`): all 30 rows agreed on type and
+  severity. `build_gold.py audit-score` reports 30/30.
+- With 30 samples, 30/30 supports "agreement of at least about 90% with 95% confidence"; it does not prove the set is
+  error-free. The brief's slide 5 and the Q&A answer now say "all 30 rows agreed" and warn against overclaiming.
+
 ## 2026-10-16 · Data slide with real numbers (PR #10)
 **Who:** Gaurav (ML1) · **Area:** Docs
 - Presentation guide, slide 5 (Data), rewritten with the real figures: about 37,000 real tweets (13 HumAID disasters,
   26 CrisisLex crises, Kaggle negatives), 710 synthetic reports, 9,551 training rows (7,563 real + 497 unique synthetic x4),
   107 / 7,755 / 144 held-out rows, the 16% event-label error finding, and a per-type table of real, synthetic and gold counts.
-- `[x]%` is the human-audit agreement, filled in once `data/gold/gold_audit.csv` is scored.
+- The human-audit agreement is filled in once `data/gold/gold_audit.csv` is scored (result: PR #11).
 - Created the `predictions/` folder (git-ignored) where teammates' prediction CSVs go.
 
 ## 2026-10-16 · Evaluation script (PR #9)
