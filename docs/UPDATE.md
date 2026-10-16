@@ -17,6 +17,21 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-16 · Backend API with fake models (BE1, reviewed and merged by Gaurav)
+**Who:** Aaryan0802 (BE1), review and fixes by Gaurav · **Area:** API
+- BE1's FastAPI app (`src/api/main.py`, `schemas.py`), fake models (`src/models/fake.py`), geocoding with a Nominatim lookup and a
+  small demo fallback table (`src/services/geocoding.py`), a minimal Streamlit voice page (`app.py`) and API tests.
+- Review: ran the real server and exercised every endpoint and error case (health, analyze, empty/too-long/invalid input,
+  queue ordering, 404, patch, transcribe checks, metrics, CORS); all behave as in SCHEMA §6 and §7.
+- Fixes added on top of BE1's commit: API tests now run the startup hook (4 of 6 failed with 503 because models never loaded);
+  `.env.example` restored (the branch deleted it) with `USE_FAKE_MODELS` documented; a model exception now returns the
+  `MODEL_NOT_READY` error instead of a raw 500; the alert-id counter is behind a lock; runtime logs (`reports/alerts.jsonl`,
+  `reports/corrections.jsonl`, `output/`) are git-ignored. Result: 10 of 10 tests pass.
+- Known gaps for BE1/BE2: `USE_FAKE_MODELS=false` needs `src/models/classifier.py`, `src/models/generator.py` and
+  `src/asr/whisper.py`, none of which exist yet; geocoding has no city-centre fallback or rate limit; malformed request bodies
+  return FastAPI's default 422 `detail`, not the SCHEMA error envelope; the root `app.py` is a minimal voice-only page, the
+  full dashboard belongs in `app/`.
+
 ## 2026-10-16 · ML3 gold file resent, predictions folder cleaned (PR #15)
 **Who:** Gaurav (ML1) · **Area:** Evaluation
 - ML3 resent `ml3_gold.csv`: one previously truncated output is now complete (gold parse rate 99.3% to 100%, ROUGE-L 0.428 to
