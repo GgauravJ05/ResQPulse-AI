@@ -32,5 +32,7 @@ streamlit-folium>=0.20
 folium>=0.16
 plotly>=5.20
 
-# Synthetic data generation / config
+# Synthetic data generation (Claude) / config
+anthropic>=1.0
+edge-tts>=6.1
 python-dotenv>=1.0

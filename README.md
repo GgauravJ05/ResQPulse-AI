@@ -6,8 +6,12 @@ GenHack v1.0 · Gen AI course · **PS 15: EmergencyScribe — Convert Emergency 
 · Technique: **Transformer + Attention**
 
 > **Status:** repository set up, development not started. Results and run commands are filled in as
-> each part is built. The full reasoning behind every decision is in
-> **[docs/RESEARCH_BRIEF.md](docs/RESEARCH_BRIEF.md)**. Read it before your first task.
+> each part is built.
+>
+> **Team docs, read before your first task:**
+> - **[docs/RESEARCH_BRIEF.md](docs/RESEARCH_BRIEF.md)**: the problem, our approach and the reasoning behind every decision
+> - **[docs/SCHEMA.md](docs/SCHEMA.md)**: every data format: enums, training CSV, Claude generation, model interfaces, API, alert, metrics
+> - **[docs/DATASETS.md](docs/DATASETS.md)**: verified download links for all datasets and models, and how each maps to our labels
 
 ---
 
@@ -58,7 +62,7 @@ and a one-line summary. An **attention heatmap** shows which words drove the dec
 Input:
 > "Accident on Mumbai–Pune expressway near Lonavala exit, truck hit two cars, one guy not moving, lot of blood, traffic blocked"
 
-Output: `ROAD_ACCIDENT` · severity **4.4 (CRITICAL)** · Lonavala exit (mapped) · 1 person unresponsive,
+Output: `TRANSPORT_ACCIDENT` · severity **4.4 (CRITICAL)** · Lonavala exit (mapped) · 1 person unresponsive,
 heavy bleeding · hazards: traffic blocked, multiple vehicles · send **ambulance + traffic police**.
 
 ## 3. What makes it different
@@ -106,40 +110,52 @@ them in parallel, and each has a fallback if the other struggles.
 
 ## 5. Alert schema
 
-The contract between the models, the API and the UI. Incident types are still to be finalised (see
-[Open decisions](#15-open-decisions)).
+The full specification is in **[docs/SCHEMA.md](docs/SCHEMA.md)** (schema v1). The essentials:
+
+**Incident types (8):** `FIRE` · `FLOOD` · `STORM_CYCLONE` · `EARTHQUAKE_COLLAPSE` · `TRANSPORT_ACCIDENT` ·
+`MEDICAL` · `VIOLENCE_CRIME` · `NON_EMERGENCY`
+
+**Severity:** 1.0–5.0 using a shared rubric → `LOW` < 2 ≤ `MEDIUM` < 3 ≤ `HIGH` < 4 ≤ `CRITICAL`
+
+**Responders:** `FIRE_BRIGADE` · `AMBULANCE` · `POLICE` · `TRAFFIC_POLICE` · `DISASTER_RESPONSE`
+
+**Alert (shortened):**
 
 ```json
 {
   "alert_id": "RQP-000123",
-  "incident_type": "FIRE | FLOOD | EARTHQUAKE_COLLAPSE | ROAD_ACCIDENT | MEDICAL | VIOLENCE_CRIME | NON_EMERGENCY",
+  "status": "NEW",
+  "is_emergency": true,
+  "input": { "text": "...", "source": "voice", "transcript_confidence": 0.82 },
+  "incident_type": "TRANSPORT_ACCIDENT",
+  "type_confidence": 0.91,
   "severity": 4.4,
-  "severity_label": "LOW | MEDIUM | HIGH | CRITICAL",
-  "location": { "text": "Mumbai–Pune expressway near Lonavala exit", "lat": 18.75, "lon": 73.40 },
+  "severity_label": "CRITICAL",
+  "location": { "text": "Mumbai-Pune expressway near Lonavala exit", "lat": 18.7546, "lon": 73.4062, "geocoded": true },
   "people_affected": 1,
-  "injuries": ["unconscious", "heavy bleeding"],
-  "hazards": ["traffic blocked", "multiple vehicles"],
+  "injuries": ["not moving", "lot of blood"],
+  "hazards": ["traffic blocked"],
+  "summary": "Truck hit two cars near Lonavala exit; one person unresponsive and bleeding heavily; road blocked.",
   "responders": ["AMBULANCE", "TRAFFIC_POLICE"],
-  "summary": "Truck–car collision near Lonavala exit; one person unresponsive with heavy bleeding; road blocked.",
-  "confidence": 0.89,
-  "attention": [["accident", 0.21], ["not moving", 0.18]],
-  "source": "text | voice",
-  "transcript_confidence": null
+  "sdg_targets": ["3.6"],
+  "explanation": { "attention": [["moving", 1.0], ["blood", 0.88]] }
 }
 ```
 
-Severity buckets: LOW < 2 ≤ MEDIUM < 3 ≤ HIGH < 4 ≤ CRITICAL.
+**API:** `GET /health` · `POST /transcribe` · `POST /analyze` · `GET /alerts` · `GET|PATCH /alerts/{id}` ·
+`GET /metrics` (details and error codes in SCHEMA.md §7).
 
 ## 6. Data
 
 | Kind | Source | Labels |
 |---|---|---|
-| **A: Real crisis posts** | [HumAID](https://crisisnlp.qcri.org/humaid_dataset), CrisisLexT26, Kaggle *NLP with Disaster Tweets* | Incident type (mapped from event name), emergency vs. not |
-| **B: Generated call-style reports** | ~3,000 reports from an LLM, using a type × severity × style × city grid | Everything: type, severity, all fields |
-| **Gold test set** | HumAID official test split + 150–200 real reports pre-labelled by an LLM and verified by a person | Human-checked, **never trained on** |
+| **A: Real crisis posts** | [HumAID](https://crisisnlp.qcri.org/humaid_dataset) set 1 (~43k tweets, 13 disasters), [CrisisLexT26](https://crisislex.org/data-collections.html) (~28k tweets, 26 crises), [Kaggle *NLP with Disaster Tweets*](https://www.kaggle.com/competitions/nlp-getting-started) | Incident type (mapped from event/crisis name), emergency vs. not |
+| **B: Generated call-style reports** | ~3,000 reports from **Claude**, using a type × severity × style × city grid | Everything: type, severity, all fields |
+| **Gold test set** | HumAID official test split + 150–200 real reports pre-labelled by Claude and verified by a person | Human-checked, **never trained on** |
 | **Voice** | ~50 teammate recordings + ~300 TTS clips with added noise | For demo, voice evaluation, and speech-style training text |
 
-- Train on A + B, demo on B-style reports. Split 70/15/15, stratified, deduplicated across splits.
+- All links, file formats and label mappings: **[docs/DATASETS.md](docs/DATASETS.md)**.
+- Train on A + B, demo on B-style reports. CrisisLexT26 also serves as a **cross-dataset test**. Split 70/15/15, stratified, deduplicated across splits.
 - Gold-set and synthetic-set scores are **always reported separately**.
 - Raw data, processed data, audio recordings and model weights are **not committed** (see `.gitignore`).
   Data lives on Kaggle; only small gold/sample files go in git.
@@ -180,6 +196,7 @@ Confusion matrices and error analysis go in `reports/`.
 | **3.d**: early warning and management of health risks | Severity-ranked medical alerts |
 | **11.5**: reduce deaths and people affected by disasters | Structured, prioritised alerts during disaster report surges |
 | **13.1**: resilience to climate-related hazards | Processes flood and cyclone reports at scale |
+| **16.1**: reduce all forms of violence | Faster police + ambulance dispatch for violence/crime reports |
 | **16.6**: effective, accountable, transparent institutions | Explainable decisions + JSON audit log of every alert |
 
 ## 10. Repository structure
@@ -193,7 +210,9 @@ ResQPulse_AI/
 │   ├── gold/            # human-verified test set      (committed, small)
 │   └── audio/           # voice recordings             (git-ignored, personal data)
 ├── docs/
-│   └── RESEARCH_BRIEF.md
+│   ├── RESEARCH_BRIEF.md  # problem, approach, decisions
+│   ├── SCHEMA.md          # all data formats and the API contract
+│   └── DATASETS.md        # dataset and model links
 ├── models/              # trained weights from Kaggle  (git-ignored)
 ├── notebooks/           # Kaggle training / eval notebooks
 ├── reports/             # metrics JSON, confusion matrices, model cards
@@ -238,10 +257,12 @@ Run commands for the API and the app are added here once those parts exist.
 **Interfaces agreed in hour 0**, so the backend can use fake versions until the models are ready:
 
 ```python
-classify(text)   -> {"type", "probs", "severity", "attention": [(word, score)]}   # ML2
-extract(text)    -> {"location", "people_affected", "injuries", "hazards", "summary"}  # ML3
-transcribe(path) -> {"transcript", "confidence", "low_confidence", "duration"}  # BE2
+classify(text: str) -> ClassifyResult          # ML2: incident_type, probs, severity, attention
+extract(text: str) -> ExtractResult            # ML3: location, people_affected, injuries, hazards, summary
+transcribe(audio_path: str) -> TranscribeResult  # BE2: transcript, confidence, low_confidence, duration_s
 ```
+
+The Pydantic definitions are in [SCHEMA.md §5](docs/SCHEMA.md#5-model-interfaces-python).
 
 ## 13. 12-hour plan
 
@@ -282,8 +303,9 @@ gh pr create --fill          # or open the PR on GitHub
 
 To settle in hour 0:
 
-- [ ] Final incident types, including whether to add `STORM_CYCLONE` (HumAID has many hurricane/cyclone tweets)
-- [ ] Which LLM API generates the synthetic data
+- [x] Incident types: 8 classes, schema v1 ([SCHEMA.md](docs/SCHEMA.md))
+- [x] Synthetic data generator: Claude
+- [ ] Claude model for generation (`claude-opus-5-5` default; Sonnet/Haiku 5.5 are cheaper), which is a budget call
 - [ ] Whether preparation before the event is allowed (dataset downloads, cached models, generated data)
 - [ ] Teammates' consent to record voice clips
 - [ ] Role assignments and which stretch features to attempt

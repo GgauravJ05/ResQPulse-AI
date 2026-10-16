@@ -135,7 +135,7 @@ Whisper (speech → text) is also an encoder–decoder Transformer:
 ```json
 {
   "alert_id": "RQP-000123",
-  "incident_type": "ROAD_ACCIDENT",
+  "incident_type": "TRANSPORT_ACCIDENT",
   "severity": 4.4,
   "severity_label": "CRITICAL",
   "location": { "text": "Mumbai–Pune expressway near Lonavala exit", "lat": 18.75, "lon": 73.40 },
@@ -227,7 +227,7 @@ The demo keeps working. We mention it honestly as a backup.
 | Type | What | Source | Labels it gives us |
 |---|---|---|---|
 | **A: Real crisis posts** | Tweets/posts during real disasters | HumAID, CrisisLexT26, Kaggle "NLP with Disaster Tweets" | Incident type (mapped), emergency vs. not |
-| **B: Generated call-style reports** | Realistic 112-style reports in the call/SMS style | Generated with an LLM (**[DECIDE]** which one) | **Everything**: type, severity, location, people, injuries, hazards, summary |
+| **B: Generated call-style reports** | Realistic 112-style reports in the call/SMS style | Generated with **Claude** (prompt and output format in [SCHEMA.md §3](SCHEMA.md#3-synthetic-generation-with-claude)) | **Everything**: type, severity, location, people, injuries, hazards, summary |
 
 **Strategy:** train on **A + B**, demo on **B-style** reports, because the demo should look like real
 dispatch work.
@@ -235,19 +235,21 @@ dispatch work.
 **Key insight:** when an LLM *generates* a synthetic report, it generates the *labels* too. So we get
 fully labelled data for every field without manual annotation.
 
-### 6.2 Incident types **[DECIDE]**
+### 6.2 Incident types (schema v1)
 
-Proposed (7 classes. More classes means weaker per-class scores with this much data):
+8 classes. The full definitions, responders and SDG targets are in [SCHEMA.md §1.1](SCHEMA.md#11-incident_type-8-classes),
+and the source mapping is in [DATASETS.md](DATASETS.md).
 
 | Class | Mainly from |
 |---|---|
-| `FIRE` | Real (wildfire tweets) + generated |
-| `FLOOD` | Real + generated |
-| `EARTHQUAKE_COLLAPSE` | Real + generated |
-| `ROAD_ACCIDENT` | Mostly generated |
-| `MEDICAL` | Mostly generated |
-| `VIOLENCE_CRIME` | Mostly generated |
-| `NON_EMERGENCY` | Kaggle Disaster Tweets (the tweets labelled not-a-disaster) |
+| `FIRE` | HumAID wildfires + CrisisLexT26 fires/explosions + generated |
+| `FLOOD` | HumAID + CrisisLexT26 + generated |
+| `STORM_CYCLONE` | HumAID hurricanes/cyclones (largest share) + CrisisLexT26 typhoons + generated |
+| `EARTHQUAKE_COLLAPSE` | HumAID + CrisisLexT26 (incl. Savar building collapse) + generated |
+| `TRANSPORT_ACCIDENT` | CrisisLexT26 train/helicopter crashes + **mostly generated** (road) |
+| `MEDICAL` | **Generated only** |
+| `VIOLENCE_CRIME` | CrisisLexT26 bombing/shooting (small) + **mostly generated** |
+| `NON_EMERGENCY` | Kaggle Disaster Tweets (`target == 0`) + CrisisLexT26 "Not related" + generated |
 
 > **Known limitation to state openly:** public datasets cover disasters well but cover everyday
 > emergencies (accidents, medical, crime) poorly, so those classes depend on generated data. This
@@ -256,13 +258,14 @@ Proposed (7 classes. More classes means weaker per-class scores with this much d
 **Mapping HumAID to our types (watch out):**
 - HumAID's labels describe **humanitarian need** (injured/dead, infrastructure damage, urgent requests, sympathy…),
   **not incident type**. Take the incident type from the **event name**, e.g. `kerala_floods_2018` → `FLOOD`.
-- **Hurricanes/cyclones** are a big share of HumAID and don't fit the 7 types. **[DECIDE]** add `STORM_CYCLONE` or drop them.
+- **Hurricanes/cyclones** are the biggest share of HumAID, so they get their own class, `STORM_CYCLONE`.
+  Cap its size or use class weights so it doesn't dominate.
 - Drop `sympathy_and_support` and `not_humanitarian` tweets. "Praying for Kerala" is neither an emergency report nor a
   "non-emergency" example.
 - Clean URLs, @mentions, `RT` and `#` symbols.
 
 **Hidden trap: the model learning style instead of meaning.** If FLOOD/FIRE come mostly from tweets and
-ROAD_ACCIDENT/MEDICAL mostly from call-style generated text, the model can learn "tweet style → flood". Scores
+TRANSPORT_ACCIDENT/MEDICAL mostly from call-style generated text, the model can learn "tweet style → flood". Scores
 look high but the model is useless. **Fix:** every class gets plenty of call-style generated examples, and
 we report scores **per source**.
 
@@ -433,9 +436,10 @@ Also show **2 failure examples** and why they failed. Honesty scores well with j
 | **3.d**: early warning and management of health risks | Severity-ranked medical alerts |
 | **11.5**: reduce deaths and people affected by disasters | Structured, prioritised alerts during disaster report surges |
 | **13.1**: strengthen resilience to climate-related hazards | Processes flood and cyclone crisis reports at scale |
+| **16.1**: reduce all forms of violence | Faster police and ambulance dispatch for violence/crime reports |
 | **16.6**: effective, accountable, transparent institutions | Explainable decisions + an audit log (JSON) of every alert |
 
-Show these as badges in the app (for example, a ROAD_ACCIDENT alert shows the SDG 3.6 badge).
+Show these as badges in the app (for example, a TRANSPORT_ACCIDENT alert shows the SDG 3.6 badge).
 
 ---
 
@@ -530,8 +534,8 @@ model with a broken app scores badly.
 
 ## 15. Open decisions for hour 0
 
-- [ ] Final incident types (§6.2), including whether to add `STORM_CYCLONE`
-- [ ] Which LLM generates the synthetic data (needs an API key)
+- [x] Final incident types: 8 classes, schema v1 (§6.2, SCHEMA.md)
+- [x] Synthetic data generated with Claude (needs an Anthropic API key; model choice is a budget call, see SCHEMA.md §3.4)
 - [ ] Is preparation before the event allowed (downloading datasets, caching models on Kaggle, generating data)?
   It would save 2–3 hours.
 - [ ] Teammates' consent to record voice clips
