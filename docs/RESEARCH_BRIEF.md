@@ -562,7 +562,7 @@ Updated with every merged change. The full history is in [UPDATE.md](UPDATE.md).
 | DistilBERT classifier + attention | ML2 | ✅ Trained, scored; `classify()` with attention rollout verified against ML2's CSV (50 of 50 rows) | Weights in `models/classifier/` (git-ignored); heatmap contrast is flat, stretch scores in the UI |
 | Flan-T5 generator + fallback | ML3 | ✅ Trained, scored; `src/models/generator.py` (`extract()` + rule fallback + people rule) written and tested; ML3 to review | Weights in `models/generator/`; 1 to 2 s per report on CPU |
 | Whisper ASR | BE2 | ✅ Integrated and verified: 9 s spoken report to text in about 4 s on CPU | Needs ffmpeg and, on Python 3.13+, `audioop-lts`; accuracy not evaluated on a test set |
-| FastAPI backend | BE1 | ✅ API merged; real classifier + generator wired (`USE_FAKE_MODELS=false`), 9 of 9 demo reports correct end to end | Geocoding: offline city table + cache + Nominatim, 7 of 9 demo alerts get a pin; duplicate detection is optional (needs `sentence-transformers`) |
+| FastAPI backend | BE1 | ✅ API merged; real classifier + generator wired (`USE_FAKE_MODELS=false`), 9 of 9 demo reports correct end to end | Geocoding: offline city table + cache + Nominatim, 7 of 9 demo alerts get a pin; duplicate detection is on (`sentence-transformers`, similarity above 0.75 marks `duplicate_of`; shown as a chip on the alert card and queue) |
 | Streamlit dashboard | FE | ✅ Built and verified against the real backend (5 screens, live and mock modes, heatmap, map, queue, metrics) | Starts in Live mode if the API answers; try the microphone once by hand |
 | Evaluation + metrics.json | ML1 | ✅ Scored on real ML2 + baseline + ML3 predictions; rerun if any file is resent | `reports/results.md`; slide 6 filled in |
 | Slides + backup video | FE + all | ⏳ Not started | |
@@ -609,7 +609,7 @@ Target time: about 7 minutes of talk + 3 minutes of demo, then questions.
 > [latency] seconds."
 - Point to the architecture: **Whisper hears it, DistilBERT understands it, Flan-T5 writes it up.**
 - Our differentiators: a full alert, not just a label; attention-based explanations; a continuous severity
-  score; voice input; a live priority queue and map; small models that run offline. [Add duplicate merging if built.]
+  score; voice input; a live priority queue and map; small models that run offline. **Duplicate detection is built**: a reworded report of the same fire is flagged "Possible duplicate of RQP-…" (0.78 to 0.93 similarity for rewordings, under 0.25 for unrelated incidents).
 
 ### Slide 4: How attention works (≈45 s) · *Technical Implementation*
 **Speaker:** [ML2]
@@ -696,7 +696,7 @@ real pipeline that runs in the demo (`extract()`: generation, retry, rule fallba
 **Show one failure and say why (pick one):**
 - *False alarm:* "Photo of dummy presented as wounded LAX shooter by media" is predicted `VIOLENCE_CRIME`. The text is
   commentary about media, but it uses shooting vocabulary. The model reads the topic, not the intent. On gold, 17 of 45
-  non-emergency tweets (mostly commentary that mentions a disaster) are flagged, false alarm 0.38 vs 0.36 for the baseline.
+  non-emergency tweets (mostly commentary that mentions a disaster) are flagged, false alarm 0.38 vs 0.36 for the baseline. We tried moving the emergency threshold to cut this: it only trades recall for false alarms (false alarm 0.38 to 0.31 costs emergency recall 0.93 to 0.87 and critical recall 0.98 to 0.95), so we kept the default.
 - *Severity shrinks toward the middle on tweets:* reports we labelled 5.0 average 3.7, labelled 1.0 average 1.8. The severity
   head was trained only on call-style reports, so it generalises only partly to news-style tweets.
 
@@ -709,7 +709,7 @@ Show `reports/confusion_matrix_gold_ml2.png` next to the table.
 **Driver:** [FE] · **Narrator:** [BE1]
 1. Type a report → alert card: type, severity, location on the map, responders, summary.
 2. Open the **Explain** tab → the attention heatmap. Say which words lit up and why that makes sense.
-3. Play the **pre-recorded noisy voice clip** → the transcript appears, gets corrected if needed → alert.
+3. Play the **pre-recorded noisy voice clip** (`demo_assets/noisy_phone_report.wav`: phone-band filtered with added noise; Whisper still gets it right but hears "Lonavala" as "La Navalan", which is a good moment to show the transcript correction) → the transcript appears, gets corrected if needed → alert.
 4. Show the **priority queue**: the critical alert jumps to the top.
 5. Type a non-emergency ("is the mall open today?") → *"No emergency detected"*.
 6. If anything breaks, switch to the backup video without commentary.

@@ -172,6 +172,9 @@ def render_alert_card(alert: Dict[str, Any]):
     conf_str = f"{confidence * 100:.1f}%" if isinstance(confidence, (int, float)) else "N/A"
     latency = alert.get("latency_ms", "N/A")
     alert_id = alert.get("alert_id", "RQP-000000")
+    dup_of = alert.get("duplicate_of")
+    dup_note = (f'<div style="margin-bottom: 0.8rem;"><span class="rq-badge" style="background:#EEF2FF; color:#3730A3;">'
+                f'Possible duplicate of {html.escape(str(dup_of))}: merge or dismiss</span></div>') if dup_of else ""
 
     # Progress percentage for severity (1.0 to 5.0 scale -> 0% to 100%)
     sev_num = float(severity) if isinstance(severity, (int, float)) else 1.0
@@ -198,6 +201,7 @@ def render_alert_card(alert: Dict[str, Any]):
                 </div>
             </div>
 
+            {dup_note}
             <!-- Severity visual bar -->
             <div style="margin-bottom: 1.4rem;">
                 <div style="display: flex; justify-content: space-between; font-size: 0.82rem; color: #475569; font-weight: 700; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.04em;">

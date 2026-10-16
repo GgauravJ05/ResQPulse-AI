@@ -17,6 +17,12 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · Duplicate detection on, demo voice clip, threshold study (PR #23)
+**Who:** Data lead · **Area:** API, UI, Docs
+- Installed `sentence-transformers` (now in requirements.txt). Duplicate threshold lowered from 0.85 to 0.75 because a reworded report of the same fire scored 0.78 (unrelated incidents score under 0.25). The alert card and queue now show "Possible duplicate of RQP-…".
+- Added `demo_assets/noisy_phone_report.wav` (phone-band filter plus noise). Whisper transcribes it correctly except the place name.
+- Tried moving the emergency threshold to reduce false alarms on gold: it only trades recall for false alarms, so no change (numbers in the brief, slide 6).
+
 ## 2026-10-17 · Alert card showed its own HTML source (PR #22)
 **Who:** Data lead · **Area:** UI
 - The alert card on screen 2 displayed raw HTML as a code block: blank lines and indentation inside the HTML ended the HTML block in Markdown. Added `_flat()` in `app/components.py` and used it for every multi-line HTML snippet (header, empty state, non-emergency card, alert card, heatmap legend).

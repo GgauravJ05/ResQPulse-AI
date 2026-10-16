@@ -447,6 +447,9 @@ elif screen == "4. 📊 Dispatcher Dashboard":
 
                 meta = get_incident_type_meta(inc_type)
                 sev_style = get_severity_style(sev_label)
+                dup_of = alert.get("duplicate_of")
+                dup_chip = (f'<span class="rq-badge" style="background:#EEF2FF; color:#3730A3;">Possible duplicate of {html.escape(str(dup_of))}</span>'
+                            if dup_of else "")
 
                 with st.container():
                     st.markdown(
@@ -461,6 +464,7 @@ elif screen == "4. 📊 Dispatcher Dashboard":
                                 <div>
                                     {render_severity_pill(sev_label, severity)}
                                     <span class="rq-badge" style="background:#E2E8F0; color:#334155;">{status}</span>
+                                    {dup_chip}
                                 </div>
                             </div>
                             <div style="font-size: 0.95rem; color: #1E293B; margin-bottom: 0.75rem;">

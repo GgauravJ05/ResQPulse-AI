@@ -1,4 +1,4 @@
-"""Duplicate-report detection (BE2): a new report whose embedding is > 0.85 similar to an earlier alert gets duplicate_of set.
+"""Duplicate-report detection (BE2): a new report whose embedding is > 0.75 similar to an earlier alert gets duplicate_of set.
 
 Optional feature. It needs `sentence-transformers` and a one-time download of all-MiniLM-L6-v2. The model is loaded on
 first use, never at import, and if anything is missing the functions return (None, None) so the API keeps working.
@@ -7,7 +7,7 @@ from typing import Dict, Optional, Tuple
 
 import numpy as np
 
-THRESHOLD = 0.85
+THRESHOLD = 0.75   # a rewording of the same fire scored 0.78, unrelated incidents under 0.25
 
 embedding_store: Dict[str, np.ndarray] = {}      # alert_id -> embedding of that alert's text
 _embedder = None
@@ -31,7 +31,7 @@ def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
 
 
 def find_duplicate(new_text: str, alert_store: dict) -> Tuple[Optional[str], Optional[np.ndarray]]:
-    """Return (id of the most similar earlier alert if similarity > 0.85 else None, embedding of the new text)."""
+    """Return (id of the most similar earlier alert if similarity > 0.75 else None, embedding of the new text)."""
     embedder = _get_embedder()
     if embedder is None:
         return None, None

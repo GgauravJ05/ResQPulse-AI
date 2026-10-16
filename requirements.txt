@@ -18,8 +18,8 @@ audioop-lts>=0.2; python_version >= "3.13"   # pydub needs audioop, removed from
 pydantic>=2.6
 geopy>=2.4
 rapidfuzz>=3.0
-# optional: duplicate-report detection (about 90 MB model downloaded on first use). Without it duplicate_of stays null
-# sentence-transformers>=3.0
+# duplicate-report detection (about 90 MB model downloaded on first use). Without it duplicate_of stays null
+sentence-transformers>=3.0
 
 # Evaluation
 jiwer>=3.0
