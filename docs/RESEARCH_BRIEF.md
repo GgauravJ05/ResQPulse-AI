@@ -555,7 +555,7 @@ Updated with every merged change. The full history is in [UPDATE.md](UPDATE.md).
 | Part | Owner | Status | Notes |
 |---|---|---|---|
 | Repo, docs, schema v1 | – | ✅ Done | README, this brief, [SCHEMA.md](SCHEMA.md), [DATASETS.md](DATASETS.md) |
-| Datasets downloaded + mapped | ML1 | ⏳ Not started | Links verified in DATASETS.md |
+| Datasets downloaded + mapped | ML1 | ✅ Done (v0) | 37k rows in `data/processed/public_*.csv`; no MEDICAL, few VIOLENCE_CRIME rows yet |
 | Synthetic reports (Claude) | ML1 | ⏳ Not started | |
 | Gold test set | ML1 + BE2 | ⏳ Not started | |
 | Baseline (TF-IDF + LR) | ML2 | ⏳ Not started | |
@@ -574,6 +574,8 @@ Updated with every merged change. The full history is in [UPDATE.md](UPDATE.md).
 | 2026-10-16 | Added `STORM_CYCLONE` class | Hurricanes/cyclones are the largest share of HumAID; dropping them wasted real data |
 | 2026-10-16 | `ROAD_ACCIDENT` → `TRANSPORT_ACCIDENT` | CrisisLexT26 has real train and helicopter crashes that fit only a broader class |
 | 2026-10-16 | Claude chosen for synthetic data | Structured outputs guarantee valid labelled JSON for every report |
+| 2026-10-16 | CrisisLexT26 split by crisis, not held out entirely | It holds the only real transport-accident and violence examples; 6 crises stay unseen as a generalisation test |
+| 2026-10-16 | Speech-transcript augmentation cut; typo/lowercase noise instead | Only about 8 hours between starting and presenting |
 
 ---
 
