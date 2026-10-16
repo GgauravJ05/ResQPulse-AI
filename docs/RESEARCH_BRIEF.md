@@ -619,11 +619,38 @@ Target time: about 7 minutes of talk + 3 minutes of demo, then questions.
 
 ### Slide 5: Data (≈45 s) · *Technical Implementation*
 **Speaker:** [ML1]
-- Real crisis posts: HumAID ([n] tweets, 13 disasters), CrisisLexT26 ([n] tweets, 26 crises), and Kaggle Disaster Tweets as negatives.
-- [n] call-style reports generated with Claude, with every field labelled, covering everyday emergencies that no
-  public dataset has.
-- **Gold test set:** 144 real reports we never trained on, labelled by Claude with a second review pass and a 30-row human audit ([x]% agreement). Say clearly that it is Claude-labelled, not hand-labelled.
-- 8 incident types; a severity rubric from 1 to 5.
+
+**Say:** "Two kinds of data, because no public dataset has real emergency calls. Real crisis tweets teach the model
+disasters; reports written in call style teach it everyday emergencies, and the demo runs on call-style text."
+
+- **Real:** about 37,000 tweets after cleaning and de-duplication, from HumAID (13 disasters), CrisisLexT26 (26 crises)
+  and Kaggle Disaster Tweets (used as hard negatives). Balanced to at most 1,200 per type for training.
+- **Synthetic:** 710 call-style reports written by Claude, every one labelled with type, severity 1 to 5, location, people,
+  injuries, hazards and a summary. 8 writing styles (panicked, SMS, elderly caller, child, official report, vague, and more),
+  about 27 words each, with hard negatives such as mock drills, film shoots with toy guns and figurative language.
+  A validator checks that every extracted phrase appears word for word in the text (711 in, 710 kept).
+- **Training set:** 9,551 rows = 7,563 real + 497 unique synthetic (each repeated 4 times so they are not drowned out).
+- **Held out, never trained on:** 107 synthetic test reports, 7,755 real test tweets (including 6 crises the models never
+  saw), and a 144-row **gold set** of real reports.
+- **Gold labels:** written by Claude, re-reviewed in a second pass (10 corrections), then audited by a person on a random
+  30 rows: **[x]% agreement**. Say plainly that these are Claude labels, not hand labels.
+- **A finding worth saying:** labelling real tweets by the name of the disaster was wrong for **16%** of them (donation
+  appeals, jokes, commentary and follow-up news mention a disaster but report nothing). That is why we built the gold set.
+
+| Incident type | Real tweets in training | Synthetic reports | Gold (real, held out) |
+|---|---|---|---|
+| `FIRE` | 1,200 | 88 | 15 |
+| `FLOOD` | 1,200 | 73 | 18 |
+| `STORM_CYCLONE` | 1,200 | 67 | 16 |
+| `EARTHQUAKE_COLLAPSE` | 1,200 | 67 | 22 |
+| `TRANSPORT_ACCIDENT` | 1,200 | 91 | 11 |
+| `MEDICAL` | 0 | 134 | 0 |
+| `VIOLENCE_CRIME` | 363 | 103 | 17 |
+| `NON_EMERGENCY` | 1,200 | 87 | 45 |
+| **Total** | **7,563** | **710** | **144** |
+
+**If asked about limits:** MEDICAL has no real tweets at all (no public dataset has them), and the real data comes from a
+handful of events, mostly news-style rather than call-style.
 
 ### Slide 6: Results (≈60 s) · *Metrics*
 **Speaker:** [ML2 / ML3]
