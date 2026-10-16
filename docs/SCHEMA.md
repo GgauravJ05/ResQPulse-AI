@@ -393,7 +393,7 @@ Base URL from `API_URL` in `.env` (default `http://localhost:8000`). JSON everyw
 | Method | Path | Request | Response |
 |---|---|---|---|
 | `GET` | `/health` | – | `{"status": "ok", "models": {"classifier": true, "generator": true, "asr": true}}` |
-| `POST` | `/transcribe` | `multipart/form-data`, field `file` (wav/mp3/m4a/webm, ≤ 60 s) | `TranscribeResult` (§5) |
+| `POST` | `/transcribe` | `multipart/form-data`, field `file` (wav/mp3/m4a/webm/ogg/oga/opus/mpeg/mpga/flac/aac, ≤ 60 s) | `TranscribeResult` (§5) |
 | `POST` | `/analyze` | `{"text": "...", "source": "text" \| "voice", "transcript_confidence": 0.82 \| null}` | Alert (§6) |
 | `GET` | `/alerts` | query: `status` (optional), `limit` (default 50) | `{"alerts": [Alert, ...]}` in queue order |
 | `GET` | `/alerts/{alert_id}` | – | Alert |

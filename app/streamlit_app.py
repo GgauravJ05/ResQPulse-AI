@@ -209,7 +209,7 @@ if screen == "1. 📝 Report Input":
     with audio_col2:
         uploaded_audio = st.file_uploader(
             "Or Upload Pre-Recorded Audio File",
-            type=["wav", "mp3", "m4a", "webm", "ogg"],
+            type=["wav", "mp3", "m4a", "webm", "ogg", "oga", "opus", "mpeg", "mpga", "flac", "aac"],
             key="file_audio_input",
         )
 

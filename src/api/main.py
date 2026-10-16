@@ -29,6 +29,9 @@ ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 REPORTS_DIR = ROOT_DIR / "reports"
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
+# Audio containers ffmpeg can decode; the extension is only a guard, pydub probes the real format.
+AUDIO_EXTENSIONS = (".wav", ".mp3", ".m4a", ".webm", ".ogg", ".oga", ".opus", ".mpeg", ".mpga", ".flac", ".aac")
+
 ALERTS_LOG = REPORTS_DIR / "alerts.jsonl"
 CORRECTIONS_LOG = REPORTS_DIR / "corrections.jsonl"
 METRICS_FILE = REPORTS_DIR / "metrics.json"
@@ -157,7 +160,7 @@ async def transcribe_endpoint(file: UploadFile = File(...)):
         return format_error("MODEL_NOT_READY", "ASR model is not ready.", status.HTTP_503_SERVICE_UNAVAILABLE)
 
     filename = file.filename or ""
-    if not filename.lower().endswith((".wav", ".mp3", ".m4a", ".webm")):
+    if not filename.lower().endswith(AUDIO_EXTENSIONS):
         return format_error("AUDIO_UNREADABLE", "Unsupported file extension.", status.HTTP_400_BAD_REQUEST)
     content = await file.read()
     if len(content) == 0:
