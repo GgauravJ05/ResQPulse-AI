@@ -18,7 +18,7 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 ---
 
 ## 2026-10-16 · Incident classifier: baseline, DistilBERT two-head, classify() (PR #7)
-**Who:** ML2 · **Area:** Classifier
+**Who:** Vansh · **Area:** Classifier
 - `scripts/baseline_tfidf_lr.py`: TF-IDF (word 1–2-grams + char 2–5-grams) + Logistic Regression. C picked on
   `val.csv` macro-F1 only (C = 8). `--predict_only` writes predictions for unlabelled files
   (`gold_inputs.csv` → `baseline_gold.csv`).
