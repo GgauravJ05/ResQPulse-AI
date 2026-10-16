@@ -5,6 +5,7 @@ Queue Rows, Severity Badges, and Metrics tables with enterprise mission-control 
 """
 
 import html
+import re
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -22,10 +23,18 @@ from app.styles import (
 )
 
 
+def _flat(markup: str) -> str:
+    """Collapse an HTML snippet to lines with no indentation, blank lines or comments.
+    Markdown ends an HTML block at a blank line and turns 4-space-indented lines into a code block,
+    which is how the alert card used to show its own source code."""
+    markup = re.sub(r"<!--.*?-->", "", markup, flags=re.S)
+    return "\n".join(line.strip() for line in markup.splitlines() if line.strip())
+
+
 def render_header():
     """Renders the master command-center header with live status beacon."""
     st.markdown(
-        """
+        _flat("""
         <div class="app-header">
             <div class="header-top-row">
                 <div>
@@ -38,7 +47,7 @@ def render_header():
                 </div>
             </div>
         </div>
-        """,
+        """),
         unsafe_allow_html=True,
     )
 
@@ -57,13 +66,13 @@ def render_severity_pill(severity_label: str, severity_score: Optional[float] = 
 def render_empty_state(title: str, description: str, icon: str = "📋"):
     """Render a clean, friendly empty state container."""
     st.markdown(
-        f"""
+        _flat(f"""
         <div class="rq-empty-state">
             <div class="rq-empty-icon">{icon}</div>
             <div class="rq-empty-title">{html.escape(title)}</div>
             <div class="rq-empty-desc">{html.escape(description)}</div>
         </div>
-        """,
+        """),
         unsafe_allow_html=True,
     )
 
@@ -76,7 +85,7 @@ def render_non_emergency_card(alert: Dict[str, Any]):
     latency = alert.get("latency_ms", "N/A")
 
     st.markdown(
-        f"""
+        _flat(f"""
         <div class="rq-card-neutral">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
                 <div style="display: flex; align-items: center; gap: 0.65rem;">
@@ -95,7 +104,7 @@ def render_non_emergency_card(alert: Dict[str, Any]):
                 <span><strong>Inference Latency:</strong> {latency} ms</span>
             </div>
         </div>
-        """,
+        """),
         unsafe_allow_html=True,
     )
 
@@ -171,7 +180,7 @@ def render_alert_card(alert: Dict[str, Any]):
     # Main Card Container with custom border color according to severity
     card_border_class = f"rq-card-{severity_label.lower()}"
     st.markdown(
-        f"""
+        _flat(f"""
         <div class="rq-card {card_border_class}" style="background: {sev_style.get('gradient', sev_style['bg'])};">
             <!-- Top bar: Alert ID, Type, and Severity -->
             <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 0.6rem;">
@@ -238,7 +247,7 @@ def render_alert_card(alert: Dict[str, Any]):
                 </div>
             </div>
         </div>
-        """,
+        """),
         unsafe_allow_html=True,
     )
 
@@ -325,7 +334,7 @@ def render_attention_heatmap(alert: Dict[str, Any]):
 
     # Attention Legend
     st.markdown(
-        """
+        _flat("""
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; font-size: 0.85rem; color: #475569;">
             <span><strong>Attention Intensity:</strong></span>
             <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
@@ -341,7 +350,7 @@ def render_attention_heatmap(alert: Dict[str, Any]):
                 <span>High Focus (0.7 - 1.0)</span>
             </span>
         </div>
-        """,
+        """),
         unsafe_allow_html=True,
     )
 

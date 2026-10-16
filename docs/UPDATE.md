@@ -17,6 +17,11 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · Alert card showed its own HTML source (PR #22)
+**Who:** Data lead · **Area:** UI
+- The alert card on screen 2 displayed raw HTML as a code block: blank lines and indentation inside the HTML ended the HTML block in Markdown. Added `_flat()` in `app/components.py` and used it for every multi-line HTML snippet (header, empty state, non-emergency card, alert card, heatmap legend).
+- Added a regression test. Checked the page in a real browser; 52 tests pass.
+
 ## 2026-10-17 · Frontend reviewed, fixed and merged (Gaurav; code by Agastya Singh)
 **Who:** Agastya Singh (frontend), review and fixes by Gaurav · **Area:** UI
 - Reviewed `feat/streamlit-app-v2` (5 screens, API client, mock mode, 11 tests) and drove the real app against the real backend

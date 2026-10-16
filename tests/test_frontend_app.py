@@ -58,3 +58,15 @@ def test_heatmap_escapes_html_in_words():
     _goto(at, "3. 🔍 Attention Heatmap")
     html = " ".join(m.value for m in at.markdown)
     assert "<script>" not in html and "&lt;script&gt;" in html
+
+
+def test_flat_html_has_no_blank_lines_or_indentation():
+    from app.components import _flat
+    out = _flat("""
+        <div>
+            <!-- note -->
+
+            <span>x</span>
+        </div>
+    """)
+    assert out == "<div>\n<span>x</span>\n</div>"
