@@ -139,7 +139,9 @@ hr { border: none !important; border-top: 1px solid var(--hair) !important; marg
 ::-webkit-scrollbar-thumb { background: var(--hair-2); border-radius: 999px; border: 2px solid var(--ground); }
 
 /* chrome we do not use */
-[data-testid="stToolbar"], [data-testid="stDecoration"], .stDeployButton { display: none; }
+/* keep stToolbar: it holds the button that reopens a collapsed sidebar */
+[data-testid="stMainMenu"], [data-testid="stAppDeployButton"], [data-testid="stDecoration"], .stDeployButton { display: none; }
+[data-testid="stExpandSidebarButton"] { background: #FFFFFF; border: 1px solid #D4D4D0; border-radius: 10px; }
 [data-testid="stHeader"] { background: transparent; }
 
 /* ---------- left rail (Kaggle) ---------- */

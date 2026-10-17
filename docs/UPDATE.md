@@ -17,6 +17,10 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · Sidebar could not be reopened (PR #33)
+**Who:** Data lead · **Area:** UI
+- The redesign hid Streamlit's toolbar, which also holds the button that reopens a collapsed sidebar, so a collapsed sidebar was gone for good. Now only the main menu and Deploy button are hidden; the reopen button shows as a small outlined square at the top left. The sidebar starts open at every width. Checked at 1440 and 900 px: collapse, reopen, both work.
+
 ## 2026-10-17 · Evaluation study notes (PR #32)
 **Who:** Data lead · **Area:** Docs
 - Added `docs/EVALUATION_PREP.md`: the 30-second pitch, rubric mapping, architecture, each model and why, data, the demo run order, a numbers cheat sheet with metric definitions, likely judge questions with answers, limitations, SDGs and restart commands.

@@ -59,7 +59,7 @@ st.set_page_config(
     page_title="ResQPulse AI · Dispatch console",
     page_icon=str(Path(__file__).resolve().parent / "static" / "favicon.png"),
     layout="wide",
-    initial_sidebar_state="auto",
+    initial_sidebar_state="expanded",
 )
 
 # Inject custom CSS
