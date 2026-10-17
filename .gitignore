@@ -16,6 +16,8 @@ kaggle.json
 data/raw/*
 data/processed/*
 !data/raw/.gitkeep
+# our own synthetic reports are committed (CC BY 4.0) so the pipeline can be rebuilt
+!data/raw/synthetic/
 !data/processed/.gitkeep
 
 # Voice recordings of teammates are personal data: never commit them
@@ -51,3 +53,12 @@ output/
 .impeccable/review/
 .impeccable/*.local.json
 certs/
+
+# gold set: only our labels are published; tweet text is rebuilt locally by scripts/rehydrate_gold.py
+data/gold/*
+!data/gold/.gitkeep
+!data/gold/gold_labels.csv
+!data/gold/gold_audit_labels.csv
+
+# release artefacts
+dist/

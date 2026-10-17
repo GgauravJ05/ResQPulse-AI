@@ -1,13 +1,15 @@
 import io
 import math
+import os
 import numpy as np
 from faster_whisper import WhisperModel
 from pydub import AudioSegment
 from pydub.exceptions import CouldntDecodeError
 from src.api.schemas import TranscribeResult
 
-print("Loading faster-whisper (small.en, int8)...")
-whisper_model = WhisperModel("small.en", device="cpu", compute_type="int8")
+WHISPER_MODEL = os.getenv("WHISPER_MODEL", "small.en")
+print(f"Loading faster-whisper ({WHISPER_MODEL}, int8)...")
+whisper_model = WhisperModel(WHISPER_MODEL, device="cpu", compute_type="int8")
 
 def transcribe_bytes(audio_bytes: bytes) -> TranscribeResult:
     """Processes audio entirely in RAM for minimum latency."""

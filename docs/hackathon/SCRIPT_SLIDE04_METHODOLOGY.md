@@ -1,6 +1,6 @@
 # Speaking script: Slide 04, Methodology and Measurable Impact
 
-Deck: `docs/ResQPulse_AI_GenHack.pptx`, slide 04 of 07. About **90 seconds**.
+Deck: `docs/hackathon/ResQPulse_AI_GenHack.pptx`, slide 04 of 07. About **90 seconds**.
 Speak in plain sentences. **→** marks where to point on the slide.
 
 ---
@@ -106,4 +106,4 @@ Speak in plain sentences. **→** marks where to point on the slide.
 | 0.75 (MSE 0.57) | Severity RMSE on call-style reports |
 | ~3 s | Per report, laptop, offline |
 
-Source of every number: `reports/results.md`. More detail: `docs/EVALUATION_PREP.md`.
+Source of every number: `reports/results.md`. More detail: `docs/hackathon/EVALUATION_PREP.md`.

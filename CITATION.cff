@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use ResQPulse AI or its synthetic dataset, please cite it as below."
+title: "ResQPulse AI: turning emergency reports into structured, prioritised, explainable alerts"
+type: software
+license: MIT
+repository-code: "https://github.com/GgauravJ05/ResQPulse-AI"
+date-released: 2026-10-17
+version: "1.0.0"
+authors:
+  - given-names: Gaurav
+    family-names: Jadhav
+  - given-names: Vansh
+    family-names: Borkar
+  - given-names: Aaryan
+  - given-names: Agastya
+    family-names: Singh
+keywords:
+  - emergency response
+  - natural language processing
+  - transformers
+  - attention
+  - speech recognition
+  - disaster informatics

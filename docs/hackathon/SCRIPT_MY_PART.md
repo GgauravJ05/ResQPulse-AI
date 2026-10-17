@@ -1,7 +1,7 @@
 # Speaking script: my part (tech stack, architecture, how it works, metrics, live demo)
 
 About **6 to 7 minutes** in total. Plain sentences; **→** means point or click.
-Slides: `docs/ResQPulse_AI_GenHack.pptx` (slide 03 tech stack and architecture, slide 05 results).
+Slides: `docs/hackathon/ResQPulse_AI_GenHack.pptx` (slide 03 tech stack and architecture, slide 05 results).
 App: **http://localhost:8501** (check the top-right pill says **LIVE · REAL MODELS**).
 
 | Part | Time | Show |
@@ -115,7 +115,7 @@ Before starting: one report already sent (models warm), queue reasonably clean.
    > "And a normal question is recognised as **no emergency**, so it never clutters the queue."
 8. Sidebar → **Model Metrics** (only if time): "and these are the numbers I just explained."
 
-**If something breaks:** stay calm. "The first request after a restart takes a few seconds," or switch to the slides and narrate. Restart commands are in `docs/EVALUATION_PREP.md`, section 11.
+**If something breaks:** stay calm. "The first request after a restart takes a few seconds," or switch to the slides and narrate. Restart commands are in `docs/hackathon/EVALUATION_PREP.md`, section 11.
 
 ---
 
@@ -163,4 +163,4 @@ Before starting: one report already sent (models warm), queue reasonably clean.
 | 15 vs 2 (of 17) | Violent crime correct, ours vs baseline |
 | ~3 s | Per report, laptop, offline |
 
-Sources: `reports/results.md`, `reports/metrics.json`. More: `docs/EVALUATION_PREP.md`.
+Sources: `reports/results.md`, `reports/metrics.json`. More: `docs/hackathon/EVALUATION_PREP.md`.

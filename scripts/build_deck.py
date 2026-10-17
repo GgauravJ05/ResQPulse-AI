@@ -1,11 +1,11 @@
-"""Fill the GenHack template (docs/Final minihackathon genhack template.pptx) with the ResQPulse AI content.
+"""Fill the GenHack template (docs/hackathon/Final minihackathon genhack template.pptx) with the ResQPulse AI content.
 
 The template's header band, section labels, section titles, footer, logos and slide numbers are kept exactly as given.
 Only the body of each slide is rebuilt (same colours and fonts as the template: Poppins headings, Inter text, red C5221F
 accent, F8FAFC cards). The instructions slide is removed, so the deck is the title slide + 6 content slides.
 
 Run from the repo root:  .venv/bin/python scripts/build_deck.py
-Output: docs/ResQPulse_AI_GenHack.pptx
+Output: docs/hackathon/ResQPulse_AI_GenHack.pptx
 Set FONT_DIR to a folder with Inter[opsz,wght].ttf and Poppins-*.ttf to get text-fit warnings measured with the real fonts.
 """
 import copy
@@ -20,8 +20,8 @@ from pptx.oxml.ns import qn
 from pptx.util import Emu, Inches, Pt
 from lxml import etree
 
-SRC = Path("docs/Final minihackathon genhack template.pptx")
-OUT = Path("docs/ResQPulse_AI_GenHack.pptx")
+SRC = Path("docs/hackathon/Final minihackathon genhack template.pptx")
+OUT = Path("docs/hackathon/ResQPulse_AI_GenHack.pptx")
 TEAM = "P 25"
 
 RED, NAVY, TEXT, MUTED = "C5221F", "0F172A", "1E293B", "64748B"

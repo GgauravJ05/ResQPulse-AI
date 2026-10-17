@@ -17,6 +17,13 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · Public release preparation (PR #42)
+**Who:** Data lead · **Area:** Repo, Data, Docs
+- **Tweet text removed from the repo.** The source datasets' terms do not allow redistributing it. `data/gold/` now holds only our labels (`gold_labels.csv`, `gold_audit_labels.csv`); `scripts/rehydrate_gold.py` rebuilds the full gold files from the public test split by ID (verified identical). The error analysis shows real tweets by ID only.
+- **Our 710 synthetic reports committed** (`data/raw/synthetic/`, CC BY 4.0), so the full pipeline can be rebuilt from the three public sources. `scripts/make_public_dataset.py` builds a redistributable Kaggle release (synthetic data in full, tweets as ID + labels).
+- **Project files:** new README for a public audience, CREDITS.md (datasets, models, software, fonts, map data, papers, licences), CITATION.cff, CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, a Makefile, and a GitHub Actions workflow that runs the tests with fake models.
+- **Tidy-up:** notebooks restored with outputs cleared; hackathon material moved to `docs/hackathon/`; unused `anthropic`/`edge-tts` requirements and `.env` keys removed; `WHISPER_MODEL` in `.env` is now honoured.
+
 ## 2026-10-17 · Pre-demo check; report box keeps its text only through its key (PR #41)
 **Who:** Data lead · **Area:** UI
 - Full browser check against the live models before the demo: all 9 samples, alert card, heatmap, voice upload and correction, duplicate flag, queue sorting, Confirm / Dispatch / Dismiss / Open alert, metrics page, sidebar collapse and reopen, and the HTTPS copy for phones. All pass; 52 tests pass.

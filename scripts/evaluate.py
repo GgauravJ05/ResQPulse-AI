@@ -202,6 +202,12 @@ def write_results_md(res: dict, path: Path) -> None:
     path.write_text("\n".join(L) + "\n", encoding="utf-8")
 
 
+def shown_text(df, i) -> str:
+    """Synthetic reports are ours and shown in full; real tweets are shown by ID only, because their source
+    datasets (HumAID, CrisisLexT26, Kaggle) do not allow redistributing tweet text."""
+    return str(df.loc[i, "text"]) if str(i).startswith("synth") else f"tweet {i}"
+
+
 def clip(text, n=110) -> str:
     text = str(text).replace("\n", " ")
     return text if len(text) <= n else text[: n - 1] + "…"
@@ -273,12 +279,12 @@ def main() -> None:
             ids = [i for i in labels[s].index if i in pred.index]
             pcols = {t: f"p_{t}" for t in INCIDENT_TYPES if f"p_{t}" in pred.columns}
             cls_rows[(name, s)] = [{
-                "true": labels[s].loc[i, "incident_type"], "pred": pred.loc[i, "pred_type"], "text": labels[s].loc[i, "text"],
+                "true": labels[s].loc[i, "incident_type"], "pred": pred.loc[i, "pred_type"], "text": shown_text(labels[s], i),
                 "conf": float(pred.loc[i, pcols[pred.loc[i, "pred_type"]]] or 0) if pred.loc[i, "pred_type"] in pcols else 0.0,
             } for i in ids]
             if sev and s in SEV_SETS:
                 sev_rows[(name, s)] = [{"true": labels[s].loc[i, "severity_f"], "pred": float(np.clip(float(pred.loc[i, "pred_severity"]), 1, 5)),
-                                        "text": labels[s].loc[i, "text"]} for i in ids if pred.loc[i, "pred_severity"] not in ("", None)]
+                                        "text": shown_text(labels[s], i)} for i in ids if pred.loc[i, "pred_severity"] not in ("", None)]
 
     for s, fname in [("test_synth", "ml3_test_flan.csv"), ("gold", "ml3_gold.csv")]:
         path = pred_dir / fname
@@ -290,7 +296,7 @@ def main() -> None:
         m, ids, true_f, pred_f = score_extraction(s, labels[s], pred)
         res["extraction"].setdefault(MODEL_NAMES["ml3"], {})[s] = m
         ext_rows[(MODEL_NAMES["ml3"], s)] = [{
-            "text": labels[s].loc[i, "text"], "gap": len(set(t["injuries"]) ^ set(p["injuries"])) + len(set(t["hazards"]) ^ set(p["hazards"])),
+            "text": shown_text(labels[s], i), "gap": len(set(t["injuries"]) ^ set(p["injuries"])) + len(set(t["hazards"]) ^ set(p["hazards"])),
             "true": f"{t['injuries']} / {t['hazards']}", "pred": f"{p['injuries']} / {p['hazards']}"}
             for i, t, p in zip(ids, true_f, pred_f)]
 

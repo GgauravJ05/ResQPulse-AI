@@ -38,7 +38,7 @@ folium>=0.16
 plotly>=5.20
 matplotlib>=3.8
 
-# Synthetic data generation (Claude) / config
-anthropic>=1.0
-edge-tts>=6.1
+# Config
 python-dotenv>=1.0
+
+# Optional: rebuilding the hackathon deck (scripts/build_deck.py) needs python-pptx
