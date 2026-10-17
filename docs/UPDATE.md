@@ -17,6 +17,10 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · Evaluation study notes (PR #32)
+**Who:** Data lead · **Area:** Docs
+- Added `docs/EVALUATION_PREP.md`: the 30-second pitch, rubric mapping, architecture, each model and why, data, the demo run order, a numbers cheat sheet with metric definitions, likely judge questions with answers, limitations, SDGs and restart commands.
+
 ## 2026-10-17 · Dashboard works fully offline (PR #31)
 **Who:** Data lead · **Area:** UI
 - Figtree and JetBrains Mono are now served from `app/static/fonts/` (Streamlit static serving, `enableStaticServing = true`) instead of Google Fonts, with their OFL licences beside them. The browser-tab icon is a local PNG of the brand mark instead of a Google-hosted icon. Checked with Google blocked: both fonts load.
