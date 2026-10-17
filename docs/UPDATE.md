@@ -17,6 +17,10 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · Gen AI syllabus study notes (PR #35)
+**Who:** Data lead · **Area:** Docs
+- Added `docs/GENAI_SYLLABUS_NOTES.md`: course Units 1–5 (neural network basics and backpropagation; MLP, CNN, RNN; GANs; VAEs, LSTMs, attention and Transformers; Python and TensorFlow 2), with formulas, comparisons, and how each topic shows up in ResQPulse for the viva.
+
 ## 2026-10-17 · "Open alert" crashed the dashboard (PR #34)
 **Who:** Data lead · **Area:** UI
 - Clicking "Open alert" in the queue raised `StreamlitWidgetAlreadyInstantiatedError`: it changed the sidebar page after the sidebar was drawn. It now uses an `on_click` callback, which runs before the page is drawn. Added a test; checked in the browser against the live backend (opens the Alert Card, no error).
