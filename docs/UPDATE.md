@@ -17,6 +17,10 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · Speaking script for slide 04 (PR #38)
+**Who:** Data lead · **Area:** Docs
+- Added `docs/SCRIPT_SLIDE04_METHODOLOGY.md`: a 90-second script for the Methodology and Measurable Impact slide, a 45-second version, likely follow-up questions with answers, and the numbers to remember.
+
 ## 2026-10-17 · Syllabus terms used in the project (PR #37)
 **Who:** Data lead · **Area:** Docs
 - Added a "Syllabus terms used in ResQPulse" section to `docs/GENAI_SYLLABUS_NOTES.md`: every course term the project uses, unit by unit, with exact values (learning rates, epochs, batch sizes, max lengths, warmup, weight decay, dropout, gradient clipping, beams) checked against the training code and notebooks, where to point in the repo, and an honest list of syllabus terms not used.
