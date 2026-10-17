@@ -50,3 +50,4 @@ output/
 .archify/
 .impeccable/review/
 .impeccable/*.local.json
+certs/

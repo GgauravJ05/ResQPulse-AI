@@ -238,3 +238,18 @@ curl http://localhost:8000/health      # classifier, generator, asr: true
 ```
 
 Start the backend **first**. Then send one report to warm up.
+
+### Letting others on the same Wi-Fi use the microphone (HTTPS)
+
+Browsers only allow the microphone on `https://` pages or `localhost`. For other devices, run a second copy of the dashboard over HTTPS with a self-signed certificate (the `certs/` folder is git-ignored):
+
+```bash
+IP=$(ipconfig getifaddr en0)
+mkdir -p certs
+openssl req -x509 -newkey rsa:2048 -nodes -days 30 -keyout certs/key.pem -out certs/cert.pem \
+  -subj "/CN=ResQPulse local demo" -addext "subjectAltName=IP:$IP,IP:127.0.0.1,DNS:localhost"
+.venv/bin/python -m streamlit run app/streamlit_app.py --server.address 0.0.0.0 --server.port 8502 \
+  --server.sslCertFile certs/cert.pem --server.sslKeyFile certs/key.pem
+```
+
+Share `https://<your IP>:8502`. Visitors see a "not private" warning once: click **Advanced → Proceed** (Safari: **Show Details → visit this website**), then allow the microphone. If your IP changes, make the certificate again.
