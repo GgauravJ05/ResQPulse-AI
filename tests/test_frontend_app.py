@@ -70,3 +70,14 @@ def test_flat_html_has_no_blank_lines_or_indentation():
         </div>
     """)
     assert out == "<div>\n<span>x</span>\n</div>"
+
+
+def test_open_alert_from_queue_goes_to_alert_card():
+    at = _app()
+    at.session_state["mock_mode"] = True
+    _goto(at, "Dispatcher Dashboard")
+    view = [b for b in at.button if b.key and b.key.startswith("btn_view_")]
+    assert view, "queue should show Open alert buttons in mock mode"
+    view[0].click().run()
+    assert not at.exception, [e.value for e in at.exception]
+    assert at.session_state["nav_screen_selection"] == "Alert Card"

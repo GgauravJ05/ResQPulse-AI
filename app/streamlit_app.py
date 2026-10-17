@@ -102,6 +102,12 @@ if "report_source" not in st.session_state:
 if "queue_filter_status" not in st.session_state:
     st.session_state.queue_filter_status = "ALL"
 
+def _open_alert(alert: Dict[str, Any]) -> None:
+    """Queue 'Open alert' callback: show this alert on the Alert Card page."""
+    st.session_state.current_alert = alert
+    st.session_state.nav_screen_selection = "Alert Card"
+
+
 # -----------------------------------------------------------------------------
 # Sidebar Navigation and Global Controls
 # -----------------------------------------------------------------------------
@@ -450,10 +456,8 @@ elif screen == "Dispatcher Dashboard":
                         except Exception as e:
                             st.error(f"Update failed: {e}")
 
-                    if actions.button("Open alert", key=f"btn_view_{alert_id}"):
-                        st.session_state.current_alert = alert
-                        st.session_state.nav_screen_selection = "Alert Card"
-                        st.rerun()
+                    # on_click runs before the sidebar radio is drawn, so it may change the selected page
+                    actions.button("Open alert", key=f"btn_view_{alert_id}", on_click=_open_alert, args=(alert,))
 
 
 # =============================================================================

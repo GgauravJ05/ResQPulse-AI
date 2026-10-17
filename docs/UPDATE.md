@@ -17,6 +17,10 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · "Open alert" crashed the dashboard (PR #34)
+**Who:** Data lead · **Area:** UI
+- Clicking "Open alert" in the queue raised `StreamlitWidgetAlreadyInstantiatedError`: it changed the sidebar page after the sidebar was drawn. It now uses an `on_click` callback, which runs before the page is drawn. Added a test; checked in the browser against the live backend (opens the Alert Card, no error).
+
 ## 2026-10-17 · Sidebar could not be reopened (PR #33)
 **Who:** Data lead · **Area:** UI
 - The redesign hid Streamlit's toolbar, which also holds the button that reopens a collapsed sidebar, so a collapsed sidebar was gone for good. Now only the main menu and Deploy button are hidden; the reopen button shows as a small outlined square at the top left. The sidebar starts open at every width. Checked at 1440 and 900 px: collapse, reopen, both work.
