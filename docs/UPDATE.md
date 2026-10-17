@@ -17,6 +17,10 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · Speaking script for the presenter's part (PR #40)
+**Who:** Data lead · **Area:** Docs
+- Added `docs/SCRIPT_MY_PART.md`: timed script for tech stack, system architecture, one report's journey, model metrics and the live demo, with likely questions and a numbers table.
+
 ## 2026-10-17 · Corrected the severe-report count (PR #39)
 **Who:** Data lead · **Area:** Docs
 - The brief, study notes and slide-04 script said the model "missed 1 of 27" severe reports. Recounted from `predictions/` and `data/gold/gold.csv`: the gold set has **56** reports with severity 4 or 5; DistilBERT dismissed 1 (98.2%), the baseline dismissed 14 (75%). The percentages were always right; only the denominator was wrong. Also confirmed the baseline was scored on exactly the same test rows (107, 7,755, 144) by the same script.
