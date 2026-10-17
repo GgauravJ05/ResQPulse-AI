@@ -129,7 +129,7 @@ The app is running at **http://localhost:8501**. The sidebar should show the **L
 | Real tweets, 7,755 | 0.73 → 0.79 | 0.62 → 0.75 | 0.63 → 0.75 |
 
 - **Emergency recall (gold): 0.91** (baseline 0.71). Of the real emergencies, 91% were flagged.
-- **Severe reports kept (gold): 0.98** (baseline 0.75). We missed only 1 of 27 reports labelled severity 4 or 5.
+- **Severe reports kept (gold): 0.98** (baseline 0.75). We missed only 1 of the 56 reports labelled severity 4 or 5; the baseline missed 14.
 - **False alarms (gold): 0.38** (baseline 0.36). This is our weak spot.
 - **Unseen crises:** accuracy **64% vs 48%**. This is the strongest argument for the transformer.
 - Biggest class gains on gold: **violent crime F1 0.19 → 0.91**, **fire 0.36 → 0.80**.

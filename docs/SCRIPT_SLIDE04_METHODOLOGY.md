@@ -50,7 +50,7 @@ Speak in plain sentences. **→** marks where to point on the slide.
 | Point at | Say |
 |---|---|
 | **91%** | "It catches **91% of real emergencies**. The word-counting baseline caught 71%." |
-| **98%** | "Most important: for the **most severe** reports, it keeps **98%**. It missed only **one out of 27**. The baseline missed a quarter of them." |
+| **98%** | "Most important: for the **most severe** reports, it keeps **98%**. It missed only **one out of 56**. The baseline missed 14 of them, a quarter." |
 | **0.77** | "Overall quality, measured by macro F1, is **0.77 against 0.56**. That means it's balanced across all emergency types, not just the common ones." |
 | **0.75** | "For severity, it's on average **0.75 points off on a 1-to-5 scale**, usually less than one point from the true urgency." |
 | **~3 s** | "And it does all this in **about 3 seconds per report, on an ordinary laptop, fully offline**. No cloud needed, even if the internet goes down during a disaster." |
@@ -101,7 +101,7 @@ Speak in plain sentences. **→** marks where to point on the slide.
 | 107 · 7,755 · 144 | Call-style test · real tweet test · human-checked gold set |
 | 6 | Disasters held out completely |
 | 91% vs 71% | Emergencies caught, ours vs baseline |
-| 98% vs 75% | Severe reports kept (missed 1 of 27) |
+| 98% vs 75% | Severe reports kept (missed 1 of 56; baseline missed 14) |
 | 0.77 vs 0.56 | Macro F1 on real reports |
 | 0.75 (MSE 0.57) | Severity RMSE on call-style reports |
 | ~3 s | Per report, laptop, offline |

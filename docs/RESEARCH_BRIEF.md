@@ -674,8 +674,8 @@ Source of truth: `reports/results.md`. **If ML2 or ML3 resend files, rerun the s
 | Real emergencies caught (emergency recall) | 0.71 | **0.91** |
 | Reports with severity 4 or 5 not dismissed as non-emergency | 0.75 | **0.98** |
 
-**Say:** "On real reports with checked labels our model catches 91% of emergencies and misses only 1 of the 27 most severe
-ones. The biggest gains are where word counting fails: violent crime F1 0.19 to 0.91, fire 0.36 to 0.80."
+**Say:** "On real reports with checked labels our model catches 91% of emergencies and misses only 1 of the 56 most severe
+ones (the baseline misses 14). The biggest gains are where word counting fails: violent crime F1 0.19 to 0.91, fire 0.36 to 0.80."
 
 **Generalisation to events the model never saw** (6 held-out crises): accuracy **64% vs 48%** for the baseline.
 This is the strongest evidence for using a transformer.
