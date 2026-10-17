@@ -256,7 +256,7 @@ Team **P 25**, Marathwada Mitra Mandal's College of Engineering, Pune.
 |---|---|
 | **Gaurav Jadhav** ([@GgauravJ05](https://github.com/GgauravJ05)) | Team lead · data and evaluation (datasets, synthetic data, gold set, metrics), integration |
 | **Vansh Borkar** ([@VanshBorkar](https://github.com/VanshBorkar)) | DistilBERT two-head classifier, attention rollout, TF-IDF baseline |
-| *Rugveda Patil* | Flan-T5 generator training |
+| **Rugveda Patil** | Flan-T5 generator training |
 | **Aaryan Patil & Atharva Talekar** ([@Aaryan0802](https://github.com/Aaryan0802)) | Backend: FastAPI service and supporting services |
 | **Agastya Singh** | Streamlit dashboard |
 
