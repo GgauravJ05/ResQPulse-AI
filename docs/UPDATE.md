@@ -17,6 +17,11 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · Pre-demo check; report box keeps its text only through its key (PR #41)
+**Who:** Data lead · **Area:** UI
+- Full browser check against the live models before the demo: all 9 samples, alert card, heatmap, voice upload and correction, duplicate flag, queue sorting, Confirm / Dispatch / Dismiss / Open alert, metrics page, sidebar collapse and reopen, and the HTTPS copy for phones. All pass; 52 tests pass.
+- The report text box no longer gets both `value=` and a `key`; it is seeded once and then kept by its key. Not a user-visible bug (the backend always received the edited text), but one source of truth is safer.
+
 ## 2026-10-17 · Speaking script for the presenter's part (PR #40)
 **Who:** Data lead · **Area:** Docs
 - Added `docs/SCRIPT_MY_PART.md`: timed script for tech stack, system architecture, one report's journey, model metrics and the live demo, with likely questions and a numbers table.

@@ -208,9 +208,12 @@ if screen == "Report Input":
             '<div class="warn"><b>Check the transcript.</b> Speech recognition was not confident on this audio. Fix any misheard words before analysing.</div>',
             unsafe_allow_html=True,
         )
+    # The box keeps its text only through its key. Passing value= as well made an edit followed straight away by a
+    # click on Analyze send the previous text, because value= overrode the edit on that run.
+    if "main_report_text_area" not in st.session_state:
+        st.session_state.main_report_text_area = st.session_state.current_report_text
     report_input = st.text_area(
         label="Type, paste or correct the transcript",
-        value=st.session_state.current_report_text,
         height=140,
         max_chars=2200,
         help="Max 2,000 characters allowed per API schema.",
