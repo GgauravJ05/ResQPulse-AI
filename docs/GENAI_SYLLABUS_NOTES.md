@@ -6,6 +6,113 @@ The syllabus image showed Units 1–5; if there is a Unit 6, add it here.
 
 ---
 
+## Syllabus terms used in ResQPulse (with where to point)
+
+Every term below is something the project **actually does**. The exact values come from `scripts/train_classifier.py`
+(as run in `notebooks/classifier-notebook.ipynb`), `notebooks/flan-t5-train.ipynb`, `src/models/` and `scripts/`.
+Use the "Where" column if an examiner asks you to show it.
+
+### Unit 1: Neural network basics
+
+| Term | How ResQPulse uses it | Where |
+|---|---|---|
+| **Artificial neural network** | All three models (DistilBERT, Flan-T5, Whisper) are deep neural networks | `src/models/`, `src/asr/` |
+| **Deep learning revolution** (data + GPUs + pre-training) | Trained on free **Kaggle T4 GPUs**; started from models pre-trained on huge corpora | Kaggle notebooks |
+| **Transfer learning** | Fine-tuned pre-trained `distilbert-base-uncased` and `google/flan-t5-base` on our 9,551 rows | `notebooks/` |
+| **Fine-tuning vs feature extraction** | **Full fine-tuning**: all DistilBERT and Flan-T5 weights were updated, nothing frozen | `train_classifier.py` |
+| **Zero-shot use of a pre-trained model** | Whisper small.en used **as is**, not trained by us | `src/asr/whisper.py` |
+| **Neuron, weights, bias** | Our two heads are linear layers `W·x + b` on top of DistilBERT | `src/models/two_head.py` |
+| **Activation functions** | **Softmax** (type probabilities), **sigmoid** (severity squashed to 0–1, then scaled to 1–5), **GELU** inside DistilBERT, **gated-GELU** in Flan-T5's feed-forward layers | `two_head.py` |
+| **Steps in training** | Clean data → split train/val/test → tokenise → forward pass → loss → backprop → AdamW update → evaluate each epoch → test on held-out sets | `train_classifier.py` |
+| **Train / validation / test split** | Train 9,551; val for monitoring; tests: 107 synthetic, 7,755 real tweets, 144-report gold set | `scripts/make_splits.py` |
+| **Loss function: cross-entropy** | Incident-type head (8 classes); Flan-T5 token-level cross-entropy | `two_head.py`, Flan notebook |
+| **Loss function: MSE** | Severity head, **masked** so rows without a severity label add zero | `two_head_loss()` |
+| **Multi-task learning** (two heads, one body) | One DistilBERT encoder feeds both the type head and the severity head; loss = CE + MSE | `two_head.py` |
+| **Optimiser: AdamW** | `torch.optim.AdamW` for DistilBERT; the Seq2Seq trainer's AdamW for Flan-T5 | both |
+| **Learning rate** | 2e-5 (DistilBERT), 1e-4 (Flan-T5) | both |
+| **Learning-rate warmup + linear decay** | 6% warmup then linear decay (DistilBERT); 10 warmup steps (Flan-T5) | `get_linear_schedule_with_warmup` |
+| **Weight decay (L2 regularisation)** | 0.01, not applied to biases and LayerNorm weights | both |
+| **Dropout** | 0.1 on the [CLS] vector before the heads | `two_head.py` |
+| **Epochs** | 3 (DistilBERT), 5 (Flan-T5) | both |
+| **Batch size, gradient accumulation** | 32 (DistilBERT); 4 × 4 accumulation = effective 16 (Flan-T5) | both |
+| **Gradient clipping** (against exploding gradients) | Max norm 1.0 | `train_classifier.py` |
+| **Mixed precision (fp16)** | Used on GPU for DistilBERT; Flan-T5 kept in **fp32** because T5 is unstable in fp16 | both |
+| **Random seed** (reproducibility) | 42 everywhere | both |
+| **Parameters** | About 66M (DistilBERT) + our heads; about 250M (Flan-T5); about 244M (Whisper small) | — |
+| **Hyperparameters** | Learning rate, epochs, batch size, max length (128 / 256 / 160 tokens), warmup, weight decay, dropout, beam size (4, retry 6), logistic-regression C (tuned on validation), duplicate threshold 0.75, 4× repeat of synthetic rows, 1,200-per-class cap | — |
+| **Hyperparameter tuning on a validation set** | Baseline's regularisation strength C chosen by validation macro-F1 | `scripts/baseline_tfidf_lr.py` |
+| **Backpropagation** | PyTorch autograd computes every gradient (`loss.backward()`) | `train_classifier.py` |
+| **Overfitting control** | Dropout, weight decay, few epochs, a separate gold set never used for training or tuning | — |
+
+### Unit 2: Foundational architectures
+
+| Term | How ResQPulse uses it | Where |
+|---|---|---|
+| **MLP / fully connected layers** | Type head (768 → 8) and severity head (768 → 1); the feed-forward block in every Transformer layer is a 2-layer MLP | `two_head.py` |
+| **RNN (why not)** | We chose a Transformer over an RNN/LSTM because it is parallel, handles long-range context, and comes pre-trained | Design choice |
+| **Linear baseline** (comparison model) | TF-IDF (word 1–2-grams + character 2–5-grams) + logistic regression, to prove the network adds value | `scripts/baseline_tfidf_lr.py` |
+
+### Unit 3: Advanced and generative AI
+
+| Term | How ResQPulse uses it | Where |
+|---|---|---|
+| **Generative AI model** | **Flan-T5 generates** the alert fields and summary as text; **Whisper generates** a transcript from audio | `src/models/generator.py` |
+| **Discriminative vs generative** | DistilBERT is discriminative (classifies); Flan-T5 and Whisper are generative | — |
+| **Generative AI for data augmentation / synthetic data** | Claude (a generative LLM) wrote the **710 call-style training reports** and pre-labelled the gold set (offline, never at run time) | `data/`, `scripts/validate_synthetic.py` |
+| **Encoder-decoder architecture** | Flan-T5 and Whisper are encoder-decoders | — |
+| **Residual (skip) connections** | Inside every Transformer layer; also added in **attention rollout** | DistilBERT, `src/models/classifier.py` |
+
+### Unit 4: Encoders, Transformers and attention (the core)
+
+| Term | How ResQPulse uses it | Where |
+|---|---|---|
+| **Transformer** | All three models are Transformers | — |
+| **Encoder-only Transformer** | DistilBERT (6 layers, 12 heads, hidden size 768) | classifier |
+| **Encoder-decoder Transformer** | Flan-T5-base and Whisper | generator, ASR |
+| **Self-attention, Q/K/V, softmax(QKᵀ/√dₖ)V** | Inside every DistilBERT layer; we read its attention weights with `output_attentions=True` | `src/models/classifier.py` |
+| **Multi-head attention** | 12 heads per layer in DistilBERT; heads are averaged before rollout | `attention_rollout()` |
+| **Cross-attention** | Flan-T5's decoder attends to the report; Whisper's decoder attends to the audio | — |
+| **Masked (causal) attention** | Flan-T5 and Whisper decoders generate one token at a time, seeing only earlier tokens | — |
+| **Attention rollout (explainability)** | Attention multiplied across all 6 layers, with the identity added for the residual, to get each word's influence on [CLS]; shown as the **yellow heatmap** | `attention_rollout()`, Attention Heatmap screen |
+| **[CLS] token representation** | The [CLS] vector from the last layer feeds both heads | `two_head.py` |
+| **Positional embeddings** | Learned in DistilBERT; relative position biases in T5 | — |
+| **Layer normalisation** | In every Transformer block; excluded from weight decay | `train_classifier.py` |
+| **Tokenisation (subwords)** | WordPiece (DistilBERT), SentencePiece (T5); **word pieces merged back into words** for the heatmap | `words_with_scores()` |
+| **Truncation / max sequence length** | 128 tokens (DistilBERT), 256 input + 160 output (Flan-T5) | both |
+| **Knowledge distillation** | DistilBERT itself is a distilled BERT (about 40% smaller, 60% faster) | — |
+| **Instruction tuning** | Flan-T5 is T5 instruction-tuned by Google; we added a task prefix `extract alert:` | `src/data/flan.py` |
+| **Seq2seq fine-tuning, teacher forcing** | Flan-T5 trained with `Seq2SeqTrainer` on input → target pairs | Flan notebook |
+| **Decoding: beam search** | 4 beams, retried with 6 if the output is incomplete | `generator.py` |
+| **Structured output from a generator** | Flat `key: value \| …` format (T5 has no `{}` tokens), parsed to JSON, with a rule fallback | `src/data/flan.py`, `generator.py` |
+| **Sentence embeddings (encoder output as a vector)** | `all-MiniLM-L6-v2` turns each report into a vector; cosine similarity > 0.75 = possible duplicate | `src/services/deduplication.py` |
+
+### Unit 5: Python and data for generative AI
+
+| Term | How ResQPulse uses it | Where |
+|---|---|---|
+| **Python ML stack** | Python 3, NumPy, Pandas, scikit-learn, **PyTorch**, Hugging Face Transformers, FastAPI, Streamlit | `requirements.txt` |
+| **Preprocessing and cleaning text** | Strip URLs, @mentions, leading RT and `#`; unescape HTML; collapse spaces; map labels to a fixed schema; drop too-short rows | `src/data/clean.py`, `scripts/build_public.py` |
+| **De-duplication and data leakage** | Duplicate tweets (retweets, copies) dropped after normalising, keeping the training copy, so no test tweet also appears in training | `scripts/build_public.py` |
+| **Class imbalance handling** | Cap of 1,200 per class; synthetic rows repeated 4× | `make_splits.py` |
+| **Data validation** | Every phrase a synthetic report claims must appear word for word (710 of 711 kept) | `scripts/validate_synthetic.py` |
+| **Audio preprocessing** | ffmpeg decode (via pydub), resample to 16 kHz mono, voice-activity detection (min silence 500 ms) | `src/asr/whisper.py` |
+| **Quantisation** | Whisper run in **int8** for fast CPU inference | `src/asr/whisper.py` |
+| **Visualising data and results** | Confusion matrices, class-count tables, attention heatmap, metrics screen | `reports/`, dashboard |
+| **Eager execution** | PyTorch runs eagerly (like TF2's default), with `torch.no_grad()` for inference | `src/models/` |
+| **Evaluation metrics** | Precision, recall, F1 (macro), accuracy, MSE, RMSE, MAE, ROUGE-L, word error rate | `src/eval/metrics.py`, `scripts/evaluate.py` |
+
+### Syllabus terms we did *not* use (and the one-line answer)
+
+| Term | Honest answer |
+|---|---|
+| **CNN** | Not used; our input is text and audio sequences, where Transformers are stronger. Whisper's encoder does begin with two small convolution layers over the audio spectrogram. |
+| **RNN / LSTM** | Not used; replaced by Transformers for parallelism and long-range context. |
+| **GAN** | Not used; we generated synthetic text with an LLM instead. A conditional GAN could generate rare-class reports in future. |
+| **VAE** | Not used; a VAE's reconstruction error could flag unusual reports (anomaly detection) as future work. |
+| **TensorFlow 2 / Keras** | We used **PyTorch**, which plays the same role: eager tensors, autograd ≈ GradientTape, `DataLoader` ≈ `tf.data`, `torch.compile` ≈ `tf.function`. |
+
+---
+
 ## Unit 1: Introduction to Neural Networks
 
 ### 1.1 History (know the timeline)
@@ -286,7 +393,7 @@ def train_step(x, y):
 - **Audio:** resample (Whisper uses 16 kHz mono), trim silence (voice-activity detection), normalise volume.
 - **Labels:** a clear schema, consistent mapping, a validation script, and a human-checked test set.
 - **In ResQPulse:**
-  - Cleaned tweets and de-duplicated across splits.
+  - Cleaned tweets and removed duplicates, keeping the training copy so nothing leaks into the test sets.
   - Capped at 1,200 per class.
   - Repeated the 497 synthetic reports 4 times so the real tweets wouldn't drown them out.
   - A validator rejected generated reports whose extracted phrases weren't verbatim in the text.

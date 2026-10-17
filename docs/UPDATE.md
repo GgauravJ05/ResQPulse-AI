@@ -17,6 +17,10 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-17 · Syllabus terms used in the project (PR #37)
+**Who:** Data lead · **Area:** Docs
+- Added a "Syllabus terms used in ResQPulse" section to `docs/GENAI_SYLLABUS_NOTES.md`: every course term the project uses, unit by unit, with exact values (learning rates, epochs, batch sizes, max lengths, warmup, weight decay, dropout, gradient clipping, beams) checked against the training code and notebooks, where to point in the repo, and an honest list of syllabus terms not used.
+
 ## 2026-10-17 · Microphone for other devices via HTTPS (PR #36)
 **Who:** Data lead · **Area:** Docs, Repo
 - Browsers block the microphone on plain `http://` from another device. Documented running a second dashboard over HTTPS with a self-signed certificate (EVALUATION_PREP.md, section 11); `certs/` is git-ignored so the key is never committed. Checked: the HTTPS page is a secure context with the microphone API available; the HTTP one is not.
