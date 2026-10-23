@@ -566,7 +566,7 @@ Updated with every merged change. The full history is in [UPDATE.md](UPDATE.md).
 | Streamlit dashboard | FE | ✅ Built and verified against the real backend (5 screens, live and mock modes, heatmap, map, queue, metrics) | Starts in Live mode if the API answers; try the microphone once by hand |
 | Evaluation + metrics.json | ML1 | ✅ Scored on real ML2 + baseline + ML3 predictions; rerun if any file is resent | `reports/results.md`; slide 6 filled in |
 | Slides + backup video | FE + all | ⏳ Not started | |
-| Public Kaggle release | ML1 | ✅ Version 5 published with the full card, usability 10.00 | Old versions 1–4 (with tweet text) still in the history; see [KAGGLE_DATACARD.md](KAGGLE_DATACARD.md) §0 |
+| Public Kaggle release | ML1 | ✅ Version 5 published with the full card, usability 10.00 | Old versions 1–4 (with tweet text) blocked (latest-only access); Kaggle's public view still pointed at v4 on 2026-10-23, see [KAGGLE_DATACARD.md](KAGGLE_DATACARD.md) §0 |
 
 **Changes from the original plan** (record every change here, because judges like to hear *why* a plan changed):
 

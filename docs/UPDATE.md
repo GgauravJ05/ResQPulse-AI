@@ -17,6 +17,15 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-23 · Kaggle: only the latest version is accessible (PR #46)
+**Who:** Data lead · **Area:** Data
+- Dataset Settings → Version Access set to **Only Latest Version Accessible**, so versions 1–4 (which contained tweet
+  text) are no longer public. Nothing was deleted; the owner can switch it back.
+- Checked logged out: `/versions/4` is a 404 page; downloads of versions 1–4 return 404 and old files 403; version 5
+  downloads exactly the 7 public-release files.
+- Open: Kaggle's public "current version" still points at version 4, so the logged-out page shows the old title and
+  file names (no preview) and the unversioned download returns 403 until Kaggle moves it to version 5.
+
 ## 2026-10-23 · Kaggle version 5: public release published (PR #45)
 **Who:** Data lead · **Area:** Data, Docs
 - Uploaded version 5 on kaggle.com with exactly the 7 files from `make public-dataset`; none of the old files (with

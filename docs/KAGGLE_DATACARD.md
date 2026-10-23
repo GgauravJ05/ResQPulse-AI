@@ -20,8 +20,8 @@ terms do not allow redistributing.
 | Version 5 = exactly the 7 files in `dist/kaggle/`; none of the old files carried over | ✅ Done (uploaded on the website) |
 | Licence MIT → CC BY 4.0; update frequency → Never | ✅ Done |
 | Title, subtitle, description, 5 tags, provenance, all 7 file and 40 column descriptions | ✅ Done; usability 10.00 |
-| Public "current version" pointer | ⏳ Kaggle's public API and logged-out page still showed version 4 about 15 minutes after version 5 was Ready. Recheck with `kaggle datasets files ggauravj05/resqpulse-data` |
-| Versions 1–4 (with tweet text) | ⚠️ Still downloadable from the version history. Settings → Version Access, or deleting old versions, is the owner's call |
+| Public "current version" pointer | ⏳ About 30 minutes after version 5 was Ready, the public API and logged-out page still pointed at version 4 (old title and file names, no preview). Since version 4 is now blocked, the unversioned download returns 403 until the pointer moves. Recheck with `kaggle datasets files ggauravj05/resqpulse-data`; if it is still stuck after a day, upload an unchanged version 6 or contact Kaggle support |
+| Versions 1–4 (with tweet text) | ✅ Settings → Version Access = Only Latest Version Accessible. Checked logged out: `/versions/4` is a 404 page, version 1–4 downloads return 404, old files return 403, version 5 downloads the 7 clean files |
 | Teammates' notebooks (`vanshborkar30/classifier-notebook`, `rugvedas/flan-t5-train`) | ⚠️ They read the old file names; tell them to pin version 4 privately or rebuild from the sources |
 | Starter notebook from the owner's account | Not done |
 | GitHub repo public, so the description's rebuild links work | Not done: repo is private |
