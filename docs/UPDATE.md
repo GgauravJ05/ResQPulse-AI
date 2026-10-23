@@ -17,6 +17,15 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-23 · One-command Kaggle release from the Data Card (PR #44)
+**Who:** Data lead · **Area:** Data, Repo
+- `scripts/make_kaggle_metadata.py` turns `docs/KAGGLE_DATACARD.md` into `dist/kaggle/dataset-metadata.json`: title,
+  subtitle, description, CC BY 4.0 licence, tags, and descriptions for all 7 files and 40 columns. It fails if a file
+  in the release has no description in the card. Every column list was checked against the real CSV headers.
+- `make kaggle-metadata` and `make kaggle-release` (new version + metadata update through the Kaggle CLI). The card
+  stays the single source of truth.
+- Not run against Kaggle yet: this machine has no Kaggle CLI or API token. Setup steps are in the card.
+
 ## 2026-10-23 · Kaggle Data Card for the public release (PR #43)
 **Who:** Data lead · **Area:** Data, Docs
 - Added `docs/KAGGLE_DATACARD.md`: paste-ready title, subtitle, description, tags, file and column descriptions for all

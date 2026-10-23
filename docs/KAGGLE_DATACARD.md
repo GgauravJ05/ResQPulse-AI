@@ -17,7 +17,7 @@ update frequency, no notebook by the owner). Filling in everything below should 
 Disaster Tweets posts. CREDITS.md and the README already say those sources' terms do not allow redistributing tweet
 text, and the README says the Kaggle release has tweet labels by ID only. The page currently contradicts both.
 
-1. `make public-dataset`, then upload a **new version** with exactly the 7 files in `dist/kaggle/`. A new version
+1. Upload a **new version** with exactly the 7 files in `dist/kaggle/` (`make kaggle-release`, below). A new version
    replaces the file list, so the old files leave the current version.
 2. Older versions stay downloadable from the version history. Check whether Kaggle lets you delete them; if not,
    consider deleting the dataset and recreating it at the same slug.
@@ -27,6 +27,19 @@ text, and the README says the Kaggle release has tweet labels by ID only. The pa
    Also add a public starter notebook from this account: it counts toward the usability score.
 5. **The GitHub repo is private** (checked 2026-10-23). The description points readers to it for the rebuild scripts
    and the schema, so make it public first, or remove those links until it is.
+
+### Publishing with one command
+
+`make kaggle-release` rebuilds `dist/kaggle/`, writes `dataset-metadata.json` from this card
+(`scripts/make_kaggle_metadata.py`: title, subtitle, description, licence, tags, and every file and column description),
+uploads the files as a new version and pushes the metadata. One-time setup:
+
+1. `pip install kaggle`
+2. kaggle.com → Settings → API → **Create New Token**, and save the downloaded `kaggle.json` to `~/.kaggle/`
+   (`chmod 600 ~/.kaggle/kaggle.json`).
+
+Edit this card, not the JSON: the JSON is regenerated on every release. Set the cover image, expected update frequency
+and provenance (§1, §5) on the website once, since Kaggle's metadata file has no fields for them.
 
 ---
 

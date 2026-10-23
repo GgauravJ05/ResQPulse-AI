@@ -566,7 +566,7 @@ Updated with every merged change. The full history is in [UPDATE.md](UPDATE.md).
 | Streamlit dashboard | FE | ✅ Built and verified against the real backend (5 screens, live and mock modes, heatmap, map, queue, metrics) | Starts in Live mode if the API answers; try the microphone once by hand |
 | Evaluation + metrics.json | ML1 | ✅ Scored on real ML2 + baseline + ML3 predictions; rerun if any file is resent | `reports/results.md`; slide 6 filled in |
 | Slides + backup video | FE + all | ⏳ Not started | |
-| Public Kaggle release | ML1 | ⚠️ Data Card drafted ([KAGGLE_DATACARD.md](KAGGLE_DATACARD.md)); Kaggle still serves the old build with tweet text | Upload `dist/kaggle/` as a new version, licence → CC BY 4.0 |
+| Public Kaggle release | ML1 | ⚠️ Data Card drafted ([KAGGLE_DATACARD.md](KAGGLE_DATACARD.md)); Kaggle still serves the old build with tweet text | `make kaggle-release` uploads `dist/kaggle/` with the card's metadata (needs a Kaggle API token); not run yet |
 
 **Changes from the original plan** (record every change here, because judges like to hear *why* a plan changed):
 

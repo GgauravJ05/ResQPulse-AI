@@ -1,7 +1,7 @@
 # ResQPulse AI: common commands. Run from the repo root with the virtual environment active.
 PY ?= python
 
-.PHONY: help install api api-fake ui test eval data gold public-dataset
+.PHONY: help install api api-fake ui test eval data gold public-dataset kaggle-metadata kaggle-release
 
 help:            ## list commands
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-16s %s\n", $$1, $$2}'
@@ -34,3 +34,10 @@ eval:            ## score every prediction file in predictions/ and write report
 
 public-dataset:  ## build the redistributable dataset release in dist/kaggle/
 	$(PY) scripts/make_public_dataset.py
+
+kaggle-metadata: public-dataset  ## write dist/kaggle/dataset-metadata.json from docs/KAGGLE_DATACARD.md
+	$(PY) scripts/make_kaggle_metadata.py
+
+kaggle-release: kaggle-metadata  ## upload dist/kaggle/ as a new Kaggle version (needs the kaggle CLI + API token); MSG="..."
+	kaggle datasets version -p dist/kaggle -m "$(or $(MSG),Update from docs/KAGGLE_DATACARD.md)"
+	kaggle datasets metadata --update -p dist/kaggle ggauravj05/resqpulse-data
