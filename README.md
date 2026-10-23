@@ -155,7 +155,8 @@ No public dataset of emergency calls with these labels exists, so we built one.
 
 **Kaggle:** the public release (synthetic reports, generator pairs, and tweet labels by ID) is at
 [kaggle.com/datasets/ggauravj05/resqpulse-data](https://www.kaggle.com/datasets/ggauravj05/resqpulse-data). Build it
-yourself with `make public-dataset`.
+yourself with `make public-dataset`; the Kaggle page text lives in [docs/KAGGLE_DATACARD.md](docs/KAGGLE_DATACARD.md), and
+`make kaggle-release` uploads the release with that text.
 
 **Rebuild everything from the sources:**
 1. Download into `data/raw/`: HumAID events set 1 → `data/raw/events_set1/`, CrisisLexT26 → `data/raw/CrisisLexT26/`, Kaggle `train.csv` → `data/raw/kaggle_disaster/` (links and exact layout in [docs/DATASETS.md](docs/DATASETS.md)).

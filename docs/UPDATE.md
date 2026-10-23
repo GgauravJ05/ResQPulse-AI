@@ -17,6 +17,52 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-23 · Kaggle card links to the public repo (PR #47)
+**Who:** Data lead · **Area:** Docs, Data
+- The repo is open-sourced as [GgauravJ05/ResQPulse-AI](https://github.com/GgauravJ05/ResQPulse-AI). The Data Card's
+  description, citation and provenance linked to the private `ResQPulse_AI`; they now link to the public repo, and the
+  Kaggle page was updated to match.
+- Card authors and citation now list the whole team as in the README (adds Rugveda Patil, Aaryan Patil, Atharva Talekar).
+- The Kaggle commits (Data Card, metadata script, release records) were ported to the public repo.
+
+## 2026-10-23 · Kaggle: only the latest version is accessible (PR #46)
+**Who:** Data lead · **Area:** Data
+- Dataset Settings → Version Access set to **Only Latest Version Accessible**, so versions 1–4 (which contained tweet
+  text) are no longer public. Nothing was deleted; the owner can switch it back.
+- Checked logged out: `/versions/4` is a 404 page; downloads of versions 1–4 return 404 and old files 403; version 5
+  downloads exactly the 7 public-release files.
+- Open: Kaggle's public "current version" still points at version 4, so the logged-out page shows the old title and
+  file names (no preview) and the unversioned download returns 403 until Kaggle moves it to version 5.
+
+## 2026-10-23 · Kaggle version 5: public release published (PR #45)
+**Who:** Data lead · **Area:** Data, Docs
+- Uploaded version 5 on kaggle.com with exactly the 7 files from `make public-dataset`; none of the old files (with
+  tweet text) carried over. Licence MIT → CC BY 4.0, update frequency → Never, new title and subtitle, the card's
+  description, 5 tags (Kaggle's maximum), provenance, and all 7 file and 40 column descriptions.
+- Usability 4.71 → **10.00**.
+- Done in the browser, not with `make kaggle-release`: no Kaggle API token was available.
+- Open: Kaggle's public view still pointed at version 4 about 15 minutes later; versions 1–4 remain in the history;
+  teammates' notebooks read the old files. Status table in `docs/KAGGLE_DATACARD.md` §0.
+
+## 2026-10-23 · One-command Kaggle release from the Data Card (PR #44)
+**Who:** Data lead · **Area:** Data, Repo
+- `scripts/make_kaggle_metadata.py` turns `docs/KAGGLE_DATACARD.md` into `dist/kaggle/dataset-metadata.json`: title,
+  subtitle, description, CC BY 4.0 licence, tags, and descriptions for all 7 files and 40 columns. It fails if a file
+  in the release has no description in the card. Every column list was checked against the real CSV headers.
+- `make kaggle-metadata` and `make kaggle-release` (new version + metadata update through the Kaggle CLI). The card
+  stays the single source of truth.
+- Not run against Kaggle yet: this machine has no Kaggle CLI or API token. Setup steps are in the card.
+
+## 2026-10-23 · Kaggle Data Card for the public release (PR #43)
+**Who:** Data lead · **Area:** Data, Docs
+- Added `docs/KAGGLE_DATACARD.md`: paste-ready title, subtitle, description, tags, file and column descriptions for all
+  7 files, provenance and collection methodology, written for the `make public-dataset` build.
+- **Found while auditing the Kaggle page:** version 4 on Kaggle is the old internal build (`train.csv`, `test_public.csv`,
+  `gold_inputs.csv`, …), which includes tweet text, and its licence is set to MIT instead of CC BY 4.0. The card's §0
+  lists the fix: upload `dist/kaggle/` as a new version, switch the licence, warn the teammates whose notebooks read
+  the old files. The GitHub repo is also still private, so the card's rebuild links will not work until it is public.
+- Usability score before: 4.71 / 10.
+
 ## 2026-10-17 · Public release preparation (PR #42)
 **Who:** Data lead · **Area:** Repo, Data, Docs
 - **Tweet text removed from the repo.** The source datasets' terms do not allow redistributing it. `data/gold/` now holds only our labels (`gold_labels.csv`, `gold_audit_labels.csv`); `scripts/rehydrate_gold.py` rebuilds the full gold files from the public test split by ID (verified identical). The error analysis shows real tweets by ID only.
