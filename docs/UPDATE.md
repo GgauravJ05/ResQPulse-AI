@@ -17,6 +17,12 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-23 · README team table matches the public repo (PR #48)
+**Who:** Data lead · **Area:** Docs
+- README team table now names the whole team, as in the public repo: Rugveda Patil (Flan-T5 generator), and Aaryan
+  Patil & Atharva Talekar (backend). The two repos now hold the same files.
+- `CITATION.cff` still lists four authors; update it if everyone should be cited.
+
 ## 2026-10-23 · Kaggle card links to the public repo (PR #47)
 **Who:** Data lead · **Area:** Docs, Data
 - The repo is open-sourced as [GgauravJ05/ResQPulse-AI](https://github.com/GgauravJ05/ResQPulse-AI). The Data Card's
