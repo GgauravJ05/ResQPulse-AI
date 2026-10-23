@@ -17,6 +17,16 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-23 · Kaggle version 5: public release published (PR #45)
+**Who:** Data lead · **Area:** Data, Docs
+- Uploaded version 5 on kaggle.com with exactly the 7 files from `make public-dataset`; none of the old files (with
+  tweet text) carried over. Licence MIT → CC BY 4.0, update frequency → Never, new title and subtitle, the card's
+  description, 5 tags (Kaggle's maximum), provenance, and all 7 file and 40 column descriptions.
+- Usability 4.71 → **10.00**.
+- Done in the browser, not with `make kaggle-release`: no Kaggle API token was available.
+- Open: Kaggle's public view still pointed at version 4 about 15 minutes later; versions 1–4 remain in the history;
+  teammates' notebooks read the old files. Status table in `docs/KAGGLE_DATACARD.md` §0.
+
 ## 2026-10-23 · One-command Kaggle release from the Data Card (PR #44)
 **Who:** Data lead · **Area:** Data, Repo
 - `scripts/make_kaggle_metadata.py` turns `docs/KAGGLE_DATACARD.md` into `dist/kaggle/dataset-metadata.json`: title,

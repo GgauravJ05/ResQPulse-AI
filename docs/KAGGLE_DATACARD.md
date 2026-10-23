@@ -5,28 +5,27 @@ Paste-ready text for every field of the Kaggle dataset page
 It describes the **public release** built by `make public-dataset` (`dist/kaggle/`, 7 files). Counts were taken from
 that build on 2026-10-23.
 
-Usability on 2026-10-23: **4.71 / 10** (no description, no file or column descriptions, no tags, no provenance, no
-update frequency, no notebook by the owner). Filling in everything below should take it to 9–10.
+Usability: **4.71 / 10** before this card; **10.00 / 10** after version 5 and the card were published on 2026-10-23.
 
 ---
 
-## 0. Fix before publishing the card
+## 0. Release status (2026-10-23)
 
-**Version 4 on Kaggle is the internal build, not the public release.** It holds `train.csv`, `val.csv`,
-`test_public.csv`, `test_synth.csv` and `gold_inputs.csv`, which include the text of HumAID, CrisisLexT26 and Kaggle
-Disaster Tweets posts. CREDITS.md and the README already say those sources' terms do not allow redistributing tweet
-text, and the README says the Kaggle release has tweet labels by ID only. The page currently contradicts both.
+Version 4 on Kaggle was the internal build: `train.csv`, `val.csv`, `test_public.csv`, `test_synth.csv` and
+`gold_inputs.csv` included the text of HumAID, CrisisLexT26 and Kaggle Disaster Tweets posts, which those sources'
+terms do not allow redistributing.
 
-1. Upload a **new version** with exactly the 7 files in `dist/kaggle/` (`make kaggle-release`, below). A new version
-   replaces the file list, so the old files leave the current version.
-2. Older versions stay downloadable from the version history. Check whether Kaggle lets you delete them; if not,
-   consider deleting the dataset and recreating it at the same slug.
-3. **Licence:** the page says MIT. The data is ours under **CC BY 4.0** (see CREDITS.md); MIT is for the code. Change it.
-4. The teammates' notebooks (`vanshborkar30/classifier-notebook`, `rugvedas/flan-t5-train`) read the old file names.
-   Tell them before uploading so they can pin version 4 privately or switch to rebuilding the data from the sources.
-   Also add a public starter notebook from this account: it counts toward the usability score.
-5. **The GitHub repo is private** (checked 2026-10-23). The description points readers to it for the rebuild scripts
-   and the schema, so make it public first, or remove those links until it is.
+| Step | Status |
+|---|---|
+| Version 5 = exactly the 7 files in `dist/kaggle/`; none of the old files carried over | ✅ Done (uploaded on the website) |
+| Licence MIT → CC BY 4.0; update frequency → Never | ✅ Done |
+| Title, subtitle, description, 5 tags, provenance, all 7 file and 40 column descriptions | ✅ Done; usability 10.00 |
+| Public "current version" pointer | ⏳ Kaggle's public API and logged-out page still showed version 4 about 15 minutes after version 5 was Ready. Recheck with `kaggle datasets files ggauravj05/resqpulse-data` |
+| Versions 1–4 (with tweet text) | ⚠️ Still downloadable from the version history. Settings → Version Access, or deleting old versions, is the owner's call |
+| Teammates' notebooks (`vanshborkar30/classifier-notebook`, `rugvedas/flan-t5-train`) | ⚠️ They read the old file names; tell them to pin version 4 privately or rebuild from the sources |
+| Starter notebook from the owner's account | Not done |
+| GitHub repo public, so the description's rebuild links work | Not done: repo is private |
+| Authors and coverage in the Metadata panel | Not filled (they don't count toward usability); values in §5 |
 
 ### Publishing with one command
 
@@ -52,10 +51,9 @@ and provenance (§1, §5) on the website once, since Kaggle's metadata file has 
 | **Licence** | CC BY 4.0 (Attribution 4.0 International) |
 | **Expected update frequency** | Never (fixed release; new versions only for label fixes) |
 | **Cover image** | `docs/architecture_diagram.png` cropped to 1200×630 (Kaggle's image size), or a clean shot of one alert card from the dashboard |
-| **Tags** | NLP, Text Classification, Text Generation, Natural Disasters, Public Safety, India, Health, Tabular |
+| **Tags** | NLP, Text Classification, Text-To-Text Generation, Natural Disasters, India |
 
-Kaggle only accepts tags from its picker. If one of these is missing, use the closest match (for example
-"Classification" instead of "Text Classification").
+Kaggle allows at most 5 tags, chosen from its picker.
 
 ---
 
