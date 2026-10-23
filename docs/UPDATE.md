@@ -17,6 +17,16 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-23 · Kaggle Data Card for the public release (PR #43)
+**Who:** Data lead · **Area:** Data, Docs
+- Added `docs/KAGGLE_DATACARD.md`: paste-ready title, subtitle, description, tags, file and column descriptions for all
+  7 files, provenance and collection methodology, written for the `make public-dataset` build.
+- **Found while auditing the Kaggle page:** version 4 on Kaggle is the old internal build (`train.csv`, `test_public.csv`,
+  `gold_inputs.csv`, …), which includes tweet text, and its licence is set to MIT instead of CC BY 4.0. The card's §0
+  lists the fix: upload `dist/kaggle/` as a new version, switch the licence, warn the teammates whose notebooks read
+  the old files. The GitHub repo is also still private, so the card's rebuild links will not work until it is public.
+- Usability score before: 4.71 / 10.
+
 ## 2026-10-17 · Public release preparation (PR #42)
 **Who:** Data lead · **Area:** Repo, Data, Docs
 - **Tweet text removed from the repo.** The source datasets' terms do not allow redistributing it. `data/gold/` now holds only our labels (`gold_labels.csv`, `gold_audit_labels.csv`); `scripts/rehydrate_gold.py` rebuilds the full gold files from the public test split by ID (verified identical). The error analysis shows real tweets by ID only.
