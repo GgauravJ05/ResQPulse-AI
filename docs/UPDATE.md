@@ -17,6 +17,14 @@ change**, then update the status table in [RESEARCH_BRIEF.md §16](RESEARCH_BRIE
 
 ---
 
+## 2026-10-23 · Kaggle card links to the public repo (PR #47)
+**Who:** Data lead · **Area:** Docs, Data
+- The repo is open-sourced as [GgauravJ05/ResQPulse-AI](https://github.com/GgauravJ05/ResQPulse-AI). The Data Card's
+  description, citation and provenance linked to the private `ResQPulse_AI`; they now link to the public repo, and the
+  Kaggle page was updated to match.
+- Card authors and citation now list the whole team as in the README (adds Rugveda Patil, Aaryan Patil, Atharva Talekar).
+- The Kaggle commits (Data Card, metadata script, release records) were ported to the public repo.
+
 ## 2026-10-23 · Kaggle: only the latest version is accessible (PR #46)
 **Who:** Data lead · **Area:** Data
 - Dataset Settings → Version Access set to **Only Latest Version Accessible**, so versions 1–4 (which contained tweet

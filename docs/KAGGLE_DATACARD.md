@@ -24,7 +24,7 @@ terms do not allow redistributing.
 | Versions 1–4 (with tweet text) | ✅ Settings → Version Access = Only Latest Version Accessible. Checked logged out: `/versions/4` is a 404 page, version 1–4 downloads return 404, old files return 403, version 5 downloads the 7 clean files |
 | Teammates' notebooks (`vanshborkar30/classifier-notebook`, `rugvedas/flan-t5-train`) | ⚠️ They read the old file names; tell them to pin version 4 privately or rebuild from the sources |
 | Starter notebook from the owner's account | Not done |
-| GitHub repo public, so the description's rebuild links work | Not done: repo is private |
+| Description and provenance link to the public repo ([GgauravJ05/ResQPulse-AI](https://github.com/GgauravJ05/ResQPulse-AI)) | ✅ Done |
 | Authors and coverage in the Metadata panel | Not filled (they don't count toward usability); values in §5 |
 
 ### Publishing with one command
@@ -65,7 +65,7 @@ emergency report (a call transcript, SMS or WhatsApp message) and output an inci
 and the key facts a dispatcher needs: location, people affected, injuries and hazards.
 
 No public dataset of emergency calls with these labels exists, so we built one for **ResQPulse AI**
-([GitHub](https://github.com/GgauravJ05/ResQPulse_AI)), made at the GenHack v1.0 Gen AI hackathon.
+([GitHub](https://github.com/GgauravJ05/ResQPulse-AI)), made at the GenHack v1.0 Gen AI hackathon.
 
 ### What's inside
 
@@ -140,8 +140,8 @@ Incident type, macro F1, TF-IDF + logistic regression → DistilBERT:
 
 ### Citation
 
-Jadhav, G., Borkar, V., Aaryan, Singh, A. *ResQPulse AI: turning emergency reports into structured, prioritised,
-explainable alerts* (2026). https://github.com/GgauravJ05/ResQPulse_AI
+Jadhav, G., Borkar, V., Patil, R., Patil, A., Talekar, A., Singh, A. *ResQPulse AI: turning emergency reports into structured, prioritised,
+explainable alerts* (2026). https://github.com/GgauravJ05/ResQPulse-AI
 
 If you rebuild the tweet text, also cite HumAID (Alam et al., ICWSM 2021) and CrisisLexT26 (Olteanu et al., CSCW 2015).
 ```
@@ -229,7 +229,7 @@ If you rebuild the tweet text, also cite HumAID (Alam et al., ICWSM 2021) and Cr
 
 | Field | Value |
 |---|---|
-| **Authors** | Gaurav Jadhav (data lead), Vansh Borkar, Aaryan, Agastya Singh. Add teammates with Kaggle accounts as collaborators. |
+| **Authors** | Gaurav Jadhav (data lead), Vansh Borkar, Rugveda Patil, Aaryan Patil, Atharva Talekar, Agastya Singh. Add teammates with Kaggle accounts as collaborators. |
 | **Coverage: temporal** | Tweets 2012–2019 (source events); synthetic reports written October 2026 |
 | **Coverage: spatial** | Synthetic: India. Tweets: worldwide (39 events) |
 | **DOI** | Optional: "Generate DOI" on Kaggle, then add it to CITATION.cff |
@@ -255,5 +255,5 @@ capped at 1,200 training rows each. CrisisLexT26 is split by crisis, so 6 crises
 Gold set: 144 held-out test tweets labelled by an LLM, reviewed a second time (16% of the event-mapped types were
 corrected), and spot-checked by a human on 30 rows (30 of 30 agreed).
 
-Full pipeline and schema: https://github.com/GgauravJ05/ResQPulse_AI (docs/SCHEMA.md, docs/DATASETS.md).
+Full pipeline and schema: https://github.com/GgauravJ05/ResQPulse-AI (docs/SCHEMA.md, docs/DATASETS.md).
 ```
